@@ -72,7 +72,7 @@ create table act_model_definition(
 		cre_time datetime not null default now()  comment '审批时间'
 	) engine = innodb character set = utf8 collate utf8_bin comment '流程审批历史';
 
-
+drop table if exists `act_process_jump_his`;
 CREATE TABLE `act_process_jump_his` (
   `id` bigint(20) NOT NULL COMMENT '主键',
   `pro_name` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '流程名',

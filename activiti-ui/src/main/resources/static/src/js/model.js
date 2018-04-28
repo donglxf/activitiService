@@ -56,6 +56,9 @@ layui.use(['table','jquery','myutil'], function(){
         } else if(layEvent === 'version'){ //查看
             queryVersionList(modelId);
         }
+        // else if(layEvent === 'export'){
+        //     exportModel(modelId);
+        // }
     });
     itemTable.on('tool(version)',function (obj) {
         var data = obj.data; //获得当前行数据
@@ -125,6 +128,31 @@ layui.use(['table','jquery','myutil'], function(){
                 }
             });
         });
+    }
+
+    function exportModel(modelId){
+        window.open(pathConfig.activitiServicePath+'/export/'+modelId);
+
+        // $.ajax({
+        //     cache : true,
+        //     type : "GET",
+        //     url : pathConfig.activitiServicePath+'/export/'+modelId,
+        //     async : false,
+        //     timeout: 10000,
+        //     error : function(request) {
+        //         layer.msg("发布失败！");
+        //         layer.closeAll('loading');
+        //     },
+        //     success : function(data) {
+        //         console.log(data);
+        //         layer.closeAll('loading');
+        //         if(data.code == 0){
+        //             layer.msg("发布成功！");
+        //         }else {
+        //             layer.msg(data.msg);
+        //         }
+        //     }
+        // });
     }
 
     function deploy(modelId){

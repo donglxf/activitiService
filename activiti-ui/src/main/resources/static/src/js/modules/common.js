@@ -75,25 +75,25 @@ layui.define(['layer','laytpl','form','ht_ajax','ht_config'], function(exports) 
 
     var myUtil = {
         v: '1.0.3',
-        baseSerive:'/activiti/service',
+        baseSerive:'/activiti/service/system/getAll',
         //业务相关
         business:{
             select:{
                 name:'businessId',
                 id:'businessId'
             },
-            init_url:'/activiti/service/business/getAll',
+            init_url:'/activiti/service/system/getAll',
             init_html: function () {
                 return     '      <div class="layui-input-inline">\n' +
                     '                    <select name="'+myUtil.business.select.name+'"  lay-filter="business_select" lay-search="" id="'+myUtil.business.select.id+'" lay-verify="required">\n' +
-                    '                        <option value="">选择业务线</option>\n' +
+                    '                        <option value="">选择系统</option>\n' +
                     '                    </select>\n' +
                     '                </div>'
             },
             init_html2: function (id) {
 
                 return ' <select name="'+myUtil.business.select.name+'" lay-filter="business_select" lay-search="" id="'+id+'" lay-verify="required">\n' +
-                    '    <option value="">选择业务线</option>\n' +
+                    '    <option value="">选择系统</option>\n' +
                     '    </select>';
             },
             /**
@@ -114,10 +114,10 @@ layui.define(['layer','laytpl','form','ht_ajax','ht_config'], function(exports) 
                         for(var i = 0; i<result.length;i++){
                             var ischeck = '';
                             //选中的设置
-                            if(result[i].businessId == businessId){
+                            if(result[i].app == businessId){
                                 ischeck = 'selected="true"';
                             }
-                            var option = '<option value="'+result[i].businessId+'" '+ischeck+' >'+result[i].businessName+'</option>';
+                            var option = '<option value="'+result[i].app+'" '+ischeck+' >'+result[i].nameCn+'</option>';
                             $(obj).find("#"+selectId).append(option);
                         }
                         form.render('select');

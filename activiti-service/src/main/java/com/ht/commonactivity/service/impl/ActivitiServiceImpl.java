@@ -23,6 +23,7 @@ import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
+import org.activiti.engine.impl.bpmn.behavior.BusinessRuleTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.javax.el.ExpressionFactory;
 import org.activiti.engine.impl.javax.el.ValueExpression;
@@ -51,10 +52,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
+import java.util.zip.ZipInputStream;
 
 @Service
 public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConstants {
@@ -122,8 +122,69 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         BpmnModel model = new BpmnJsonConverter().convertToBpmnModel(modelNode);
         bpmnBytes = new BpmnXMLConverter().convertToXML(model, "GBK");
         String processName = modelData.getName() + ".bpmn20.xml";
+
+
+
+
         Deployment deployment = repositoryService.createDeployment().name(modelData.getName())
                 .addString(processName, new String(bpmnBytes)).deploy();
+        modelData.setDeploymentId(deployment.getId());
+        repositoryService.saveModel(modelData);
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+        List<RpcSenceInfo> modelSences = new ArrayList<RpcSenceInfo>();
+        RpcDeployResult result = new RpcDeployResult();
+        result.setProcessDefineId(processDefinition.getId());
+        result.setDeploymentId(deployment.getId());
+        result.setSences(getProcScenceList(model));
+        result.setVersion(ActivitiConstants.PROC_VERSION_PREFIX + processDefinition.getVersion());
+
+
+        String prcdefId = result.getProcessDefineId();
+        String modelVersion = result.getVersion();
+        // 往模型版本控制表中插入一条记录
+        Model modelRpc = getModelInfo(modelId);
+        ActProcRelease release = new ActProcRelease();
+        release.setModelCategory(modelRpc.getCategory());
+        release.setModelCode(modelRpc.getKey());
+        release.setModelId(modelData.getId());
+        release.setModelName(modelRpc.getName());
+        release.setModelVersion(modelVersion);
+        release.setModelProcdefId(prcdefId);
+        release.setVersionType("0");
+        release.setCreateTime(new Date(System.currentTimeMillis()));
+//        release.setCreateUser(userId);
+        actProcReleaseMapper.insert(release);
+
+
+        return result;
+    }
+
+    public RpcDeployResult deployZip(String modelId) throws Exception {
+        Result<RpcDeployResult> data = null;
+        Model modelData = repositoryService.getModel(modelId);
+
+        ObjectNode modelNode;
+        modelNode = (ObjectNode) new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId()));
+        byte[] bpmnBytes = null;
+        BpmnModel model = new BpmnJsonConverter().convertToBpmnModel(modelNode);
+        bpmnBytes = new BpmnXMLConverter().convertToXML(model, "GBK");
+        String processName = modelData.getName() + ".bpmn20.xml";
+//             InputStream in= this.getClass().getResourceAsStream("/drl/drl.zip");
+//        ZipInputStream zipInputStream = new ZipInputStream(in);
+//        Deployment deployment = repositoryService//获取流程定义和部署对象相关的Service
+//                .createDeployment()//创建部署对象
+//                .addZipInputStream(zipInputStream).deploy();
+
+
+        Deployment deployment = repositoryService.createDeployment().name(modelData.getName())
+                .addClasspathResource("drl/new7.drl")
+                .addClasspathResource("drl/127501.bpmn20.xml")
+//                .addString(processName, new String(bpmnBytes))
+                .deploy();
+
+
+//        Deployment deployment = repositoryService.createDeployment().name(modelData.getName())
+//                .addString(processName, new String(bpmnBytes)).deploy();
         modelData.setDeploymentId(deployment.getId());
         repositoryService.saveModel(modelData);
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
@@ -178,7 +239,6 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         // 模型执行任务流水号
         modelParamter.put(ActivitiConstants.PROC_TASK_ID_VAR_KEY, task.getId());
 
-        modelParamter.put("userID","role_user");
         ProcessInstance instance = runtimeService.startProcessInstanceById(procDefId, modelParamter);
 
         // 更新模型任务流程实例ID
