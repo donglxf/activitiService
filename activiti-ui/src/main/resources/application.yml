@@ -5,7 +5,7 @@ spring:
         mode: LEGACYHTML5
         cache: false
 server:
-    port: 8003
+    port: 32106
 eureka:
     instance:
       prefer-ip-address: true
