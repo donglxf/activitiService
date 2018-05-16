@@ -17,6 +17,9 @@
         <start-class>com.ht.commonactivity.CommonActivityApplication</start-class>
         <maven.deploy.skip>true</maven.deploy.skip>
         <swagger.version>2.5.0</swagger.version>
+
+        <start-class>com.ht.commonactivity.CommonActivityApplication</start-class>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <dependencies>
@@ -337,10 +340,10 @@
                 <artifactId>docker-maven-plugin</artifactId>
             </plugin>
 
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 
