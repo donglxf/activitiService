@@ -198,7 +198,7 @@
             //初始化权限资源
             ht_auth.load();
                 //设置登录用户名
-                $.get("/rule/service/user/getUserInfo",function (data) {
+                $.get("/activiti/service/user/getUserInfo",function (data) {
                     if(data.code == 0){
                         $("#userName").text(data.data.userName);
                     }else{
