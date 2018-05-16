@@ -11,7 +11,7 @@ layui.define(['config'],function (exports) {
         console.log(e);
     }
     exports('ht_config', {
-        app: "AC"
+        app: "ACTIVITI"
         , basePath: basePath + rule + "/"
         , loadMenuUrl: basePath + rule + "/auth/loadMenu"
         , loadBtnAndTabUrl: basePath + rule + "/auth/loadBtnAndTab"
