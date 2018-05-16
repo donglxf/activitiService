@@ -1,6 +1,6 @@
 spring:
   application:
-      name: common-activiti-ui
+      name: activiti-ui
 cloud:
     config:
       name: common-activiti-ui,base,rabbitmq,mongo,redis
