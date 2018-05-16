@@ -1,10 +1,26 @@
 package com.ht.commonactivity.vo;
 
+import java.util.Map;
+
 public class FindTaskBeanVo {
     /**
      * 用户名
      */
     private String assignee;
+
+    private String paramMap;  // json格式
+
+    private int firstResult ;
+
+    private int maxResults ;
+
+    public String getParamMap() {
+        return paramMap;
+    }
+
+    public void setParamMap(String paramMap) {
+        this.paramMap = paramMap;
+    }
 
     public String getCandidateUser() {
         return candidateUser;
@@ -14,10 +30,26 @@ public class FindTaskBeanVo {
         this.candidateUser = candidateUser;
     }
 
+    public int getFirstResult() {
+        return firstResult;
+    }
+
+    public void setFirstResult(int firstResult) {
+        this.firstResult = firstResult;
+    }
+
+    public int getMaxResults() {
+        return maxResults;
+    }
+
+    public void setMaxResults(int maxResults) {
+        this.maxResults = maxResults;
+    }
+
     /**
      * 候选人
      */
-    private String candidateUser ;
+    private String candidateUser;
 
     /**
      * 候选组

@@ -3,6 +3,7 @@ package com.ht.commonactivity.vo;
 import java.util.Date;
 
 public class TaskVo {
+    private String businessKey; // 业务key
     private String id;
     private String name;
     private Date createTime;
@@ -10,6 +11,14 @@ public class TaskVo {
     private String executionId;
     private String procDefId;
     private String assign;
+
+    public String getBusinessKey() {
+        return businessKey;
+    }
+
+    public void setBusinessKey(String businessKey) {
+        this.businessKey = businessKey;
+    }
 
     public String getAssign() {
         return assign;

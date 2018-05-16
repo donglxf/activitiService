@@ -1,6 +1,8 @@
 package com.ht.commonactivity.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.baomidou.mybatisplus.plugins.Page;
@@ -9,6 +11,7 @@ import com.ht.commonactivity.common.ActivitiConstants;
 import com.ht.commonactivity.common.ModelParamter;
 import com.ht.commonactivity.common.RpcDeployResult;
 import com.ht.commonactivity.common.RpcStartParamter;
+import com.ht.commonactivity.common.enumtype.ActivitiSignEnum;
 import com.ht.commonactivity.common.result.PageResult;
 import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActModelDefinition;
@@ -324,7 +327,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             String filename = modelData.getName() + ".bpmn20.xml";
             response.setHeader("Content-Disposition", "attachment; filename=" + java.net.URLEncoder.encode(filename, "UTF-8"));
             response.flushBuffer();
-        } catch (Exception e){
+        } catch (Exception e) {
             PrintWriter out = null;
             try {
                 out = response.getWriter();
@@ -460,8 +463,36 @@ public class ActivitiController implements ModelDataJsonConstants {
             data = Result.error(1, "参数异常！");
             return data;
         }
-        List<Task> list = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
-                .createTaskQuery().taskCandidateUser(vo.getCandidateUser()).orderByTaskCreateTime().asc().list();
+//        List<Task> list = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
+//                .createTaskQuery().taskCandidateUser(vo.getCandidateUser()).orderByTaskCreateTime().asc().list();
+
+        TaskQuery query = getProcessEngine().getTaskService()
+                .createTaskQuery();
+        String str = "[{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"},{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"}]";
+        if (!org.springframework.util.StringUtils.isEmpty(vo.getParamMap())) {
+            JSONArray array = JSONArray.parseArray(str);
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject o = array.getJSONObject(i);
+                if (ActivitiSignEnum.equle.getVal().equals(o.getString("type"))) {
+                    query.processVariableValueEquals(o.getString("name"), o.getString("value"));
+                } else if (ActivitiSignEnum.notequle.getVal().equals(o.getString("key"))) {
+                    query.processVariableValueNotEquals(o.getString("name"), o.getString("value"));
+                } else if (ActivitiSignEnum.great.getVal().equals(o.getString("key"))) {
+                    query.processVariableValueGreaterThan(o.getString("name"), o.getString("value"));
+                } else if (ActivitiSignEnum.greatEq.getVal().equals(o.getString("key"))) {
+                    query.processVariableValueGreaterThanOrEqual(o.getString("name"), o.getString("value"));
+                } else if (ActivitiSignEnum.less.getVal().equals(o.getString("key"))) {
+                    query.processVariableValueLessThan(o.getString("name"), o.getString("value"));
+                } else if (ActivitiSignEnum.lessEq.getVal().equals(o.getString("key"))) {
+                    query.processVariableValueLessThanOrEqual(o.getString("name"), o.getString("value"));
+                } else if (ActivitiSignEnum.like.getVal().equals(o.getString("key"))) {
+                    query.processVariableValueLike(o.getString("name"), o.getString("value"));
+                }
+            }
+        }
+
+        List<Task> list = query.taskCandidateUser(vo.getCandidateUser()).orderByTaskCreateTime().asc().listPage(vo.getFirstResult(), vo.getMaxResults());
+
 
         for (Task task : list) {
             TaskVo tvo = new TaskVo();
@@ -512,7 +543,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping("/findTaskByAssignee")
     @ResponseBody
-    public Result<List<TaskVo>> findMyPersonalTask(FindTaskBeanVo vo,String assignee) {
+    public Result<List<TaskVo>> findMyPersonalTask(FindTaskBeanVo vo, String assignee) {
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null; // new ArrayList<TaskVo>();
 //        List<ActRuTask> tlist= activitiService.findTaskByAssigneeOrGroup(vo);
@@ -523,7 +554,7 @@ public class ActivitiController implements ModelDataJsonConstants {
 //            }
 //        });
 
-        vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee: vo.getAssignee());
+        vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
         if (StringUtils.isEmpty(vo.getAssignee())) {
             data = Result.error(1, "参数异常！");
             return data;
@@ -613,7 +644,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping("/processGoBack")
     @ResponseBody
-    public Result<String> processGoBack(@RequestParam(value="procInstanceId") String procInstanceId, String toBackNoteId) {
+    public Result<String> processGoBack(@RequestParam(value = "procInstanceId") String procInstanceId, String toBackNoteId) {
         List<Task> tasks = getProcessEngine().getTaskService().createTaskQuery().processInstanceId(procInstanceId).list();
         for (Task task : tasks) {
             try {
@@ -624,7 +655,7 @@ public class ActivitiController implements ModelDataJsonConstants {
                 e.printStackTrace();
             }
         }
-        return  Result.error(1,"操作失败");
+        return Result.error(1, "操作失败");
     }
 
     /**
@@ -729,6 +760,7 @@ public class ActivitiController implements ModelDataJsonConstants {
 
     /**
      * 流程图查看
+     *
      * @param processInstanceId
      * @param response
      * @throws Exception
@@ -821,26 +853,34 @@ public class ActivitiController implements ModelDataJsonConstants {
         return highFlows;
     }
 
+    /**
+     * 获取流程跳转历史
+     *
+     * @param proInstId
+     * @return
+     */
     @RequestMapping("/getProTzHis")
-    public Result<List<ActProcessJumpHis>>  getProTzHis(String proInstId){
-        Wrapper<ActProcessJumpHis> wrapper=new EntityWrapper<ActProcessJumpHis>();
-        wrapper.eq("proc_inst_id",proInstId);
+    public Result<List<ActProcessJumpHis>> getProTzHis(String proInstId) {
+        Wrapper<ActProcessJumpHis> wrapper = new EntityWrapper<ActProcessJumpHis>();
+        wrapper.eq("proc_inst_id", proInstId);
         return Result.success(jumpHisService.selectList(wrapper));
     }
 
+    /**
+     * 从uc获取所有系统
+     *
+     * @return
+     */
     @RequestMapping("/system/getAll")
-    public Result<List<GetAllAppDto>>  getAllSystem(){
-        Result<List<GetAllAppDto>> result= ucAppRpc.getAllApp();
+    public Result<List<GetAllAppDto>> getAllSystem() {
+        Result<List<GetAllAppDto>> result = ucAppRpc.getAllApp();
         return result;
     }
 
 
-
-
-
     @RequestMapping("/testPoint")
-    @TestPointCat(ids="aaa",name={"abc","des"})
-    public void testPoint(){
+    @TestPointCat(ids = "aaa", name = {"abc", "des"})
+    public void testPoint() {
         LOGGER.info("+++++++++++++++++++++>>>>");
     }
 
