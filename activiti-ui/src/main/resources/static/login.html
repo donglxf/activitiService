@@ -174,9 +174,20 @@
                     success: function (data) {
                         console.info(data);
                         if (data && data["token"] != null & data["token"] != "") {
-                            cookie.setToken(data["token"]);
-                            cookie.setRefreshToken(data["refreshToken"]);
-                            top.location.href = 'indexDev.html';
+                            if(data.code=='0000'){
+                                cookie.setToken(data["token"]);
+                                cookie.setRefreshToken(data["refreshToken"]);
+                                top.location.href = 'index.html';
+                                return false;
+                            }else if(data.code=='0009'){
+                                layer.confirm('您得密码为初始密码，请重新设置密码后再登录。', {
+                                    btn: ['确认']
+                                }, function(index, layero){
+                                    top.location.href = ht_config.changePwdUrl+"?token="+data["token"]+"&urls="+ht_config.loginIndex;
+                                });
+                                return false;
+                            }
+
                         } else {
                             layer.alert("登录失败，请联系管理员");
                         }
