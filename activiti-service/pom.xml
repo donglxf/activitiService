@@ -7,7 +7,7 @@
         <artifactId>ht-common-activiti</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>common-activity</artifactId>
+    <artifactId>common-activiti</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
