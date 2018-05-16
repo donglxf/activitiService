@@ -31,7 +31,7 @@
         var $=layui.jquery;
         table.render({
             elem: '#proc_detail'
-            ,url:'/activiti/service/processBackTaskList?processInstanceId='+$("#proInstId").val()
+            ,url:'/activity/service/processBackTaskList?processInstanceId='+$("#proInstId").val()
             ,cellMinWidth: 200 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             ,cols: [[
                 {field:'name', width:100, title: '退回节点'}
@@ -48,7 +48,7 @@
             $.ajax({
                 cache : true,
                 type : "POST",
-                url : '/activiti/service/processGoBack?procInstanceId='+$("#proInstId").val()+'&toBackNoteId='+taskDefId,
+                url : '/activity/service/processGoBack?procInstanceId='+$("#proInstId").val()+'&toBackNoteId='+taskDefId,
                 async : false,
                 error : function(request) {
                     alert("Connection error");

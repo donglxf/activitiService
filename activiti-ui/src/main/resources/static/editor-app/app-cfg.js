@@ -21,7 +21,7 @@
 var ACTIVITI = ACTIVITI || {};
 
 ACTIVITI.CONFIG = {
-	'contextRoot' : '/activiti/service/',
+	'contextRoot' : '/activity/service/',
 };
 
 var headers  = {

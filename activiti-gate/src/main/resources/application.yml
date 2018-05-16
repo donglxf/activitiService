@@ -20,7 +20,7 @@ zuul:
     activiti-ui:
       path: /activiti/ui/** #匹配/techouse/usersystem/** 均路由到cloud-client
     activiti-service:
-      path: /activiti/service/**
+      path: /activity/service/**
   host:
     connect-timeout-millis: 6000
 

@@ -22,7 +22,7 @@ layui.define(['config'],function (exports) {
         , userInfoUpdate: userInfoUpdate
 
         , activitiServicePath:"/activiti/" // 流程引擎配置模块根路径
-        , ruleServicePath:"/activiti/service/" // 流程引擎配置模块根路径
+        , ruleServicePath:"/activity/service/" // 流程引擎配置模块根路径
         ,dev:true
     });
 });
