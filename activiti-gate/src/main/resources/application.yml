@@ -56,10 +56,10 @@ ribbon:
     enabled: false #配置zuul路由时用将此属性设置为false
 activiti-ui:
   ribbon:
-    listOfServers: 127.0.0.1:8003 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
+    listOfServers: 127.0.0.1:32106 #为cloud-client服务指定一组服务地址，应该是用于负载均衡
 activiti-service:
   ribbon:
-    listOfServers: 127.0.0.1:8002
+    listOfServers: 127.0.0.1:32101
 
 
 eureka:

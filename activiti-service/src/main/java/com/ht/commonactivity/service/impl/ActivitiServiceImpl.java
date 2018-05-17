@@ -235,9 +235,10 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         // 模型运行所需数据
         modelParamter.put(ActivitiConstants.PROC_MODEL_DATA_KEY, paramter.getData());
         // 模型执行类型：type:0 模型验证，1 业务调用
-        modelParamter.put(ActivitiConstants.PROC_MODEL_EXCUTE_TYPE_KEY, paramter.getType());
-        // 模型执行任务流水号
-        modelParamter.put(ActivitiConstants.PROC_TASK_ID_VAR_KEY, task.getId());
+//        modelParamter.put(ActivitiConstants.PROC_MODEL_EXCUTE_TYPE_KEY, paramter.getType());
+
+        // 模型执行业务号
+        modelParamter.put(ActivitiConstants.PROC_BUSINESS_KEY, paramter.getBusinessKey());
 
         ProcessInstance instance = runtimeService.startProcessInstanceById(procDefId, modelParamter);
 

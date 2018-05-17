@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class RpcStartParamter implements Serializable {
 
+    private String businessKey;
     /**
      * 模型定义ID
      */
@@ -29,7 +30,7 @@ public class RpcStartParamter implements Serializable {
 
     private Map<String,Object> data;
     /**
-     * 批次大小,批量调用时需要传递
+     * 批次大小
      */
     private int batchSize;
     /**
@@ -107,5 +108,13 @@ public class RpcStartParamter implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getBusinessKey() {
+        return businessKey;
+    }
+
+    public void setBusinessKey(String businessKey) {
+        this.businessKey = businessKey;
     }
 }

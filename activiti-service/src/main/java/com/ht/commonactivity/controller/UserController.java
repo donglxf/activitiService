@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author zhangpeng
@@ -20,17 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/user")
-public class UserController  {
+public class UserController {
 
     @Autowired
     public LoginUserInfoHelper userInfoHelper;
 
     @GetMapping("getUserInfo")
     @ApiOperation(value = "获取登录用户信息")
-    public Result<LoginInfoDto> getLoginInfo(){
-        LoginInfoDto user = userInfoHelper.getLoginInfo();
-        return Result.success(user);
-
+    public Result<LoginInfoDto> getLoginInfo() {
+//        LoginInfoDto user = userInfoHelper.getLoginInfo();
+//        return Result.success(user);
+        return null;
     }
 
 

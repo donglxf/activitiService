@@ -328,12 +328,10 @@
         <dependency>
             <artifactId>ussp-common</artifactId>
             <groupId>com.ht.ussp</groupId>
-        </dependency>
-        <dependency>
-            <artifactId>ussp-common</artifactId>
-            <groupId>com.ht.ussp</groupId>
             <version>0.0.10</version>
         </dependency>
+
+
     </dependencies>
 
     <build>

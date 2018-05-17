@@ -112,13 +112,6 @@
 				<artifactId>mybatis-plus</artifactId>
 				<version>${mybatisplus.version}</version>
 			</dependency>
-			<!--对接权限系统需要这个公共jar去生成api权限-->
-			<dependency>
-				<artifactId>ussp-common</artifactId>
-				<groupId>com.ht.ussp</groupId>
-				<version>0.0.10</version>
-			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 
