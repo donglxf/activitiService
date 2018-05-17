@@ -13,7 +13,7 @@ layui.use(['table','jquery','myutil'], function(){
     table.render({
         elem: '#model_list'
         ,height: 'auto'
-        ,url:preUrl+'/list1' //数据接口
+        ,url:preUrl+'list1' //数据接口
         ,id: 'testReload'
         ,page: true //开启分页
         ,cols: [[ //表头\
