@@ -3,8 +3,8 @@ layui.config({
 }).extend({ //设定模块别名
     myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
 });
-var preUrl="/activity/service/";
-var preUrlUi="/activiti/ui/";
+var preUrl="/activity/service";
+var preUrlUi="/activiti/ui";
 var proInstIds='';
 layui.use(['table','jquery','myutil'], function(){
     var table = layui.table;
