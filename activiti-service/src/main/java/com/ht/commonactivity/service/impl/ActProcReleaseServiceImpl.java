@@ -139,7 +139,7 @@ public class ActProcReleaseServiceImpl extends BaseServiceImpl<ActProcReleaseMap
         RpcStartParamter rpcStartParamter = new RpcStartParamter();
         rpcStartParamter.setProcDefId(release.getModelProcdefId());
         rpcStartParamter.setType(ActivitiConstants.EXCUTE_TYPE_SERVICE);
-        rpcStartParamter.setData(modelStartVo.getData());
+//        rpcStartParamter.setData(modelStartVo.getData());
         // TODO 启动模型
         this.SycnStart(rpcStartParamter, task);
         return String.valueOf(task.getId());
@@ -230,9 +230,9 @@ public class ActProcReleaseServiceImpl extends BaseServiceImpl<ActProcReleaseMap
     }
 
     private void SycnStart(RpcStartParamter rpcStartParamter, ActExcuteTask task) {
-        Map<String, Object> data = rpcStartParamter.getData() == null ? new HashMap<String, Object>() : rpcStartParamter.getData();
-        rpcStartParamter.setData(data);
-        rpcStartParamter.setTaskId(task.getId());
+//        Map<String, Object> data = rpcStartParamter.getData() == null ? new HashMap<String, Object>() : rpcStartParamter.getData();
+//        rpcStartParamter.setData(data);
+//        rpcStartParamter.setTaskId(task.getId());
         threadPoolExecutor.execute(new SycnStartModel(rpcStartParamter, task));
         //new Thread().start();
     }

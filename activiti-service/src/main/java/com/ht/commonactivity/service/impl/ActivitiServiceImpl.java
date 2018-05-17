@@ -1,6 +1,7 @@
 package com.ht.commonactivity.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ht.commonactivity.common.*;
 import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActExcuteTask;
@@ -150,7 +151,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         release.setModelName(modelRpc.getName());
         release.setModelVersion(modelVersion);
         release.setModelProcdefId(prcdefId);
-        release.setVersionType("0");
+        release.setVersionType("1");
         release.setCreateTime(new Date(System.currentTimeMillis()));
 //        release.setCreateUser(userId);
         actProcReleaseMapper.insert(release);
@@ -484,6 +485,38 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
     @Override
     public List<ActRuTask> findTaskByAssigneeOrGroup(FindTaskBeanVo vo) {
         return actProcReleaseMapper.findTaskByAssigneeOrGroup(vo);
+    }
+
+    @Override
+    public ActProcRelease getModelLastedVersion(String processDefinedKey) {
+        Map<String, Object> paramter = new HashMap<String, Object>();
+        paramter.put("modelCode", processDefinedKey);
+        List<ActProcRelease> releases = actProcReleaseMapper.getModelLastedVersion(paramter);
+        if (releases == null || releases.size() == 0) {
+            return null;
+        }
+        return releases.get(0);
+    }
+
+    /**
+     * 获取模型信息
+     *
+     * @param modelCode
+     * @return
+     */
+    @Override
+    public ActProcRelease getModelInfo(String modelCode, String modeVersion) {
+        EntityWrapper<ActProcRelease> wrapper = new EntityWrapper<ActProcRelease>();
+        ActProcRelease actProcRelease = new ActProcRelease();
+        actProcRelease.setModelCode(modelCode);
+        actProcRelease.setModelVersion(modeVersion);
+        actProcRelease.setVersionType("1");
+        wrapper.setEntity(actProcRelease);
+        List<ActProcRelease> releases = actProcReleaseMapper.selectList(wrapper);
+        if (releases == null || releases.size() == 0) {
+            return null;
+        }
+        return releases.get(0);
     }
 
     /**

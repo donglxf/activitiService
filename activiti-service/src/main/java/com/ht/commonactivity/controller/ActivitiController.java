@@ -26,6 +26,7 @@ import com.ht.commonactivity.utils.TestPointCat;
 import com.ht.commonactivity.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.log4j.Log4j2;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
@@ -46,6 +47,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +75,7 @@ import java.util.*;
  */
 @RestController
 @Api("工作流")
+@Log4j2
 public class ActivitiController implements ModelDataJsonConstants {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(ActivitiController.class);
@@ -105,6 +108,9 @@ public class ActivitiController implements ModelDataJsonConstants {
 
     @Autowired
     private ActProcessJumpHisService jumpHisService;
+
+    @Autowired
+    private RuntimeService runtimeService;
 
 
     @Autowired
@@ -202,6 +208,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             String key = paramter.getKey();
             List modelList = repositoryService.createModelQuery().modelKey(key).list();
             if (modelList != null && modelList.size() > 0) {
+                log.error("创建模型失败，模型编码已存在！");
                 data = Result.error(1, "创建模型失败，模型编码已存在！");
                 return data;
             }
@@ -279,7 +286,54 @@ public class ActivitiController implements ModelDataJsonConstants {
         return data;
     }
 
-    @RequestMapping("/start")
+    @RequestMapping("/startProcessInstanceByKey")
+    @ApiOperation("启动模型")
+    public Result<String> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
+        LOGGER.info("start model,paramter:" + JSON.toJSONString(paramter));
+        Result<String> data = null;
+        try {
+            if (StringUtils.isEmpty(paramter.getBusinessKey())) {
+                return Result.error(1, "businessKey is null ,check");
+            }
+            String str = "{\"name\": \"name1\",\"value\": \"value1\"}";
+            ActProcRelease release = null;
+            // 版本信息为空，获取模型最新版本
+            if (StringUtils.isEmpty(paramter.getVersion())) {
+                release = activitiService.getModelLastedVersion(paramter.getProcessDefinedKey());
+            } else {
+                release = activitiService.getModelInfo(paramter.getProcessDefinedKey(), paramter.getVersion());
+            }
+            if (release == null) {
+                return Result.error(1, ActivitiConstants.MODEL_UNEXIST);
+            }
+//            Map<String, Object> map = null;
+//            if (StringUtils.isNotBlank(paramter.getData())) {
+//                map = JSON.parseObject(paramter.getData(), Map.class);
+//            }
+
+            List<ProcessInstance> processInstancs = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(paramter.getBusinessKey()).list();
+            String deleteReason = "删除重新启动";
+            if (processInstancs != null) {
+                for (ProcessInstance processInstance : processInstancs) {
+                    runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), deleteReason);
+                }
+            }
+
+            ProcessInstance instance = runtimeService.startProcessInstanceById(release.getModelProcdefId(),
+                    paramter.getBusinessKey(), paramter.getData());
+
+//            String processInstanceId = activitiService.startProcess(paramter);
+            data = Result.success(instance.getId());
+        } catch (Exception e) {
+            data = Result.error(1, "模型启动异常！");
+            LOGGER.error("deploy model error,error message：", e);
+        }
+        LOGGER.info("start model sucess.");
+        return data;
+    }
+
+
+    @RequestMapping("/tstart")
     @ApiOperation("启动模型")
     public Result<String> startProcess(RpcStartParamter paramter) {
         LOGGER.info("start model,paramter:" + JSON.toJSONString(paramter));
@@ -456,7 +510,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping("/findTaskByCandidateUser")
     @ResponseBody
-    public Result<List<TaskVo>> findTaskByCandidateUser(FindTaskBeanVo vo) {
+    public Result<List<TaskVo>> findTaskByCandidateUser(@RequestBody FindTaskBeanVo vo) {
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
         if (vo.getCandidateUser() == null) {
@@ -468,27 +522,45 @@ public class ActivitiController implements ModelDataJsonConstants {
 
         TaskQuery query = getProcessEngine().getTaskService()
                 .createTaskQuery();
-        String str = "[{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"},{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"}]";
-        if (!org.springframework.util.StringUtils.isEmpty(vo.getParamMap())) {
-            JSONArray array = JSONArray.parseArray(str);
-            for (int i = 0; i < array.size(); i++) {
-                JSONObject o = array.getJSONObject(i);
-                if (ActivitiSignEnum.equle.getVal().equals(o.getString("type"))) {
-                    query.processVariableValueEquals(o.getString("name"), o.getString("value"));
-                } else if (ActivitiSignEnum.notequle.getVal().equals(o.getString("key"))) {
-                    query.processVariableValueNotEquals(o.getString("name"), o.getString("value"));
-                } else if (ActivitiSignEnum.great.getVal().equals(o.getString("key"))) {
-                    query.processVariableValueGreaterThan(o.getString("name"), o.getString("value"));
-                } else if (ActivitiSignEnum.greatEq.getVal().equals(o.getString("key"))) {
-                    query.processVariableValueGreaterThanOrEqual(o.getString("name"), o.getString("value"));
-                } else if (ActivitiSignEnum.less.getVal().equals(o.getString("key"))) {
-                    query.processVariableValueLessThan(o.getString("name"), o.getString("value"));
-                } else if (ActivitiSignEnum.lessEq.getVal().equals(o.getString("key"))) {
-                    query.processVariableValueLessThanOrEqual(o.getString("name"), o.getString("value"));
-                } else if (ActivitiSignEnum.like.getVal().equals(o.getString("key"))) {
-                    query.processVariableValueLike(o.getString("name"), o.getString("value"));
-                }
+//        String str = "[{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"},{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"}]";
+        if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
+            Map<String, Object> o = vo.getParamMap();
+            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
             }
+
+
+//            JSONArray array = JSONArray.parseArray(str);
+//            for (int i = 0; i < array.size(); i++) {
+//                JSONObject o = array.getJSONObject(i);
+//                if (ActivitiSignEnum.equle.getVal().equals(o.getString("type"))) {
+//                    query.processVariableValueEquals(o.getString("name"), o.getString("value"));
+//                } else if (ActivitiSignEnum.notequle.getVal().equals(o.getString("key"))) {
+//                    query.processVariableValueNotEquals(o.getString("name"), o.getString("value"));
+//                } else if (ActivitiSignEnum.great.getVal().equals(o.getString("key"))) {
+//                    query.processVariableValueGreaterThan(o.getString("name"), o.getString("value"));
+//                } else if (ActivitiSignEnum.greatEq.getVal().equals(o.getString("key"))) {
+//                    query.processVariableValueGreaterThanOrEqual(o.getString("name"), o.getString("value"));
+//                } else if (ActivitiSignEnum.less.getVal().equals(o.getString("key"))) {
+//                    query.processVariableValueLessThan(o.getString("name"), o.getString("value"));
+//                } else if (ActivitiSignEnum.lessEq.getVal().equals(o.getString("key"))) {
+//                    query.processVariableValueLessThanOrEqual(o.getString("name"), o.getString("value"));
+//                } else if (ActivitiSignEnum.like.getVal().equals(o.getString("key"))) {
+//                    query.processVariableValueLike(o.getString("name"), o.getString("value"));
+//                }
+//            }
         }
 
         List<Task> list = query.taskCandidateUser(vo.getCandidateUser()).orderByTaskCreateTime().asc().listPage(vo.getFirstResult(), vo.getMaxResults());
@@ -543,9 +615,10 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping("/findTaskByAssignee")
     @ResponseBody
-    public Result<List<TaskVo>> findMyPersonalTask(FindTaskBeanVo vo, String assignee) {
+    public Result<List<TaskVo>> findMyPersonalTask(@RequestBody FindTaskBeanVo vo, String assignee) {
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null; // new ArrayList<TaskVo>();
+//        泛型过滤重复对象
 //        List<ActRuTask> tlist= activitiService.findTaskByAssigneeOrGroup(vo);
 //        List<ActRuTask> list1= new ArrayList<ActRuTask>();
 //        tlist.stream().forEach(p -> {
@@ -554,23 +627,44 @@ public class ActivitiController implements ModelDataJsonConstants {
 //            }
 //        });
 
-        vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
+//        vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
         if (StringUtils.isEmpty(vo.getAssignee())) {
             data = Result.error(1, "参数异常！");
             return data;
         }
 
 
-        TaskQuery list = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
+
+        TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
                 .createTaskQuery();//创建任务查询对象
+
+        if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
+            Map<String, Object> o = vo.getParamMap();
+            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            }
+        }
+
         /**查询条件（where部分）*/
         if (vo.getAssignee() != null) {
-            list.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
+            query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
         /**排序*/
-        List<Task> d = list.orderByTaskCreateTime().asc().list();//返回列表
-        if (d != null && d.size() > 0) {
-            for (Task task : d) {
+        List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
+        if (list != null && list.size() > 0) {
+            for (Task task : list) {
                 TaskVo tvo = new TaskVo();
                 tvo.setCreateTime(task.getCreateTime());
                 tvo.setId(task.getId());

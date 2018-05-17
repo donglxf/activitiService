@@ -1,4 +1,4 @@
-drop table if exists `act_excute_task`;
+# drop table if exists `act_excute_task`;
 create table `act_excute_task` (
   `id` bigint(20) not null comment '主键',
   `batch_id` bigint(20) null default null comment '批次号，验证任务调用时存在',
@@ -16,7 +16,7 @@ create table `act_excute_task` (
   primary key (`id`)
 ) engine = innodb character set = utf8 collate utf8_bin COMMENT '模型版本记录表';
 
-drop table if exists `act_proc_release`;
+# drop table if exists `act_proc_release`;
 create table `act_proc_release` (
   `id` bigint(20) not null comment '主键',
   `model_id` varchar(64) character set utf8 collate utf8_bin not null comment '模型id，与 act_re_model.id_ 关联',
@@ -41,7 +41,7 @@ create table `act_proc_release` (
 ) engine = innodb character set = utf8 collate utf8_bin;
 
 
-drop table if exists `act_model_definition`;
+# drop table if exists `act_model_definition`;
 create table act_model_definition(
 	id bigint(20) NOT NULL COMMENT '主键',
 	model_id varchar(50) not null comment '模型id',
@@ -57,7 +57,7 @@ create table act_model_definition(
 
 
 
-	drop table if exists `act_process_audit_his`;
+	# drop table if exists `act_process_audit_his`;
 	create table act_process_audit_his(
 		id bigint(20) NOT NULL COMMENT '主键',
 		task_id varchar(50) not null comment '任务id',
@@ -72,7 +72,7 @@ create table act_model_definition(
 		cre_time datetime not null default now()  comment '审批时间'
 	) engine = innodb character set = utf8 collate utf8_bin comment '流程审批历史';
 
-drop table if exists `act_process_jump_his`;
+# drop table if exists `act_process_jump_his`;
 CREATE TABLE `act_process_jump_his` (
   `id` bigint(20) NOT NULL COMMENT '主键',
   `pro_name` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '流程名',

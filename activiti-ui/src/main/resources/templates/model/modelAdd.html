@@ -26,7 +26,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">所属系统<span style="color: red">&nbsp;*</span></label>
             <div class="layui-input-block"  id="systemDiv">
-                <select id="belongSystem" ></select>
+                <select id="belongSystem" name="belongSystem"></select>
             </div>
         </div>
         <div class="layui-form-item" >
@@ -59,7 +59,7 @@
 </div>
 <script src="/activiti/ui/plugins/layui/layui.js"></script>
 <script src="/activiti/ui/src/js/model/model_config.js"></script>
-<script src="/activiti/ui/src/js/model/model.js"></script>
+<script src="/activiti/ui/src/js/model.js"></script>
 <script>
 
     layui.config({
@@ -98,6 +98,8 @@
                             }
                         });
                         parent.layer.full(layIndex);
+                    }else{
+                        layer.msg("保存失败！模型code重复");
                     }
                 }
             });

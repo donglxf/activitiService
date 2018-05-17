@@ -6,15 +6,23 @@ import java.util.Map;
 
 public class RpcStartParamter implements Serializable {
 
+    /**
+     * 业务key ,启动流程是传入
+     */
     private String businessKey;
     /**
      * 模型定义ID
      */
     private String procDefId;
 
+    /**
+     * 流程定义key  ,启动流程是传入
+     */
+    private String processDefinedKey;
+
     private String userId;
     /**
-     * 模型版本
+     * 流程版本
      */
     private String version;
     /**
@@ -26,9 +34,9 @@ public class RpcStartParamter implements Serializable {
      */
     private String type;
 
-    private Long taskId;
+//    private Long taskId;
 
-    private Map<String,Object> data;
+    private Map<String,Object> data; // 业务数据
     /**
      * 批次大小
      */
@@ -36,7 +44,7 @@ public class RpcStartParamter implements Serializable {
     /**
      * 批量调用流程参数
      */
-    private List<Map<String,Object>> datas;
+//    private List<Map<String,Object>> datas;
 
     public String getVersion() {
         return version;
@@ -86,22 +94,6 @@ public class RpcStartParamter implements Serializable {
         this.batchSize = batchSize;
     }
 
-    public List<Map<String, Object>> getDatas() {
-        return datas;
-    }
-
-    public void setDatas(List<Map<String, Object>> datas) {
-        this.datas = datas;
-    }
-
-    public Long getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
     public String getUserId() {
         return userId;
     }
@@ -111,10 +103,18 @@ public class RpcStartParamter implements Serializable {
     }
 
     public String getBusinessKey() {
-        return businessKey;
+            return businessKey;
     }
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    public String getProcessDefinedKey() {
+        return processDefinedKey;
+    }
+
+    public void setProcessDefinedKey(String processDefinedKey) {
+        this.processDefinedKey = processDefinedKey;
     }
 }

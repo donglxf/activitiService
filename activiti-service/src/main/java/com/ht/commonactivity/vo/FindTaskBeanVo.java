@@ -8,17 +8,17 @@ public class FindTaskBeanVo {
      */
     private String assignee;
 
-    private String paramMap;  // json格式
+    private Map<String,Object> paramMap;  // json格式
 
     private int firstResult ;
 
     private int maxResults ;
 
-    public String getParamMap() {
+    public Map<String, Object> getParamMap() {
         return paramMap;
     }
 
-    public void setParamMap(String paramMap) {
+    public void setParamMap(Map<String, Object> paramMap) {
         this.paramMap = paramMap;
     }
 

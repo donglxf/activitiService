@@ -3,6 +3,7 @@ package com.ht.commonactivity.service;
 import com.ht.commonactivity.common.ModelParamter;
 import com.ht.commonactivity.common.RpcDeployResult;
 import com.ht.commonactivity.common.RpcStartParamter;
+import com.ht.commonactivity.entity.ActProcRelease;
 import com.ht.commonactivity.entity.ActRuTask;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -102,4 +103,8 @@ public interface ActivitiService {
      * @return
      */
     public List<ActRuTask> findTaskByAssigneeOrGroup(FindTaskBeanVo vo);
+
+    public ActProcRelease getModelLastedVersion(String processDefinedKey);
+
+    public ActProcRelease getModelInfo(String modelCode, String modeVersion);
 }

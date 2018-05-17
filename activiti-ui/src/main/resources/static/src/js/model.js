@@ -19,7 +19,7 @@ layui.use(['table','jquery','myutil'], function(){
         ,cols: [[ //表头\
              {field: 'modelName', title: '模型名称', width:"20%"}
             ,{field: 'belongSystem', title: '所属系统', width:"20%"}
-            ,{field: 'creTime', title: '创建时间', width:"20%"}
+            ,{field: 'creTime', title: '创建时间', width:"20%",templet:"#creTime"}
             ,{fixed: 'right', width:150, align:'center', toolbar: '#barDemo', width: "40%"}
         ]]
     });

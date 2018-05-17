@@ -79,8 +79,8 @@ layui.define(['layer','laytpl','form','ht_ajax','ht_config'], function(exports) 
         //业务相关
         business:{
             select:{
-                name:'businessId',
-                id:'businessId'
+                name:'belongSystem',
+                id:'belongSystem'
             },
             init_url:'/activity/service/system/getAll',
             init_html: function () {
