@@ -16,7 +16,7 @@ public interface UcAppRpc {
     /**
      * 描述：获取所有系统列表
      */
-    @PostMapping(value = "/system/getAllApp", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/apps/getAllApp", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     Result<List<GetAllAppDto>> getAllApp();
 
 }
