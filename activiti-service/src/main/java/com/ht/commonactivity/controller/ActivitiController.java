@@ -55,6 +55,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -130,6 +131,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      * @return
      */
     @GetMapping("/page")
+    @ApiIgnore
     public PageResult<List<ActProcReleaseVo>> queryProcReleaseForPage(ActProcRelease actProcRelease, int limit, int page) {
         log.info("查询模型版本分页信息开始");
         PageResult<List<ActProcReleaseVo>> result = null;
@@ -158,6 +160,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      * @return
      */
     @RequestMapping(value = "/getModelInfo")
+    @ApiIgnore
     public Result<ModelParamter> getModelInfo(@RequestBody ModelParamter paramter) {
         log.info("获取模型信息,参数paramter:" + JSON.toJSONString(paramter));
         Result<ModelParamter> data = null;
@@ -282,7 +285,7 @@ public class ActivitiController implements ModelDataJsonConstants {
     }
 
 
-    @RequestMapping("/tstart")
+    @RequestMapping("/start")
     @ApiOperation("启动模型")
     public Result<String> startProcess(RpcStartParamter paramter) {
         log.info("start model,paramter:" + JSON.toJSONString(paramter));

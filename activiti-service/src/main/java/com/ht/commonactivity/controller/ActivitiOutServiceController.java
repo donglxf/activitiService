@@ -9,6 +9,7 @@ import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActProcRelease;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
+import com.ht.commonactivity.utils.TaskResult;
 import com.ht.commonactivity.vo.ComplateTaskVo;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.ht.commonactivity.vo.TaskVo;
@@ -18,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.engine.*;
 import org.activiti.engine.impl.identity.Authentication;
+import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -85,9 +87,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @RequestMapping("/startProcessInstanceByKey")
     @ApiOperation("启动模型")
-    public Result<String> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
+    public Result<List<TaskResult>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
         log.info("start model,paramter:" + JSON.toJSONString(paramter));
-        Result<String> data = null;
+        Result<List<TaskResult>> data = null;
         try {
             if (StringUtils.isEmpty(paramter.getBusinessKey())) {
                 return Result.error(1, "businessKey is null ,check");
@@ -113,9 +115,25 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
             ProcessInstance instance = runtimeService.startProcessInstanceById(release.getModelProcdefId(),
                     paramter.getBusinessKey(), paramter.getData());
-
+            List<TaskResult> list = new ArrayList<TaskResult>();
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
+            for (Task t : tasks) {
+                TaskResult result = new TaskResult();
+                result.setTaskDefineKey(t.getTaskDefinitionKey());
+                result.setTaskText(t.getName());
+                result.setProcInstId(instance.getId());
+                result.setTaskAssign(t.getAssignee());
+                result.setTaskId(t.getId());
+                list.add(result);
+            }
 //            String processInstanceId = activitiService.startProcess(paramter);
-            data = Result.success(instance.getId());
+//            TaskDefinition taskDefinition = activitiService.getNextTaskInfoByProcessId(instance.getId());
+//            TaskResult result = new TaskResult();
+//            result.setTaskDefineKey(taskDefinition.getKey());
+//            result.setTaskText(taskDefinition.getNameExpression().getExpressionText());
+//            result.setProcInstId(instance.getId());
+//            result.setTaskAssign(taskDefinition.getAssigneeExpression().getExpressionText());
+            data = Result.success(list);
         } catch (Exception e) {
             data = Result.error(1, "模型启动异常！");
             log.error("deploy model error,error message：", e);
@@ -131,7 +149,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param owner  转办人
      * @return
      */
-    @PostMapping("/taskChangeOther_abc")
+    @PostMapping("/taskChangeOther")
     public Result<String> taksChangeOther(@RequestParam String taskId, @RequestParam String owner) {
         taskService.setAssignee(taskId, owner);
         return Result.success();

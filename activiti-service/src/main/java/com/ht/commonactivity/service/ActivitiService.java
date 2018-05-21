@@ -100,6 +100,8 @@ public interface ActivitiService {
      */
     public TaskDefinition getNextTaskInfo(String taskId);
 
+    public TaskDefinition getNextTaskInfoByProcessId(String taskId);
+
     /**
      * 根据名称或分组查询所有任务信息
      * @param taskId

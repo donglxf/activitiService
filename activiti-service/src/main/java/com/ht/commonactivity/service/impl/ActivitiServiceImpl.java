@@ -461,6 +461,34 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
     }
 
 
+    public TaskDefinition getNextTaskInfoByProcessId(String procInstId) {
+        String id = null;
+        TaskDefinition task = null;
+        String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(procInstId).singleResult().getProcessDefinitionId();
+        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
+                .getDeployedProcessDefinition(definitionId);
+        ExecutionEntity execution = (ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(procInstId).singleResult();
+        String activitiId = execution.getActivityId(); ////当前流程节点Id信息
+        List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
+        //遍历所有节点信息
+        for (ActivityImpl activityImpl : activitiList) {
+            id = activityImpl.getId();
+            if (activitiId.equals(id)) {
+//                System.out.println("当前任务："+activityImpl.getProperty("name")); //输出某个节点的某种属性
+//                for (Map.Entry<String,Object> map:activityImpl.getProperties().entrySet()) {
+//                    System.out.println("属性："+map.getKey()+"======"+map.getValue()); //输出某个节点的某种属性
+//
+//                }
+                task= (TaskDefinition) activityImpl.getProperties().get("taskDefinition");
+                //获取下一个节点信息
+//                task = nextTaskDefinition(activityImpl, activityImpl.getId(), null, procInstId);
+                break;
+            }
+        }
+
+        return task;
+    }
+
     public TaskDefinition getNextTaskInfo(String taskId) {
         String id = null;
         TaskDefinition task = null;
