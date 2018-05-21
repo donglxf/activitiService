@@ -131,7 +131,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param owner  转办人
      * @return
      */
-    @PostMapping("/taksChangeOther")
+    @PostMapping("/taskChangeOther_abc")
     public Result<String> taksChangeOther(@RequestParam String taskId, @RequestParam String owner) {
         taskService.setAssignee(taskId, owner);
         return Result.success();

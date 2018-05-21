@@ -3,14 +3,17 @@ package com.ht.commonactivity.service;
 import com.ht.commonactivity.common.ModelParamter;
 import com.ht.commonactivity.common.RpcDeployResult;
 import com.ht.commonactivity.common.RpcStartParamter;
+import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActProcRelease;
 import com.ht.commonactivity.entity.ActRuTask;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ht.commonactivity.vo.TaskVo;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.Model;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Map;
@@ -107,4 +110,5 @@ public interface ActivitiService {
     public ActProcRelease getModelLastedVersion(String processDefinedKey);
 
     public ActProcRelease getModelInfo(String modelCode, String modeVersion);
+
 }

@@ -72,10 +72,55 @@ import java.util.*;
  * @create 2017-06-06 13:34
  */
 @RestController
-@Api("工作流")
 @Log4j2
-public class ActivitiController extends ActivitiOutServiceController implements ModelDataJsonConstants {
+public class ActivitiController implements ModelDataJsonConstants {
 
+    @Resource
+    protected RepositoryService repositoryService;
+
+    @Autowired
+    protected HistoryService historyService;
+
+    @Resource
+    protected ObjectMapper objectMapper;
+    @Resource
+    protected ActivitiService activitiService;
+
+    @Resource
+    protected ActProcReleaseService actProcReleaseService;
+
+    @Autowired
+    protected TaskService taskService;
+
+    @Autowired
+    protected ActModelDefinitionService modelDefinitionService;
+
+    @Autowired
+    protected ProcessGoBack processGoBack;
+
+    @Autowired
+    protected ActProcessAuditHisService auditHisService;
+
+    @Autowired
+    protected ActProcessJumpHisService jumpHisService;
+
+    @Autowired
+    protected RuntimeService runtimeService;
+
+
+    @Autowired
+    protected UcAppRpc ucAppRpc;
+
+    protected static volatile ProcessEngine processEngine = null;
+
+    protected static ProcessEngine getProcessEngine() {
+        synchronized (ProcessEngine.class) {
+            if (processEngine == null) {
+                processEngine = ProcessEngines.getDefaultProcessEngine();
+            }
+        }
+        return processEngine;
+    }
 
     /**
      * 查询待验证的模型信息
@@ -235,8 +280,6 @@ public class ActivitiController extends ActivitiOutServiceController implements 
         }
         return data;
     }
-
-
 
 
     @RequestMapping("/tstart")
@@ -528,12 +571,60 @@ public class ActivitiController extends ActivitiOutServiceController implements 
         return data = Result.success(voList);
     }
 
-    @RequestMapping("/findTaskByAssigneeSelf")
+    @PostMapping("/findTaskByAssigneeSelf")
     public Result<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee) {
         vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
-        return findMyPersonalTask(vo);
-    }
+        List<TaskVo> voList = new ArrayList<>();
+        Result<List<TaskVo>> data = null;
+        if (StringUtils.isEmpty(vo.getAssignee())) {
+            data = Result.error(1, "参数异常！");
+            return data;
+        }
 
+
+        TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
+                .createTaskQuery();//创建任务查询对象
+
+        if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
+            Map<String, Object> o = vo.getParamMap();
+            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            }
+        }
+
+        /**查询条件（where部分）*/
+        if (vo.getAssignee() != null) {
+            query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
+        }
+        /**排序*/
+        List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
+        if (list != null && list.size() > 0) {
+            for (Task task : list) {
+                TaskVo tvo = new TaskVo();
+                tvo.setCreateTime(task.getCreateTime());
+                tvo.setId(task.getId());
+                tvo.setExecutionId(task.getExecutionId());
+                tvo.setName(task.getName());
+                tvo.setProcDefId(task.getProcessDefinitionId());
+                tvo.setProInstId(task.getProcessInstanceId());
+                tvo.setAssign(task.getAssignee());
+                voList.add(tvo);
+            }
+        }
+        return data = Result.success(voList);
+    }
 
 
     /**
