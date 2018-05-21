@@ -13,7 +13,7 @@ layui.use(['table','jquery','myutil'], function(){
     table.render({
         elem: '#proc_list'
         ,height: 'auto'
-        ,url:preUrl+'findTaskByAssignee' //数据接口
+        ,url:preUrl+'findTaskByAssigneeSelf' //数据接口
         ,id: 'testReload'
         ,page: true //开启分页
         ,cols: [[ //表头\

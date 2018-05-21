@@ -49,8 +49,6 @@ import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.HttpStatus;
@@ -76,56 +74,8 @@ import java.util.*;
 @RestController
 @Api("工作流")
 @Log4j2
-public class ActivitiController implements ModelDataJsonConstants {
+public class ActivitiController extends ActivitiOutServiceController implements ModelDataJsonConstants {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ActivitiController.class);
-
-    @Resource
-    private RepositoryService repositoryService;
-
-    @Autowired
-    HistoryService historyService;
-
-    @Resource
-    private ObjectMapper objectMapper;
-    @Resource
-    private ActivitiService activitiService;
-
-    @Resource
-    private ActProcReleaseService actProcReleaseService;
-
-    @Autowired
-    private TaskService taskService;
-
-    @Autowired
-    private ActModelDefinitionService modelDefinitionService;
-
-    @Autowired
-    private ProcessGoBack processGoBack;
-
-    @Autowired
-    private ActProcessAuditHisService auditHisService;
-
-    @Autowired
-    private ActProcessJumpHisService jumpHisService;
-
-    @Autowired
-    private RuntimeService runtimeService;
-
-
-    @Autowired
-    private UcAppRpc ucAppRpc;
-
-    private static volatile ProcessEngine processEngine = null;
-
-    private static ProcessEngine getProcessEngine() {
-        synchronized (ProcessEngine.class) {
-            if (processEngine == null) {
-                processEngine = ProcessEngines.getDefaultProcessEngine();
-            }
-        }
-        return processEngine;
-    }
 
     /**
      * 查询待验证的模型信息
@@ -136,7 +86,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @GetMapping("/page")
     public PageResult<List<ActProcReleaseVo>> queryProcReleaseForPage(ActProcRelease actProcRelease, int limit, int page) {
-        LOGGER.info("查询模型版本分页信息开始");
+        log.info("查询模型版本分页信息开始");
         PageResult<List<ActProcReleaseVo>> result = null;
         if (actProcRelease == null || actProcRelease.getModelId() == null) {
             result = PageResult.success(null, 0);
@@ -151,7 +101,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             releaseVos.add(new ActProcReleaseVo(iterator.next()));
         }
         result = PageResult.success(releaseVos, modelReleasePage.getTotal());
-        LOGGER.info("查询模型版本证分页信息结束");
+        log.info("查询模型版本证分页信息结束");
         return result;
     }
 
@@ -164,17 +114,17 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping(value = "/getModelInfo")
     public Result<ModelParamter> getModelInfo(@RequestBody ModelParamter paramter) {
-        LOGGER.info("获取模型信息,参数paramter:" + JSON.toJSONString(paramter));
+        log.info("获取模型信息,参数paramter:" + JSON.toJSONString(paramter));
         Result<ModelParamter> data = null;
         try {
             if (paramter == null || StringUtils.isEmpty(paramter.getModelId())) {
-                LOGGER.error("获取模型失败：参数异常，模型ID为空！");
+                log.error("获取模型失败：参数异常，模型ID为空！");
                 data = Result.error(1, "参数异常，模型ID为空！");
                 return data;
             }
             Model model = activitiService.getModelInfo(paramter.getModelId());
             if (model == null) {
-                LOGGER.error("获取模型失败：没有对应的模型！");
+                log.error("获取模型失败：没有对应的模型！");
                 data = Result.error(1, "没有对应的模型！");
                 return data;
             }
@@ -184,10 +134,10 @@ public class ActivitiController implements ModelDataJsonConstants {
             paramter.setCategory(model.getCategory());
             data = Result.success(paramter);
         } catch (Exception e) {
-            LOGGER.error("获取模型失败：", e);
+            log.error("获取模型失败：", e);
             data = Result.error(1, "获取模型失败");
         }
-        LOGGER.info("获取模型信息！");
+        log.info("获取模型信息！");
         return data;
     }
 
@@ -201,7 +151,7 @@ public class ActivitiController implements ModelDataJsonConstants {
     @GetMapping(value = "/addModeler")
     @ResponseBody
     public Result<ModelParamter> addModel(ModelParamter paramter) {
-        LOGGER.info("addModel paramter:" + JSON.toJSONString(paramter));
+        log.info("addModel paramter:" + JSON.toJSONString(paramter));
         Result<ModelParamter> data = null;
         try {
             paramter.setCategory(paramter.getBusinessId());
@@ -224,10 +174,10 @@ public class ActivitiController implements ModelDataJsonConstants {
             modelDefinitionService.insert(t);
             data = Result.success(paramter);
         } catch (Exception e) {
-            LOGGER.error("addModel error：", e);
+            log.error("addModel error：", e);
             data = Result.error(1, "创建模型失败");
         }
-        LOGGER.info("addModel end !");
+        log.info("addModel end !");
         return data;
     }
 
@@ -238,11 +188,11 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping(value = "/deleteModel")
     public Result<ModelParamter> deleteModel(ModelParamter paramter) {
-        LOGGER.info("delete model paramter:" + JSON.toJSONString(paramter));
+        log.info("delete model paramter:" + JSON.toJSONString(paramter));
         Result<ModelParamter> data = null;
         try {
             if (paramter == null || StringUtils.isEmpty(paramter.getModelId())) {
-                LOGGER.error("delete model error.");
+                log.error("delete model error.");
                 data = Result.error(1, "参数异常.");
                 return data;
             }
@@ -254,10 +204,10 @@ public class ActivitiController implements ModelDataJsonConstants {
             repositoryService.deleteModel(paramter.getModelId());
             data = Result.success(paramter);
         } catch (Exception e) {
-            LOGGER.error("delete model error,errorMsg:", e);
+            log.error("delete model error,errorMsg:", e);
             data = Result.error(1, "删除模型失败");
         }
-        LOGGER.info("delete model end");
+        log.info("delete model end");
         return data;
     }
 
@@ -268,11 +218,11 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping(value = "/deploy")
     public Result<RpcDeployResult> deploy(ModelParamter paramter) {
-        LOGGER.info("deploy model,paramter:" + JSON.toJSONString(paramter));
+        log.info("deploy model,paramter:" + JSON.toJSONString(paramter));
         Result<RpcDeployResult> data = null;
         try {
             if (paramter == null || StringUtils.isEmpty(paramter.getModelId())) {
-                LOGGER.error("deploy model error.");
+                log.error("deploy model error.");
                 data = Result.error(1, "deploy model error.");
                 return data;
             }
@@ -280,70 +230,26 @@ public class ActivitiController implements ModelDataJsonConstants {
             RpcDeployResult result = activitiService.deploy(paramter.getModelId());
             data = Result.success(result);
         } catch (Exception e) {
-            LOGGER.error("deploy model error,error message：", e);
+            log.error("deploy model error,error message：", e);
             data = Result.error(1, "部署流程失败!");
         }
         return data;
     }
 
-    @RequestMapping("/startProcessInstanceByKey")
-    @ApiOperation("启动模型")
-    public Result<String> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
-        LOGGER.info("start model,paramter:" + JSON.toJSONString(paramter));
-        Result<String> data = null;
-        try {
-            if (StringUtils.isEmpty(paramter.getBusinessKey())) {
-                return Result.error(1, "businessKey is null ,check");
-            }
-            String str = "{\"name\": \"name1\",\"value\": \"value1\"}";
-            ActProcRelease release = null;
-            // 版本信息为空，获取模型最新版本
-            if (StringUtils.isEmpty(paramter.getVersion())) {
-                release = activitiService.getModelLastedVersion(paramter.getProcessDefinedKey());
-            } else {
-                release = activitiService.getModelInfo(paramter.getProcessDefinedKey(), paramter.getVersion());
-            }
-            if (release == null) {
-                return Result.error(1, ActivitiConstants.MODEL_UNEXIST);
-            }
-//            Map<String, Object> map = null;
-//            if (StringUtils.isNotBlank(paramter.getData())) {
-//                map = JSON.parseObject(paramter.getData(), Map.class);
-//            }
 
-            List<ProcessInstance> processInstancs = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(paramter.getBusinessKey()).list();
-            String deleteReason = "删除重新启动";
-            if (processInstancs != null) {
-                for (ProcessInstance processInstance : processInstancs) {
-                    runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), deleteReason);
-                }
-            }
-
-            ProcessInstance instance = runtimeService.startProcessInstanceById(release.getModelProcdefId(),
-                    paramter.getBusinessKey(), paramter.getData());
-
-//            String processInstanceId = activitiService.startProcess(paramter);
-            data = Result.success(instance.getId());
-        } catch (Exception e) {
-            data = Result.error(1, "模型启动异常！");
-            LOGGER.error("deploy model error,error message：", e);
-        }
-        LOGGER.info("start model sucess.");
-        return data;
-    }
 
 
     @RequestMapping("/tstart")
     @ApiOperation("启动模型")
     public Result<String> startProcess(RpcStartParamter paramter) {
-        LOGGER.info("start model,paramter:" + JSON.toJSONString(paramter));
+        log.info("start model,paramter:" + JSON.toJSONString(paramter));
         Result<String> data = null;
         try {
             paramter.setType(ActivitiConstants.EXCUTE_TYPE_VERFICATION);
             paramter.setBatchSize(1);
 
             if (paramter == null || StringUtils.isEmpty(paramter.getProcDefId())) {
-                LOGGER.info("start model error,paramter error.");
+                log.info("start model error,paramter error.");
                 data = Result.error(1, "参数异常！");
                 return data;
             }
@@ -351,9 +257,9 @@ public class ActivitiController implements ModelDataJsonConstants {
             data = Result.success(processInstanceId);
         } catch (Exception e) {
             data = Result.error(1, "模型启动异常！");
-            LOGGER.error("deploy model error,error message：", e);
+            log.error("deploy model error,error message：", e);
         }
-        LOGGER.info("start model sucess.");
+        log.info("start model sucess.");
         return data;
     }
 
@@ -396,7 +302,7 @@ public class ActivitiController implements ModelDataJsonConstants {
 
     @RequestMapping("/editModel")
     public ObjectNode getEditorJson(ModelParamterVo paramter) {
-        LOGGER.info("getEditorJson invoke start ,paramter:" + JSON.toJSONString(paramter));
+        log.info("getEditorJson invoke start ,paramter:" + JSON.toJSONString(paramter));
         ObjectNode modelNode = null;
         Model model = repositoryService.getModel(paramter.getModelId());
         if (model != null) {
@@ -412,7 +318,7 @@ public class ActivitiController implements ModelDataJsonConstants {
                         new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
                 modelNode.put("model", editorJsonNode);
             } catch (Exception e) {
-                LOGGER.error("Error creating model JSON", e);
+                log.error("Error creating model JSON", e);
                 throw new ActivitiException("Error creating model JSON", e);
             }
         }
@@ -422,7 +328,7 @@ public class ActivitiController implements ModelDataJsonConstants {
     @RequestMapping(value = "/model/save", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void saveModel(@RequestParam String modelId, @RequestBody MultiValueMap<String, String> values) {
-        LOGGER.info("saveModel invoke ,paramter[modelId:" + modelId + ";values:" + JSON.toJSONString(values));
+        log.info("saveModel invoke ,paramter[modelId:" + modelId + ";values:" + JSON.toJSONString(values));
         List<String> list = values.get("json_xml");
         String json = list.get(0);
         Map<String, Object> map = new GsonJsonParser().parseMap(json);
@@ -431,10 +337,10 @@ public class ActivitiController implements ModelDataJsonConstants {
         try {
             activitiService.saveModel(modelId, values);
         } catch (Exception e) {
-            LOGGER.error("Error saving model", e);
+            log.error("Error saving model", e);
             throw new ActivitiException("Error saving model", e);
         }
-        LOGGER.info("模型定义保存成功！");
+        log.info("模型定义保存成功！");
     }
 
     @RequestMapping(value = "/editor/stencilset")
@@ -500,9 +406,22 @@ public class ActivitiController implements ModelDataJsonConstants {
             data = PageResult.success(ovs, count);
         } catch (Exception e) {
             data = PageResult.error(1, "查询模型列表失败");
-            LOGGER.error("查询模型列表失败!", e);
+            log.error("查询模型列表失败!", e);
         }
         return data;
+    }
+
+    /**
+     * 委托任务,a被b办理，b办理之后回到a，然后a办理之后流程继续往下
+     *
+     * @param taskId 任务id
+     * @param owner  被委托人
+     * @return
+     */
+    @PostMapping("/ownerTask")
+    public Result<String> ownerTask(String taskId, String owner) {
+        taskService.delegateTask(taskId, owner);
+        return Result.success();
     }
 
     /**
@@ -609,80 +528,18 @@ public class ActivitiController implements ModelDataJsonConstants {
         return data = Result.success(voList);
     }
 
-
-    /**
-     * 根据用户、候选人、候选组 查询所有任务
-     */
-    @RequestMapping("/findTaskByAssignee")
-    @ResponseBody
-    public Result<List<TaskVo>> findMyPersonalTask(@RequestBody FindTaskBeanVo vo, String assignee) {
-        List<TaskVo> voList = new ArrayList<>();
-        Result<List<TaskVo>> data = null; // new ArrayList<TaskVo>();
-//        泛型过滤重复对象
-//        List<ActRuTask> tlist= activitiService.findTaskByAssigneeOrGroup(vo);
-//        List<ActRuTask> list1= new ArrayList<ActRuTask>();
-//        tlist.stream().forEach(p -> {
-//            if(!list1.contains(p)){
-//                list1.add(p);
-//            }
-//        });
-
-//        vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
-        if (StringUtils.isEmpty(vo.getAssignee())) {
-            data = Result.error(1, "参数异常！");
-            return data;
-        }
-
-
-
-        TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
-                .createTaskQuery();//创建任务查询对象
-
-        if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
-            Map<String, Object> o = vo.getParamMap();
-            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
-                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
-                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
-                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            }
-        }
-
-        /**查询条件（where部分）*/
-        if (vo.getAssignee() != null) {
-            query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
-        }
-        /**排序*/
-        List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
-        if (list != null && list.size() > 0) {
-            for (Task task : list) {
-                TaskVo tvo = new TaskVo();
-                tvo.setCreateTime(task.getCreateTime());
-                tvo.setId(task.getId());
-                tvo.setExecutionId(task.getExecutionId());
-                tvo.setName(task.getName());
-                tvo.setProcDefId(task.getProcessDefinitionId());
-                tvo.setProInstId(task.getProcessInstanceId());
-                tvo.setAssign(task.getAssignee());
-                voList.add(tvo);
-            }
-        }
-        return data = Result.success(voList);
+    @RequestMapping("/findTaskByAssigneeSelf")
+    public Result<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee) {
+        vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
+        return findMyPersonalTask(vo);
     }
+
+
 
     /**
      * 完成任务
      */
-    @RequestMapping("/complateTask")
+    @RequestMapping("/complateTask_bak")
     @ResponseBody
     public Result<Integer> completeMyPersonalTask(ComplateTaskVo vo) {
         String taskId = vo.getTaskId();
@@ -692,6 +549,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             }
             Task t = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
 //        TaskInfo tt=  getProcessEngine().getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("flag", "2");
@@ -975,7 +833,7 @@ public class ActivitiController implements ModelDataJsonConstants {
     @RequestMapping("/testPoint")
     @TestPointCat(ids = "aaa", name = {"abc", "des"})
     public void testPoint() {
-        LOGGER.info("+++++++++++++++++++++>>>>");
+        log.info("+++++++++++++++++++++>>>>");
     }
 
 }
