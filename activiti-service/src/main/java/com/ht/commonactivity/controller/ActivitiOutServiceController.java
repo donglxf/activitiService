@@ -9,7 +9,7 @@ import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActProcRelease;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
-import com.ht.commonactivity.utils.TaskResult;
+import com.ht.commonactivity.utils.NextTaskInfo;
 import com.ht.commonactivity.vo.ComplateTaskVo;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.ht.commonactivity.vo.TaskVo;
@@ -38,19 +38,12 @@ import java.util.Map;
 @Log4j2
 public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
-    @Resource
-    protected RepositoryService repositoryService;
 
     @Autowired
     protected HistoryService historyService;
 
     @Resource
-    protected ObjectMapper objectMapper;
-    @Resource
     protected ActivitiService activitiService;
-
-    @Resource
-    protected ActProcReleaseService actProcReleaseService;
 
     @Autowired
     protected TaskService taskService;
@@ -87,9 +80,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @RequestMapping("/startProcessInstanceByKey")
     @ApiOperation("启动模型")
-    public Result<List<TaskResult>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
+    public Result<List<NextTaskInfo>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
         log.info("start model,paramter:" + JSON.toJSONString(paramter));
-        Result<List<TaskResult>> data = null;
+        Result<List<NextTaskInfo>> data = null;
         try {
             if (StringUtils.isEmpty(paramter.getBusinessKey())) {
                 return Result.error(1, "businessKey is null ,check");
@@ -115,20 +108,24 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
             ProcessInstance instance = runtimeService.startProcessInstanceById(release.getModelProcdefId(),
                     paramter.getBusinessKey(), paramter.getData());
-            List<TaskResult> list = new ArrayList<TaskResult>();
+
+            boolean bool = procIsEnd(instance.getId());
+            List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
             List<Task> tasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
             for (Task t : tasks) {
-                TaskResult result = new TaskResult();
+                NextTaskInfo result = new NextTaskInfo();
                 result.setTaskDefineKey(t.getTaskDefinitionKey());
                 result.setTaskText(t.getName());
                 result.setProcInstId(instance.getId());
                 result.setTaskAssign(t.getAssignee());
-                result.setTaskId(t.getId());
+                result.setProIsEnd(bool ? "Y" : "N");
+//                result.setTaskId(t.getId());
                 list.add(result);
             }
+
 //            String processInstanceId = activitiService.startProcess(paramter);
 //            TaskDefinition taskDefinition = activitiService.getNextTaskInfoByProcessId(instance.getId());
-//            TaskResult result = new TaskResult();
+//            NextTaskInfo result = new NextTaskInfo();
 //            result.setTaskDefineKey(taskDefinition.getKey());
 //            result.setTaskText(taskDefinition.getNameExpression().getExpressionText());
 //            result.setProcInstId(instance.getId());
@@ -143,7 +140,21 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     }
 
     /**
-     * 任务转办
+     * 判断流程是否结束
+     *
+     * @param proInstId
+     * @return true-结束，false-未结束
+     */
+    public boolean procIsEnd(String proInstId) {
+        ProcessInstance rpi = getProcessEngine().getRuntimeService()//
+                .createProcessInstanceQuery()//创建流程实例查询对象
+                .processInstanceId(proInstId)
+                .singleResult();
+        return rpi == null ? true : false;
+    }
+
+    /**
+     * 任务转办,a办理人转给b办理，b办理完成之后流程往下走
      *
      * @param taskId 任务id
      * @param owner  转办人
@@ -228,7 +239,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      */
     @PostMapping("/complateTask")
     @ResponseBody
-    public Result<Integer> completeMyPersonalTask(@RequestBody ComplateTaskVo vo) {
+    public Result<List<NextTaskInfo>> completeMyPersonalTask(@RequestBody ComplateTaskVo vo) {
+        List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
         String taskId = vo.getTaskId();
         try {
             if (StringUtils.isEmpty(taskId)) {
@@ -236,21 +248,77 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             }
             Task t = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
 //        TaskInfo tt=  getProcessEngine().getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            TaskDefinition taskDefinition = activitiService.getNextTaskInfo(taskId, vo.getData());
+            NextTaskInfo result = new NextTaskInfo();
+            result.setTaskDefineKey(taskDefinition.getKey());
+            result.setTaskText(taskDefinition.getNameExpression().getExpressionText());
+            result.setProcInstId(vo.getProInstId());
+            result.setTaskAssign(taskDefinition.getAssigneeExpression().getExpressionText());
+            result.setProIsEnd(procIsEnd(vo.getProInstId()) ? "Y" : "N");
+            list.add(result);
 
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
-            Map<String, Object> variables = new HashMap<String, Object>();
-            variables.put("flag", "2");
+//            Map<String, Object> variables = new HashMap<String, Object>();
+//            variables.put("flag", "2");
             TaskService service = getProcessEngine().getTaskService();
-            Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人
+            Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人,记入日志
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
-            service.complete(taskId, variables);
+            service.complete(taskId, vo.getData());
 
-            return Result.success(0);
+            return Result.success(list);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return Result.error(1, "完成任务失败" + taskId);
     }
 
+    /**
+     * 撤销整个流程
+     *
+     * @param proId
+     * @return
+     */
+    @RequestMapping("/repealPro")
+    public Result<String> repealPro(@RequestParam String proId) {
+        runtimeService.deleteProcessInstance(proId, "撤销流程");
+        return Result.success("撤销成功");
+    }
+
+    /**
+     * 单步撤销
+     *
+     * @param proInstId    流程实例Id
+     * @param toBackNoteId 格式：sid-26585B1A-9680-4331-AD31-7A107BA03AB7
+     * @return
+     */
+    @RequestMapping("/singleRepealPro")
+    public Result<String> singleRepealPro(@RequestParam String proInstId, @RequestParam String toBackNoteId) {
+        try {
+            // 根据流程实例找到当前任务节点
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInstId).list();
+            for (Task t : tasks) {
+                String currentTaskId = processGoBack.turnBackNew(t.getId(), "流程单步撤销", "", toBackNoteId);
+            }
+
+            return Result.success("撤销成功");
+
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return Result.error(1, "单步撤销失败");
+    }
+
+    /**
+     * 委托任务,a指派b办理，b办理之后回到a，然后a办理之后流程继续往下
+     *
+     * @param taskId 任务id
+     * @param owner  被委托人
+     * @return
+     */
+    @PostMapping("/ownerTask")
+    public Result<String> ownerTask(String taskId, String owner) {
+        taskService.delegateTask(taskId, owner);
+        return Result.success();
+    }
 
 }

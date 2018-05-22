@@ -20,7 +20,7 @@ public class ActivitiConstants {
      */
     public final static String EXCUTE_TYPE_SERVICE = "0";
     /**
-     *  验证
+     * 验证
      */
     public final static String EXCUTE_TYPE_VERFICATION = "1";
 
@@ -45,4 +45,6 @@ public class ActivitiConstants {
     public final static String PROC_TASK_ID_VAR_KEY = "proc_task_id";// 模型执行任务taskid在流程变量key值
 
     public final static String PROC_BUSINESS_KEY = "businessKey";// 流程业务
+
+    public static String[] EL_ARR = {"ac", "==", ">", ">=", "<", "<="}; // EL表达式条件数组
 }

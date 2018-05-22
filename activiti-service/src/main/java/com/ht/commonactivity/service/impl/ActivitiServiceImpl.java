@@ -43,6 +43,7 @@ import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -126,8 +127,6 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         BpmnModel model = new BpmnJsonConverter().convertToBpmnModel(modelNode);
         bpmnBytes = new BpmnXMLConverter().convertToXML(model, "GBK");
         String processName = modelData.getName() + ".bpmn20.xml";
-
-
 
 
         Deployment deployment = repositoryService.createDeployment().name(modelData.getName())
@@ -222,6 +221,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
 
     /**
      * 启动流程
+     *
      * @param paramter
      * @return
      */
@@ -253,8 +253,8 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
             task.setStatus("4");
         }
         updateTask(task);
-        String nextId=getNextNode(instance.getId());
-        LOGGER.error("nextId=="+nextId);
+        String nextId = getNextNode(instance.getId());
+        LOGGER.error("nextId==" + nextId);
         return instance.getId();
     }
 
@@ -264,11 +264,12 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
 
     /**
      * 获取当前流程的下一个节点
+     *
      * @param procInstanceId
      * @return
      */
-    public String getNextNode(String procInstanceId){
-        ProcessEngine processEngine=ProcessEngines.getDefaultProcessEngine();
+    public String getNextNode(String procInstanceId) {
+        ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
         // 1、首先是根据流程ID获取当前任务：
         List<Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(procInstanceId).list();
         String nextId = "";
@@ -479,7 +480,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
 //                    System.out.println("属性："+map.getKey()+"======"+map.getValue()); //输出某个节点的某种属性
 //
 //                }
-                task= (TaskDefinition) activityImpl.getProperties().get("taskDefinition");
+                task = (TaskDefinition) activityImpl.getProperties().get("taskDefinition");
                 //获取下一个节点信息
 //                task = nextTaskDefinition(activityImpl, activityImpl.getId(), null, procInstId);
                 break;
@@ -489,22 +490,25 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         return task;
     }
 
-    public TaskDefinition getNextTaskInfo(String taskId) {
+    public TaskDefinition getNextTaskInfo(String taskId,Map<String, Object> data) {
         String id = null;
         TaskDefinition task = null;
-        String procInstId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessDefinitionId(); // 流程实例id
-        String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(procInstId).singleResult().getProcessDefinitionId();
-        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
-                .getDeployedProcessDefinition(definitionId);
-        ExecutionEntity execution = (ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(procInstId).singleResult();
-        String activitiId = execution.getActivityId(); ////当前流程节点Id信息
-        List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
+//        String procInstId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessDefinitionId(); // 流程实例id
+        Task t = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        String excId = t.getExecutionId();
+        ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().executionId(excId).singleResult();
+        String activitiId = execution.getActivityId();
+
+        ProcessDefinitionEntity def = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(t.getProcessDefinitionId());
+        List<ActivityImpl> activitiList = def.getActivities();
+
         //遍历所有节点信息
         for (ActivityImpl activityImpl : activitiList) {
             id = activityImpl.getId();
             if (activitiId.equals(id)) {
                 //获取下一个节点信息
-                task = nextTaskDefinition(activityImpl, activityImpl.getId(), null, procInstId);
+                task = nextTaskDefinition(activityImpl, activityImpl.getId(), null, t.getProcessInstanceId(),data);
                 break;
             }
         }
@@ -564,7 +568,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
      * @param String       processInstanceId      流程实例Id信息
      * @return
      */
-    private TaskDefinition nextTaskDefinition(ActivityImpl activityImpl, String activityId, String elString, String processInstanceId) {
+    private TaskDefinition nextTaskDefinition(ActivityImpl activityImpl, String activityId, String elString, String processInstanceId,Map<String,Object> data) {
 
         PvmActivity ac = null;
 
@@ -587,22 +591,32 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                     outTransitionsTemp = ac.getOutgoingTransitions();
 
                     // 如果网关路线判断条件为空信息
-                    if (StringUtils.isEmpty(elString)) {
-                        // 获取流程启动时设置的网关判断条件信息
-                        elString = getGatewayCondition(ac.getId(), processInstanceId);
-                    }
+//                    if (StringUtils.isEmpty(elString)) {
+//                        // 获取流程启动时设置的网关判断条件信息
+//                        elString = getGatewayCondition(ac.getId(), processInstanceId);
+//                    }
 
                     // 如果排他网关只有一条线路信息
                     if (outTransitionsTemp.size() == 1) {
                         return nextTaskDefinition((ActivityImpl) outTransitionsTemp.get(0).getDestination(), activityId,
-                                elString, processInstanceId);
+                                elString, processInstanceId,data);
                     } else if (outTransitionsTemp.size() > 1) { // 如果排他网关有多条线路信息
                         for (PvmTransition tr1 : outTransitionsTemp) {
                             s = tr1.getProperty("conditionText"); // 获取排他网关线路判断条件信息
+                            String key = null;
+                            // 解析出表达式 key
+                            for (int i = 0; i < ActivitiConstants.EL_ARR.length; i++) {
+                                if (((String) s).contains(ActivitiConstants.EL_ARR[i])) {
+                                    key = ((String) s).substring(2, ((String) s).indexOf(ActivitiConstants.EL_ARR[i]));
+                                    break;
+                                }
+                            }
+                            elString= (String) data.get(key);
                             // 判断el表达式是否成立
-                            if (isCondition(ac.getId(), StringUtils.trim(s.toString()), elString)) {
+//                            if (isCondition(ac.getId(), StringUtils.trim(s.toString()), elString)) {
+                            if (isCondition(key, StringUtils.trim(s.toString()), elString)) {
                                 return nextTaskDefinition((ActivityImpl) tr1.getDestination(), activityId, elString,
-                                        processInstanceId);
+                                        processInstanceId,data);
                             }
                         }
                     }
@@ -645,7 +659,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         return (Boolean) e.getValue(context);
     }
 
-    public void getCurrentTask(){
+    public void getCurrentTask() {
 //        ProcessEngines.getDefaultProcessEngine().getTaskService().createTaskQuery().
     }
 

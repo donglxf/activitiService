@@ -410,10 +410,14 @@ public class ProcessGoBackImpl implements ProcessGoBack {
      */
     public String turnBackNew(String taskId, String msg, String endActivityId,String toBackNoteId) throws Exception {
 //        Map<String, Object> variables;
+        // 取得要撤销环节的任务
+
+
 //        // 取得当前任务
         HistoricTaskInstance currTask = historyService
                 .createHistoricTaskInstanceQuery().taskId(taskId)
                 .singleResult();
+
         // 取得流程实例
         ProcessInstance instance = runtimeService
                 .createProcessInstanceQuery()
@@ -443,6 +447,7 @@ public class ProcessGoBackImpl implements ProcessGoBack {
 //        List<ActivityImpl> activities = iteratorBackActivity( taskId, currActivity, rtnList, tempList);
 
 //        if (activities == null || activities.size() <= 0) throw new RuntimeException("没有可以选择的驳回节点!");
+
         List<Task> list = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
         for (Task task : list) {
             if (!task.getId().equals(taskId)) {
@@ -452,7 +457,7 @@ public class ProcessGoBackImpl implements ProcessGoBack {
         }
 
 //        turnTransition(taskId, activities.get(0).getId(), null); // 逐步退回
-        turnTransition(taskId, toBackNoteId, null); // 退回指定节点
+        turnTransition(taskId, toBackNoteId, null); // 退回指定节点,从taskID节点退回到toBackNoteId节点
         // 流程退回日志
         ActProcessJumpHis his=new ActProcessJumpHis();
         his.setProcDefId(currTask.getProcessDefinitionId());

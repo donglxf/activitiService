@@ -98,7 +98,7 @@ public interface ActivitiService {
      * @param taskId
      * @return
      */
-    public TaskDefinition getNextTaskInfo(String taskId);
+    public TaskDefinition getNextTaskInfo(String taskId,Map<String, Object> data);
 
     public TaskDefinition getNextTaskInfoByProcessId(String taskId);
 
