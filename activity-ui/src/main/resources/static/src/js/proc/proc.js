@@ -1,10 +1,10 @@
 layui.config({
-    base: '/activiti/ui/src/js/modules/' //假设这是你存放拓展模块的根目录
+    base: '/activity/ui/src/js/modules/' //假设这是你存放拓展模块的根目录
 }).extend({ //设定模块别名
     myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
 });
 var preUrl="/activity/service";
-var preUrlUi="/activiti/ui";
+var preUrlUi="/activity/ui";
 var proInstIds='';
 layui.use(['table','jquery','myutil'], function(){
     var table = layui.table;

@@ -19,7 +19,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.formLogin().loginPage("/login").defaultSuccessUrl("/activiti/ui/indexDev").permitAll().and()
+    http.formLogin().loginPage("/login").defaultSuccessUrl("/activity/ui/indexDev").permitAll().and()
         .logout().logoutSuccessUrl("/indexDev")
             .invalidateHttpSession(true) .and().authorizeRequests()
         .antMatchers("/**/*.css", "/img/**", "/api/**", "/**/*.js") // 放开"/api/**"：为了给被监控端免登录注册

@@ -503,11 +503,11 @@ var myUtil = {
          * 导入页面打开
          */
         openImport:function (type) {
-            var url = "/activiti/ui/src/html/decision/import_entity.html";
+            var url = "/activity/ui/src/html/decision/import_entity.html";
             if(type == 1){
 
             }else{
-                url = "/activiti/ui/src/html/decision/import_action.html";
+                url = "/activity/ui/src/html/decision/import_action.html";
             }
             //打开导入面板
             $.get(url,function(html){
@@ -542,11 +542,11 @@ var myUtil = {
          * 导入页面打开,导入评分卡和决策
          */
         openImportDecision:function (type) {
-            var url = "/activiti/ui/src/html/decision/import_scene.html";
+            var url = "/activity/ui/src/html/decision/import_scene.html";
             if(type == 1){
 
             }else{
-                url = "/activiti/ui/src/html/decision/import_grade.html";
+                url = "/activity/ui/src/html/decision/import_grade.html";
             }
             //打开导入面板
             $.get(url,function(html){

@@ -16,7 +16,7 @@ layui.define(['config'],function (exports) {
         , loadMenuUrl: basePath + rule + "/auth/loadMenu"
         , loadBtnAndTabUrl: basePath + rule + "/auth/loadBtnAndTab"
         , loginUrl: basePath + "uaa/auth/login"
-        , loginIndex:basePath+"activiti/ui/login.html"
+        , loginIndex:basePath+"activity/ui/login.html"
         , refreshTokenUrl: basePath + "uaa/auth/token"
         , changePwdUrl : changePwdUrl
         , userInfoUpdate: userInfoUpdate

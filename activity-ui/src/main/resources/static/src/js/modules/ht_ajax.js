@@ -75,7 +75,7 @@ layui.define(["ht_cookie", "ht_config"], function (exports) {
                     // 备份jquery的ajax方法
                     var _ajax = $.ajax;
                     var href = window.location.href;
-                    if(href.indexOf(":8005/activiti/ui/")>0){
+                    if(href.indexOf(":8005/activity/ui/")>0){
                         return _ajax;
                     }
                     // 重写jquery的ajax方法
