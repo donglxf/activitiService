@@ -335,7 +335,7 @@
     </dependencies>
 
     <build>
-        <finalName>common-activiti</finalName>
+        <finalName>activity-service</finalName>
         <plugins>
             <plugin>
                 <groupId>pl.project13.maven</groupId>
