@@ -6,24 +6,8 @@ public class ComplateTaskVo {
     private String taskId; // 任务id
     private String opinion; // 办理意见
     private String userName; //办理者
-    private String proInstId; // 流程实例id
-    private Map<String, Object> data; // 业务数据
-
-    public Map<String, Object> getData() {
-        return data;
-    }
-
-    public void setData(Map<String, Object> data) {
-        this.data = data;
-    }
-
-    public String getProInstId() {
-        return proInstId;
-    }
-
-    public void setProInstId(String proInstId) {
-        this.proInstId = proInstId;
-    }
+//    private String proInstId; // 流程实例id
+//    private Map<String, Object> data; // 业务数据
 
     public String getUserName() {
         return userName;

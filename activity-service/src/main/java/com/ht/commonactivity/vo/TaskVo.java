@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class TaskVo {
     private String businessKey; // 业务key
-    private String id;
+    private String taskId;
     private String name;
     private Date createTime;
     private String proInstId;
@@ -28,12 +28,12 @@ public class TaskVo {
         this.assign = assign;
     }
 
-    public String getId() {
-        return id;
+    public String getTaskId() {
+        return taskId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     public String getName() {

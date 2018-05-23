@@ -433,7 +433,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         for (Task task : list) {
             TaskVo tvo = new TaskVo();
             tvo.setCreateTime(task.getCreateTime());
-            tvo.setId(task.getId());
+            tvo.setTaskId(task.getId());
             tvo.setExecutionId(task.getExecutionId());
             tvo.setName(task.getName());
             tvo.setProcDefId(task.getProcessDefinitionId());
@@ -462,7 +462,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         for (Task task : list) {
             TaskVo tvo = new TaskVo();
             tvo.setCreateTime(task.getCreateTime());
-            tvo.setId(task.getId());
+            tvo.setTaskId(task.getId());
             tvo.setExecutionId(task.getExecutionId());
             tvo.setName(task.getName());
             tvo.setProcDefId(task.getProcessDefinitionId());
@@ -516,7 +516,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             for (Task task : list) {
                 TaskVo tvo = new TaskVo();
                 tvo.setCreateTime(task.getCreateTime());
-                tvo.setId(task.getId());
+                tvo.setTaskId(task.getId());
                 tvo.setExecutionId(task.getExecutionId());
                 tvo.setName(task.getName());
                 tvo.setProcDefId(task.getProcessDefinitionId());

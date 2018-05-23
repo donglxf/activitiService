@@ -225,7 +225,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 TaskVo tvo = new TaskVo();
                 tvo.setBusinessKey(pi.getBusinessKey());
                 tvo.setCreateTime(task.getCreateTime());
-                tvo.setId(task.getId());
+                tvo.setTaskId(task.getId());
                 tvo.setExecutionId(task.getExecutionId());
                 tvo.setName(task.getName());
                 tvo.setProcDefId(task.getProcessDefinitionId());
@@ -251,23 +251,33 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             }
             Task t = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
 //        TaskInfo tt=  getProcessEngine().getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-            TaskDefinition taskDefinition = activitiService.getNextTaskInfo(taskId, vo.getData());
-            NextTaskInfo result = new NextTaskInfo();
-            result.setTaskDefineKey(taskDefinition.getKey());
-            result.setTaskText(taskDefinition.getNameExpression().getExpressionText());
-            result.setProcInstId(vo.getProInstId());
-            result.setTaskAssign(taskDefinition.getAssigneeExpression().getExpressionText());
-            result.setProIsEnd(procIsEnd(vo.getProInstId()) ? "Y" : "N");
-            list.add(result);
+//            TaskDefinition taskDefinition = activitiService.getNextTaskInfo(taskId, vo.getData());
+//            NextTaskInfo result = new NextTaskInfo();
+//            result.setTaskDefineKey(taskDefinition.getKey());
+//            result.setTaskText(taskDefinition.getNameExpression().getExpressionText());
+//            result.setProcInstId(vo.getProInstId());
+//            result.setTaskAssign(taskDefinition.getAssigneeExpression().getExpressionText());
+//            result.setProIsEnd(procIsEnd(vo.getProInstId()) ? "Y" : "N");
+//            list.add(result);
+            Task task = taskService.createTaskQuery().taskId(vo.getTaskId()).singleResult();
+
 
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
-//            Map<String, Object> variables = new HashMap<String, Object>();
-//            variables.put("flag", "2");
             TaskService service = getProcessEngine().getTaskService();
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人,记入日志
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
-            service.complete(taskId, vo.getData());
-
+            service.complete(taskId);
+            List<Task> taskList = taskService.createTaskQuery().processDefinitionId(task.getProcessDefinitionId()).list();
+            taskList.size();
+            taskList.forEach(ta -> {
+                NextTaskInfo result = new NextTaskInfo();
+                result.setTaskDefineKey(ta.getTaskDefinitionKey());
+                result.setTaskText(ta.getName());
+                result.setProcInstId(ta.getProcessInstanceId());
+                result.setTaskAssign(ta.getAssignee());
+                result.setProIsEnd(procIsEnd(ta.getProcessInstanceId()) ? "Y" : "N");
+                list.add(result);
+            });
             return Result.success(list);
         } catch (Exception e) {
             e.printStackTrace();
