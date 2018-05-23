@@ -260,7 +260,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //            result.setProIsEnd(procIsEnd(vo.getProInstId()) ? "Y" : "N");
 //            list.add(result);
             Task task = taskService.createTaskQuery().taskId(vo.getTaskId()).singleResult();
-
+            String proInstId = task.getProcessInstanceId();
 
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             TaskService service = getProcessEngine().getTaskService();
@@ -268,7 +268,13 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
             service.complete(taskId);
             List<Task> taskList = taskService.createTaskQuery().processDefinitionId(task.getProcessDefinitionId()).list();
-            taskList.size();
+            if (taskList.size() <= 0) {
+                NextTaskInfo result = new NextTaskInfo();
+                result.setProIsEnd("Y");
+                list.add(result);
+                return Result.success(list);
+            }
+
             taskList.forEach(ta -> {
                 NextTaskInfo result = new NextTaskInfo();
                 result.setTaskDefineKey(ta.getTaskDefinitionKey());
