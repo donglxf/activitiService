@@ -43,7 +43,7 @@ public class MysqlGenerator {
     private static String projectName = "activiti-service";
     private static String packageName="rule";    //文件路径
     private static String authorName="dyb";     //作者
-    private static String[] table={"act_process_jump_his"};                  //table名字
+    private static String[] table={"msg_sent_record"};                  //table名字
     private static String prefix="risk_";                     //table前缀
     private static File file = new File(projectName);
 //    private static String path = file.getAbsolutePath();
@@ -88,9 +88,9 @@ public class MysqlGenerator {
                             }
                         })
                         .setDriverName("com.mysql.jdbc.Driver")
-                        .setUsername("root")
-                        .setPassword("dongymao")
-                        .setUrl("jdbc:mysql://localhost:3306/diamond?useUnicode=true&characterEncoding=UTF8")
+                        .setUsername("msgcenter")
+                        .setPassword("kcCCNHLyp5Anczl7")
+                        .setUrl("jdbc:mysql://172.16.200.111:3306/msg_center?useUnicode=true&characterEncoding=UTF8")
         ).setStrategy(
                 // 策略配置
                 new StrategyConfig()

@@ -1,9 +1,9 @@
 spring:
   application:
-    name: activiti-service
+    name: activity-service
 cloud:
     config:
-      name: common-activiti,base,rabbitmq,mongo,redis
+      name: activity-service,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
         enabled: true

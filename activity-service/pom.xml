@@ -7,7 +7,7 @@
         <artifactId>ht-common-activiti</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>activiti-service</artifactId>
+    <artifactId>activity-service</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
