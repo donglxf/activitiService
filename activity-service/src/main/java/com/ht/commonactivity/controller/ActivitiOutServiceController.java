@@ -20,6 +20,7 @@ import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.engine.*;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.task.TaskDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -220,7 +221,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
         if (list != null && list.size() > 0) {
             for (Task task : list) {
+                ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
                 TaskVo tvo = new TaskVo();
+                tvo.setBusinessKey(pi.getBusinessKey());
                 tvo.setCreateTime(task.getCreateTime());
                 tvo.setId(task.getId());
                 tvo.setExecutionId(task.getExecutionId());
