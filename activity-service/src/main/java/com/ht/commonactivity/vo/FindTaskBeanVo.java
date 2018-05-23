@@ -1,5 +1,6 @@
 package com.ht.commonactivity.vo;
 
+import java.util.List;
 import java.util.Map;
 
 public class FindTaskBeanVo {
@@ -8,11 +9,11 @@ public class FindTaskBeanVo {
      */
     private String assignee;
 
-    private Map<String,Object> paramMap;  // json格式
+    private Map<String, Object> paramMap;  // json格式
 
-    private int firstResult ;
+    private int firstResult = 0;
 
-    private int maxResults ;
+    private int maxResults = 10;
 
     public Map<String, Object> getParamMap() {
         return paramMap;
@@ -54,7 +55,7 @@ public class FindTaskBeanVo {
     /**
      * 候选组
      */
-    private String candidateGroup;
+    private List<String> candidateGroup;
 
     public String getAssignee() {
         return assignee;
@@ -64,11 +65,11 @@ public class FindTaskBeanVo {
         this.assignee = assignee;
     }
 
-    public String getCandidateGroup() {
+    public List<String> getCandidateGroup() {
         return candidateGroup;
     }
 
-    public void setCandidateGroup(String candidateGroup) {
+    public void setCandidateGroup(List<String> candidateGroup) {
         this.candidateGroup = candidateGroup;
     }
 }

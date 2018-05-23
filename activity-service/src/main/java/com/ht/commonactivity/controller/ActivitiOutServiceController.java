@@ -220,8 +220,11 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         /**排序*/
         List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
         if (list != null && list.size() > 0) {
+            ProcessInstance pi = null;
             for (Task task : list) {
-                ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+                if (pi == null) {
+                    pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+                }
                 TaskVo tvo = new TaskVo();
                 tvo.setBusinessKey(pi.getBusinessKey());
                 tvo.setCreateTime(task.getCreateTime());
@@ -233,6 +236,39 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 tvo.setAssign(task.getAssignee());
                 voList.add(tvo);
             }
+        }
+        return data = Result.success(voList);
+    }
+
+    /**
+     * 根据候选组 查询所有代办任务,角色
+     */
+    @RequestMapping("/findTaskByCandidateGroup")
+    @ResponseBody
+    public Result<List<TaskVo>> findTaskByCandidateGroup(@RequestBody FindTaskBeanVo vo) {
+        List<TaskVo> voList = new ArrayList<>();
+        Result<List<TaskVo>> data = null;
+        if (vo.getCandidateGroup() == null) {
+            data = Result.error(1, "参数异常！");
+            return data;
+        }
+        List<Task> list = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
+                .createTaskQuery().taskCandidateGroupIn(vo.getCandidateGroup()).orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
+        ProcessInstance pi = null;
+        for (Task task : list) {
+            if (pi == null) {
+                pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+            }
+            TaskVo tvo = new TaskVo();
+            tvo.setBusinessKey(pi.getBusinessKey());
+            tvo.setCreateTime(task.getCreateTime());
+            tvo.setTaskId(task.getId());
+            tvo.setExecutionId(task.getExecutionId());
+            tvo.setName(task.getName());
+            tvo.setProcDefId(task.getProcessDefinitionId());
+            tvo.setProInstId(task.getProcessInstanceId());
+            tvo.setAssign(task.getAssignee());
+            voList.add(tvo);
         }
         return data = Result.success(voList);
     }
@@ -260,7 +296,6 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //            result.setProIsEnd(procIsEnd(vo.getProInstId()) ? "Y" : "N");
 //            list.add(result);
             Task task = taskService.createTaskQuery().taskId(vo.getTaskId()).singleResult();
-            String proInstId = task.getProcessInstanceId();
 
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             TaskService service = getProcessEngine().getTaskService();

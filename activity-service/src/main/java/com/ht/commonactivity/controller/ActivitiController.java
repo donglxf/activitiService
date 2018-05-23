@@ -309,7 +309,6 @@ public class ActivitiController implements ModelDataJsonConstants {
     }
 
 
-
     /**
      * 查询列表
      *
@@ -444,35 +443,6 @@ public class ActivitiController implements ModelDataJsonConstants {
         return data = Result.success(voList);
     }
 
-    /**
-     * 根据候选组 查询所有代办任务
-     */
-    @RequestMapping("/findTaskByCandidateGroup")
-    @ResponseBody
-    public Result<List<TaskVo>> findTaskByCandidateGroup(FindTaskBeanVo vo) {
-        List<TaskVo> voList = new ArrayList<>();
-        Result<List<TaskVo>> data = null;
-        if (vo.getCandidateGroup() == null) {
-            data = Result.error(1, "参数异常！");
-            return data;
-        }
-        List<Task> list = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
-                .createTaskQuery().taskCandidateGroup(vo.getCandidateGroup()).orderByTaskCreateTime().asc().list();
-
-        for (Task task : list) {
-            TaskVo tvo = new TaskVo();
-            tvo.setCreateTime(task.getCreateTime());
-            tvo.setTaskId(task.getId());
-            tvo.setExecutionId(task.getExecutionId());
-            tvo.setName(task.getName());
-            tvo.setProcDefId(task.getProcessDefinitionId());
-            tvo.setProInstId(task.getProcessInstanceId());
-            tvo.setAssign(task.getAssignee());
-            voList.add(tvo);
-        }
-        return data = Result.success(voList);
-    }
-
     @PostMapping("/findTaskByAssigneeSelf")
     public Result<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee) {
         vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
@@ -565,7 +535,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping("/getNextTask")
     public void getNextTaskInfo(String taskId) {
-        TaskDefinition taskDefinition = activitiService.getNextTaskInfo(taskId,null);
+        TaskDefinition taskDefinition = activitiService.getNextTaskInfo(taskId, null);
 
     }
 
