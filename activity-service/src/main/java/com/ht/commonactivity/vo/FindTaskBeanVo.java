@@ -3,6 +3,7 @@ package com.ht.commonactivity.vo;
 import java.util.List;
 import java.util.Map;
 
+
 public class FindTaskBeanVo {
     /**
      * 用户名
@@ -14,6 +15,16 @@ public class FindTaskBeanVo {
     private int firstResult = 0;
 
     private int maxResults = 10;
+
+    private String taskDefinId;
+
+    public String getTaskDefinId() {
+        return taskDefinId;
+    }
+
+    public void setTaskDefinId(String taskDefinId) {
+        this.taskDefinId = taskDefinId;
+    }
 
     public Map<String, Object> getParamMap() {
         return paramMap;

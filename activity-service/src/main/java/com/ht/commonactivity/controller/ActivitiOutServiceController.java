@@ -10,6 +10,7 @@ import com.ht.commonactivity.entity.ActProcRelease;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.NextTaskInfo;
+import com.ht.commonactivity.utils.ObjectUtils;
 import com.ht.commonactivity.vo.ComplateTaskVo;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.ht.commonactivity.vo.TaskVo;
@@ -252,8 +253,19 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             data = Result.error(1, "参数异常！");
             return data;
         }
-        List<Task> list = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
-                .createTaskQuery().taskCandidateGroupIn(vo.getCandidateGroup()).orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
+        TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
+                .createTaskQuery();
+        if (ObjectUtils.isNotEmpty(vo.getTaskDefinId())) {
+            query.taskDefinitionKeyLike(vo.getTaskDefinId());
+//            if (vo.getTaskDefinId().size() == 1) {
+//                query.processDefinitionKeyLike(vo.getTaskDefinId().get(0));
+//            } else {
+//                query.processDefinitionKeyIn(vo.getTaskDefinId());
+//            }
+
+        }
+        List<Task> list = query.taskCandidateGroupIn(vo.getCandidateGroup())
+                .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
         ProcessInstance pi = null;
         for (Task task : list) {
             if (pi == null) {
@@ -316,7 +328,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 result.setTaskText(ta.getName());
                 result.setProcInstId(ta.getProcessInstanceId());
                 result.setTaskAssign(ta.getAssignee());
-                result.setProIsEnd(procIsEnd(ta.getProcessInstanceId()) ? "Y" : "N");
+//                result.setProIsEnd(procIsEnd(ta.getProcessInstanceId()) ? "Y" : "N");
+                result.setProIsEnd("N");
                 list.add(result);
             });
             return Result.success(list);
