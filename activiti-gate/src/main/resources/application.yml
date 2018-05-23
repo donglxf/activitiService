@@ -18,7 +18,7 @@ zuul:
   #ignoredServices: '*'
   routes:
     activiti-ui:
-      path: /activiti/ui/** #匹配/techouse/usersystem/** 均路由到cloud-client
+      path: /activity/ui/** #匹配/techouse/usersystem/** 均路由到cloud-client
     activiti-service:
       path: /activity/service/**
   host:
