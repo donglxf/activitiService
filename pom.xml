@@ -182,8 +182,8 @@
 
 
 	<modules>
-		<module>activiti-service</module>
-		<module>activiti-ui</module>
+		<module>activity-service</module>
+		<module>activity-ui</module>
 		<module>activiti-center</module>
 		<module>activiti-gate</module>
 	</modules>
