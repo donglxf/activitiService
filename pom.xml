@@ -24,7 +24,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<maven.test.skip>true</maven.test.skip>
-
+		<alibaba.druid.version>1.0.31</alibaba.druid.version>
 		<maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
 		<spring-boot-maven-plugin.version>1.5.9.RELEASE</spring-boot-maven-plugin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -111,6 +111,11 @@
 				<groupId>com.baomidou</groupId>
 				<artifactId>mybatis-plus</artifactId>
 				<version>${mybatisplus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>druid</artifactId>
+				<version>${alibaba.druid.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
