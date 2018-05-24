@@ -221,7 +221,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
         /**排序*/
-        List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
+        List<Task> list = query.orderByTaskCreateTime().desc().listPage(vo.getFirstResult(),vo.getMaxResults());//返回列表
         if (list != null && list.size() > 0) {
             for (Task task : list) {
                 ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();

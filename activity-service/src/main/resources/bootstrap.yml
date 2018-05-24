@@ -1,7 +1,9 @@
 spring:
   application:
     name: activity-service
-cloud:
+  autoconfigure:
+
+  cloud:
     config:
 #      name: activity-service,base,rabbitmq,mongo,redis
       discovery:
