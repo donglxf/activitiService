@@ -387,21 +387,23 @@ public class ActivitiController implements ModelDataJsonConstants {
                 .createTaskQuery();
 //        String str = "[{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"},{\"name\":\"阿布\",\"value\":\"123\",\"type\":\"1\"}]";
         if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
-            Map<String, Object> o = vo.getParamMap();
-            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
-                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
-                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
-                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            for (int i = 0; i < vo.getParamMap().size(); i++) {
+                Map<String, Object> o = vo.getParamMap().get(i);
+                if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                    query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                    query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                }
             }
 
 
@@ -458,21 +460,23 @@ public class ActivitiController implements ModelDataJsonConstants {
                 .createTaskQuery();//创建任务查询对象
 
         if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
-            Map<String, Object> o = vo.getParamMap();
-            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
-                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
-                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
-                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            for (int i = 0; i < vo.getParamMap().size(); i++) {
+                Map<String, Object> o = vo.getParamMap().get(i);
+                if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                    query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                    query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                }
             }
         }
 

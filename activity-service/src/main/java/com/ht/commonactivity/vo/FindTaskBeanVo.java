@@ -10,7 +10,7 @@ public class FindTaskBeanVo {
      */
     private String assignee;
 
-    private Map<String, Object> paramMap;  // json格式
+    private List<Map<String, Object>> paramMap;
 
     private int firstResult = 0;
 
@@ -26,11 +26,11 @@ public class FindTaskBeanVo {
         this.taskDefinId = taskDefinId;
     }
 
-    public Map<String, Object> getParamMap() {
+    public List<Map<String, Object>> getParamMap() {
         return paramMap;
     }
 
-    public void setParamMap(Map<String, Object> paramMap) {
+    public void setParamMap(List<Map<String, Object>> paramMap) {
         this.paramMap = paramMap;
     }
 

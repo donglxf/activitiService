@@ -196,21 +196,23 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 .createTaskQuery();//创建任务查询对象
 
         if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
-            Map<String, Object> o = vo.getParamMap();
-            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
-                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
-                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
-                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            for (int i = 0; i < vo.getParamMap().size(); i++) {
+                Map<String, Object> o = vo.getParamMap().get(i);
+                if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                    query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                    query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                }
             }
         }
 
@@ -263,21 +265,23 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         }
 
         if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
-            Map<String, Object> o = vo.getParamMap();
-            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
-                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
-                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
-                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
-            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
-                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            for (int i = 0; i < vo.getParamMap().size(); i++) {
+                Map<String, Object> o = vo.getParamMap().get(i);
+                if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                    query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                    query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                    query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+                }
             }
         }
 
@@ -301,6 +305,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     /**
      * 完成任务
+     *
+     * @param vo
+     * @return
      */
     @PostMapping("/complateTask")
     @ResponseBody
@@ -369,7 +376,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * 单步撤销
      *
      * @param proInstId    流程实例Id
-     * @param toBackNoteId 格式：sid-26585B1A-9680-4331-AD31-7A107BA03AB7
+     * @param toBackNoteId 任务id，如在流程设置则为设置的id，否则为默认id，格式：sid-26585B1A-9680-4331-AD31-7A107BA03AB7
      * @return
      */
     @RequestMapping("/singleRepealPro")

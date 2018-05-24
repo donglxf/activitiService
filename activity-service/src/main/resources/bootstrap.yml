@@ -3,13 +3,13 @@ spring:
     name: activity-service
 cloud:
     config:
-      name: activity-service,base,rabbitmq,mongo,redis
+#      name: activity-service,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
-        enabled: true
-      enabled: true
+        enabled: false
+      enabled: false
     bus:
-      enabled: true
+      enabled: false
 eureka:
   client:
     serviceUrl:
