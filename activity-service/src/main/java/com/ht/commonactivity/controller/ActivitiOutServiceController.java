@@ -264,6 +264,26 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //            }
 
         }
+
+        if (com.ht.commonactivity.utils.ObjectUtils.isNotEmpty(vo.getParamMap())) {
+            Map<String, Object> o = vo.getParamMap();
+            if (ActivitiSignEnum.equle.getVal().equals(o.get("type"))) {
+                query.processVariableValueEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.notequle.getVal().equals(o.get("key"))) {
+                query.processVariableValueNotEquals(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.great.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.greatEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueGreaterThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.less.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThan(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.lessEq.getVal().equals(o.get("key"))) {
+                query.processVariableValueLessThanOrEqual(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            } else if (ActivitiSignEnum.like.getVal().equals(o.get("key"))) {
+                query.processVariableValueLike(String.valueOf(o.get("name")), String.valueOf(o.get("value")));
+            }
+        }
+
         List<Task> list = query.taskCandidateGroupIn(vo.getCandidateGroup())
                 .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
         ProcessInstance pi = null;
