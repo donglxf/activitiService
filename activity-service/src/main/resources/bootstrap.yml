@@ -2,10 +2,10 @@ spring:
   application:
     name: activity-service
   autoconfigure:
-
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration.RabbitAnnotationDrivenConfiguration,org.springframework.cloud.config.client.ConfigClientAutoConfiguration
   cloud:
     config:
-#      name: activity-service,base,rabbitmq,mongo,redis
+      name: activity-service,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
         enabled: false
@@ -14,6 +14,6 @@ spring:
       enabled: false
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://172.16.200.110:30101/eureka/
-#      defaultZone: http://localhost:8001/eureka/
+      serviceUrl:
+  #      defaultZone: http://192.168.12.195:30101/eureka/  # 配置注册中心url
+        defaultZone: http://172.16.200.110:30101/eureka/  # 配置注册中心url

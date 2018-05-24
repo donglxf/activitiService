@@ -53,13 +53,13 @@ public class SwaggerConfiguration extends WebMvcConfigurerAdapter implements Env
 	@Override
 	public void setEnvironment(Environment environment) {
 		this.propertyResolver = new RelaxedPropertyResolver(environment, null);
-		this.basePackage = "com.ht.commonactivity.controller";
-		this.creatName = "activity-service";
-		this.serviceName = "activity-service";
-		this.description = "F1";
-//		this.basePackage = propertyResolver.getProperty("swagger.basepackage");
-//		this.creatName = propertyResolver.getProperty("swagger.service.developer");
-//		this.serviceName = propertyResolver.getProperty("swagger.service.name");
-//		this.description = propertyResolver.getProperty("swagger.service.description");
+//		this.basePackage = "com.ht.commonactivity.controller";
+//		this.creatName = "activity-service";
+//		this.serviceName = "activity-service";
+//		this.description = "F1";
+		this.basePackage = propertyResolver.getProperty("swagger.basepackage");
+		this.creatName = propertyResolver.getProperty("swagger.service.developer");
+		this.serviceName = propertyResolver.getProperty("swagger.service.name");
+		this.description = propertyResolver.getProperty("swagger.service.description");
 	}
 }
