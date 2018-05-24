@@ -221,11 +221,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         /**排序*/
         List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
         if (list != null && list.size() > 0) {
-            ProcessInstance pi = null;
             for (Task task : list) {
-                if (pi == null) {
-                    pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-                }
+                ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
                 TaskVo tvo = new TaskVo();
                 tvo.setBusinessKey(pi.getBusinessKey());
                 tvo.setCreateTime(task.getCreateTime());
@@ -286,11 +283,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
         List<Task> list = query.taskCandidateGroupIn(vo.getCandidateGroup())
                 .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
-        ProcessInstance pi = null;
         for (Task task : list) {
-            if (pi == null) {
-                pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-            }
+            ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
             TaskVo tvo = new TaskVo();
             tvo.setBusinessKey(pi.getBusinessKey());
             tvo.setCreateTime(task.getCreateTime());
