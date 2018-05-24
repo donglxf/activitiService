@@ -8,10 +8,10 @@ spring:
       name: activity-service,base,rabbitmq,mongo,redis
       discovery:
         service-id: ussp-config-app
-        enabled: false
-      enabled: false
+        enabled: true
+      enabled: true
     bus:
-      enabled: false
+      enabled: true
 eureka:
   client:
       serviceUrl:
