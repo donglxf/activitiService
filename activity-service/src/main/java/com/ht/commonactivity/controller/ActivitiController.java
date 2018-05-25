@@ -182,6 +182,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             t.setModelCode(paramter.getKey());
             t.setModelName(paramter.getName());
             t.setModelDesc(paramter.getDescription());
+
             modelDefinitionService.insert(t);
             data = Result.success(paramter);
         } catch (Exception e) {
@@ -670,6 +671,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         q.forEach(h -> {
 //            System.out.println(h.getId() + "," + h.getBusinessKey() + "," + h.getProcessDefinitionId() + "," + h.getStartTime() + "," + h.getProcessDefinitionKey());
             HisProcListVo vo = new HisProcListVo();
+            vo.setProName(actProcReleaseService.selectOne(new EntityWrapper().eq("model_procdef_id",h.getProcessDefinitionId())).getModelName());
             vo.setProInstId(h.getId());
             vo.setEndTime(h.getEndTime() != null ? sim.format(h.getEndTime()) : "");
             vo.setStartTime(sim.format(h.getStartTime()));

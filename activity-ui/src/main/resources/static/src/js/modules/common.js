@@ -131,7 +131,8 @@ layui.define(['layer','laytpl','form','ht_ajax','ht_config'], function(exports) 
                 console.log(data);
             }
         },
-
     };
+
+
     exports('myutil', myUtil);
 });

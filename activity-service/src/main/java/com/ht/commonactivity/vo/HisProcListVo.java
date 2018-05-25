@@ -5,6 +5,15 @@ public class HisProcListVo {
     private String startTime;
     private String endTime ;
     private String isComplate;
+    private String proName;
+
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName;
+    }
 
     public String getProInstId() {
         return proInstId;

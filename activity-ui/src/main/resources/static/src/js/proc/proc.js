@@ -18,6 +18,7 @@ layui.use(['table','jquery','myutil'], function(){
         ,page: true //开启分页
         ,cols: [[ //表头\
              {field: 'proInstId', title: '实例id'}
+             ,{field: 'proName', title: '流程名'}
             ,{field: 'startTime', title: '开始系统'}
             ,{field: 'endTime', title: '结束时间'}
             ,{field: 'isComplate', title: '是否结束',templet:"#start"}
@@ -60,7 +61,7 @@ layui.use(['table','jquery','myutil'], function(){
                     curr: 1 //重新从第 1 页开始
                 }
                 ,where: {
-                    "proId": modelName.val()
+                    proId: modelName.val()
                 }
             });
         }

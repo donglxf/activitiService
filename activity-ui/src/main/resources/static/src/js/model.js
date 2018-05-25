@@ -250,7 +250,7 @@ function addModel(){
         type: 2,
         shade: false,
         title:"新增模型",
-        area: ['800px','450px'],
+        area: ['800px','550px'],
         content: pathConfig.activitiUiPath+'/addView',
         zIndex: layer.zIndex, //重点1
         success: function(layero){
@@ -259,6 +259,7 @@ function addModel(){
         }
     });
 }
+
 
 
 
