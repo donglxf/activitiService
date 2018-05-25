@@ -445,8 +445,8 @@ public class ActivitiController implements ModelDataJsonConstants {
         return data = Result.success(voList);
     }
 
-    @PostMapping("/findTaskByAssigneeSelf")
-    public Result<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee) {
+    @GetMapping("/findTaskByAssigneeSelf")
+    public Result<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee, Integer page, Integer limit) {
         vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
@@ -485,7 +485,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
         /**排序*/
-        List<Task> list = query.orderByTaskCreateTime().asc().list();//返回列表
+        List<Task> list = query.orderByTaskCreateTime().asc().listPage(page, limit);//返回列表
         if (list != null && list.size() > 0) {
             for (Task task : list) {
                 TaskVo tvo = new TaskVo();
@@ -656,7 +656,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @GetMapping("/queryHisProcList")
     @ResponseBody
-    public Result<List<HisProcListVo>> queryHisProcList(String proId) {
+    public PageResult<List<HisProcListVo>> queryHisProcList(String proId, Integer page, Integer limit) {
         SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<HisProcListVo> list = new ArrayList<>();
 
@@ -664,7 +664,9 @@ public class ActivitiController implements ModelDataJsonConstants {
         if (!StringUtils.isEmpty(proId)) {
             query.processInstanceId(proId);
         }
-        List<HistoricProcessInstance> q = query.orderByProcessInstanceStartTime().asc().list();
+        int size = query.orderByProcessInstanceStartTime().desc().list().size();
+        page = (page - 1) * limit;
+        List<HistoricProcessInstance> q = query.orderByProcessInstanceStartTime().desc().listPage(page, limit); // 开始记录数，每页显示数
         q.forEach(h -> {
 //            System.out.println(h.getId() + "," + h.getBusinessKey() + "," + h.getProcessDefinitionId() + "," + h.getStartTime() + "," + h.getProcessDefinitionKey());
             HisProcListVo vo = new HisProcListVo();
@@ -674,7 +676,8 @@ public class ActivitiController implements ModelDataJsonConstants {
             vo.setIsComplate(h.getEndTime() == null ? "未结束" : "已结束");
             list.add(vo);
         });
-        return Result.success(list);
+
+        return PageResult.success(list, size);
     }
 
     /**
