@@ -80,7 +80,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return processEngine;
     }
 
-    @RequestMapping("/startProcessInstanceByKey")
+    @PostMapping("/startProcessInstanceByKey")
     @ApiOperation("启动模型")
     public Result<List<NextTaskInfo>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
         log.info("start model,paramter:" + JSON.toJSONString(paramter));
@@ -172,7 +172,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     /**
      * 根据用户、候选人、候选组 查询所有任务
      */
-    @RequestMapping("/findTaskByAssignee")
+    @PostMapping("/findTaskByAssignee")
     @ResponseBody
     public Result<List<TaskVo>> findMyPersonalTask(@RequestBody FindTaskBeanVo vo) {
         List<TaskVo> voList = new ArrayList<>();
@@ -243,7 +243,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     /**
      * 根据候选组 查询所有代办任务,角色
      */
-    @RequestMapping("/findTaskByCandidateGroup")
+    @PostMapping("/findTaskByCandidateGroup")
     @ResponseBody
     public Result<List<TaskVo>> findTaskByCandidateGroup(@RequestBody FindTaskBeanVo vo) {
         List<TaskVo> voList = new ArrayList<>();
@@ -366,7 +366,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param proId
      * @return
      */
-    @RequestMapping("/repealPro")
+    @GetMapping("/repealPro")
     public Result<String> repealPro(@RequestParam String proId) {
         runtimeService.deleteProcessInstance(proId, "撤销流程");
         return Result.success("撤销成功");
@@ -379,7 +379,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param toBackNoteId 任务id，如在流程设置则为设置的id，否则为默认id，格式：sid-26585B1A-9680-4331-AD31-7A107BA03AB7
      * @return
      */
-    @RequestMapping("/singleRepealPro")
+    @GetMapping("/singleRepealPro")
     public Result<String> singleRepealPro(@RequestParam String proInstId, @RequestParam String toBackNoteId) {
         try {
             // 根据流程实例找到当前任务节点
