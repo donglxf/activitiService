@@ -492,6 +492,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         if (list != null && list.size() > 0) {
             for (Task task : list) {
                 TaskVo tvo = new TaskVo();
+                tvo.setProName(actProcReleaseService.selectOne(new EntityWrapper().eq("model_procdef_id", task.getProcessDefinitionId())).getModelName());
                 tvo.setCreateTime(task.getCreateTime());
                 tvo.setTaskId(task.getId());
                 tvo.setExecutionId(task.getExecutionId());
@@ -673,7 +674,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         q.forEach(h -> {
 //            System.out.println(h.getId() + "," + h.getBusinessKey() + "," + h.getProcessDefinitionId() + "," + h.getStartTime() + "," + h.getProcessDefinitionKey());
             HisProcListVo vo = new HisProcListVo();
-            vo.setProName(actProcReleaseService.selectOne(new EntityWrapper().eq("model_procdef_id",h.getProcessDefinitionId())).getModelName());
+            vo.setProName(actProcReleaseService.selectOne(new EntityWrapper().eq("model_procdef_id", h.getProcessDefinitionId())).getModelName());
             vo.setProInstId(h.getId());
             vo.setEndTime(h.getEndTime() != null ? sim.format(h.getEndTime()) : "");
             vo.setStartTime(sim.format(h.getStartTime()));

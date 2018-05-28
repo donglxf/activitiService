@@ -18,6 +18,7 @@ layui.use(['table','jquery','myutil'], function(){
         ,page: true //开启分页
         ,cols: [[ //表头\
              {field: 'taskId', title: '任务id'}
+            ,{field: 'proName', title: '流程名'}
             ,{field: 'name', title: '任务名'}
             ,{field: 'proInstId', title: '实例id'}
             ,{field: 'procDefId', title: '节点定义id'}

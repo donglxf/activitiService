@@ -11,6 +11,15 @@ public class TaskVo {
     private String executionId;
     private String procDefId;
     private String assign;
+    private String proName;
+
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName;
+    }
 
     public String getBusinessKey() {
         return businessKey;
