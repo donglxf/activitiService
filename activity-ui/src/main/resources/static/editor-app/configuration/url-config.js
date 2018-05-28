@@ -25,7 +25,7 @@ KISBPM.URL = {
     },
 
     getStencilSet: function() {
-        return ACTIVITI.CONFIG.contextRoot + '/activiti/editor/stencilset?version=' + Date.now();
+        return ACTIVITI.CONFIG.contextRoot + 'activiti/editor/stencilset?version=' + Date.now();
     },
 
     getNewStencilSet: function() {
@@ -33,6 +33,6 @@ KISBPM.URL = {
     },
 
     putModel: function(modelId) {
-        return ACTIVITI.CONFIG.contextRoot + '/activiti/model/save?modelId=' + modelId;
+        return ACTIVITI.CONFIG.contextRoot + 'activiti/model/save?modelId=' + modelId;
     }
 };
