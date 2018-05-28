@@ -70,6 +70,7 @@ import java.util.*;
  */
 @RestController
 @Log4j2
+@RequestMapping("/activiti")
 public class ActivitiAuthorityController implements ModelDataJsonConstants {
 
     @Resource

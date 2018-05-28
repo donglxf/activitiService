@@ -74,7 +74,7 @@ import java.util.*;
  */
 @RestController
 @Log4j2
-@RequestMapping("/process")
+//@RequestMapping("/process")
 public class ActivitiController implements ModelDataJsonConstants {
 
     @Resource
@@ -215,6 +215,7 @@ public class ActivitiController implements ModelDataJsonConstants {
                 return data;
             }
             repositoryService.deleteModel(paramter.getModelId());
+            modelDefinitionService.delete(new EntityWrapper<ActModelDefinition>().eq("model_id", paramter.getModelId()));
             data = Result.success(paramter);
         } catch (Exception e) {
             log.error("delete model error,errorMsg:", e);
