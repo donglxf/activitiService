@@ -38,6 +38,7 @@ import java.util.Map;
 @RestController
 @Api("工作流对外提供的接口服务")
 @Log4j2
+@RequestMapping("/process")
 public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
 

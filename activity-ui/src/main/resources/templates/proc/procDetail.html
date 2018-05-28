@@ -27,7 +27,7 @@
         var $=layui.jquery;
         table.render({
             elem: '#proc_detail'
-            ,url:'/activity/service/processHisAutoIdea?processInstanceId='+$("#proInstId").val()
+            ,url:'/activity/service/process/processHisAutoIdea?processInstanceId='+$("#proInstId").val()
             ,cellMinWidth: 100 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
             ,cols: [[
                 {field:'taskId', width:80, title: '任务id', sort: true}
