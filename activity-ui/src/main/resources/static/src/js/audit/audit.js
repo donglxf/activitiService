@@ -17,7 +17,7 @@ layui.use(['table','jquery','myutil'], function(){
         ,id: 'testReload'
         ,page: true //开启分页
         ,cols: [[ //表头\
-             {field: 'id', title: '任务id'}
+             {field: 'taskId', title: '任务id'}
             ,{field: 'name', title: '任务名'}
             ,{field: 'proInstId', title: '实例id'}
             ,{field: 'procDefId', title: '节点定义id'}
@@ -28,7 +28,7 @@ layui.use(['table','jquery','myutil'], function(){
         var data = obj.data; //获得当前行数据
         var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
         var tr = obj.tr; //获得当前行 tr 的DOM对象
-        var taskId = data.id;
+        var taskId = data.taskId;
         var proInstId = data.proInstId;
         console.log(data);
         if(layEvent === 'view'){ //编辑

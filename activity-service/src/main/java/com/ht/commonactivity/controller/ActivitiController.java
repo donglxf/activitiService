@@ -485,6 +485,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         if (vo.getAssignee() != null) {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
+        page = (page - 1) * limit;
         /**排序*/
         List<Task> list = query.orderByTaskCreateTime().asc().listPage(page, limit);//返回列表
         if (list != null && list.size() > 0) {

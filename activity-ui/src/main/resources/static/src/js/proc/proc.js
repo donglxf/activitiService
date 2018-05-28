@@ -19,7 +19,7 @@ layui.use(['table','jquery','myutil'], function(){
         ,cols: [[ //表头\
              {field: 'proInstId', title: '实例id'}
              ,{field: 'proName', title: '流程名'}
-            ,{field: 'startTime', title: '开始系统'}
+            ,{field: 'startTime', title: '开始时间'}
             ,{field: 'endTime', title: '结束时间'}
             ,{field: 'isComplate', title: '是否结束',templet:"#start"}
             ,{fixed: 'right', width:250, align:'center', toolbar: '#barDemo'}
