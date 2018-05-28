@@ -451,10 +451,11 @@ public class ActivitiController implements ModelDataJsonConstants {
         vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
-        if (StringUtils.isEmpty(vo.getAssignee())) {
-            data = Result.error(1, "参数异常！");
-            return data;
-        }
+
+//        if (StringUtils.isEmpty(vo.getAssignee())) {
+//            data = Result.error(1, "请输入姓名查询！");
+//            return data;
+//        }
 
 
         TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
@@ -482,7 +483,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         }
 
         /**查询条件（where部分）*/
-        if (vo.getAssignee() != null) {
+        if (StringUtils.isNotBlank(vo.getAssignee())) {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
         page = (page - 1) * limit;
