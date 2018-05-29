@@ -16,7 +16,7 @@
     layui.use(['table', 'ht_ajax', 'ht_auth', "ht_config"], function () {
         var config = layui.ht_config;
         var $=layui.jquery;
-        console.log(config.proImg);
+        console.log(config.proImg+"viewProImg?processInstanceId="+ parent.proInstIds);
         window.location.href = config.proImg + "viewProImg?processInstanceId=" + parent.proInstIds;
 //        window.location.href = "http://localhost:32101/viewProImg?processInstanceId=" + parent.proInstIds;
     });
