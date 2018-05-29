@@ -6,6 +6,7 @@
     <title>流程回退</title>
 </head>
 <body>
+<script src="/activity/ui/plugins/layui/layui.js"></script>
 <script>
     layui.config({
         base: '/activity/ui/src/js/modules/' //假设这是你存放拓展模块的根目录
@@ -14,6 +15,8 @@
     });
     layui.use(['table', 'ht_ajax', 'ht_auth', "ht_config"], function () {
         var config = layui.ht_config;
+        var $=layui.jquery;
+        console.log(config.proImg);
         window.location.href = config.proImg + "viewProImg?processInstanceId=" + parent.proInstIds;
 //        window.location.href = "http://localhost:32101/viewProImg?processInstanceId=" + parent.proInstIds;
     });
