@@ -75,32 +75,32 @@ layui.use(['table', 'jquery', 'myutil','ht_ajax', "ht_config"], function () {
 
     function showProImg(proInstId) {
         proInstIds = proInstId;
-        layer.open({
-            type: 2,
-            shade: false,
-            title: "查看流程图",
-            anim: 5,
-            area: ['1200px', '600px'],
-            content: config.proImg + "viewProImg?processInstanceId=" + proInstId,
-            zIndex: layer.zIndex, //重点1
-            success: function (layero, index) {
-            }
-        });
-        // var layIndex = layer.open({
+        // layer.open({
         //     type: 2,
         //     shade: false,
-        //     title:"流程图",
-        //     anim:5,
-        //     area : [ '1200px', '600px' ],
-        //     content: preUrlUi+'/showProImg',
+        //     title: "查看流程图",
+        //     anim: 5,
+        //     area: ['1200px', '600px'],
+        //     content: config.proImg + "viewProImg?processInstanceId=" + proInstId,
         //     zIndex: layer.zIndex, //重点1
-        //     success: function(layero, index){
-        //         var body = layer.getChildFrame('body', index);
-        //         var input=body.find("input[type='hidden']");
-        //         input.val(proInstId);
-        //         layer.setTop(layero); //重点2
+        //     success: function (layero, index) {
         //     }
         // });
+        var layIndex = layer.open({
+            type: 2,
+            shade: false,
+            title:"流程图",
+            anim:5,
+            area : [ '1200px', '600px' ],
+            content: preUrlUi+'/showProImg',
+            zIndex: layer.zIndex, //重点1
+            success: function(layero, index){
+                var body = layer.getChildFrame('body', index);
+                var input=body.find("input[type='hidden']");
+                input.val(proInstId);
+                layer.setTop(layero); //重点2
+            }
+        });
     }
 
     function showTzHis(proInstId) {
