@@ -725,7 +725,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         int len;
         while ((len = imageStream.read(b, 0, 1024)) != -1) {
 //            response.setContentType("text/html;charset=UTF-8");
-            response.setHeader("Content-type", "text/html;charset=GBK");
+//            response.setHeader("Content-type", "application/json;charset=GBK");
 
             response.getOutputStream().write(b, 0, len);
         }
