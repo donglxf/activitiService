@@ -6,7 +6,7 @@ layui.config({
 var preUrl = "/activity/service";
 var preUrlUi = "/activity/ui";
 var proInstIds = '';
-layui.use(['table', 'jquery', 'myutil', "ht_config"], function () {
+layui.use(['table', 'jquery', 'myutil','ht_ajax', "ht_config"], function () {
     var table = layui.table;
     var $ = layui.jquery;
     var config = layui.ht_config;
