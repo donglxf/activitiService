@@ -3,39 +3,40 @@ layui.config({
 }).extend({ //设定模块别名
     myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
 });
-var preUrl="/activity/service";
-var preUrlUi="/activity/ui";
-var proInstIds='';
-layui.use(['table','jquery','myutil'], function(){
+var preUrl = "/activity/service";
+var preUrlUi = "/activity/ui";
+var proInstIds = '';
+layui.use(['table', 'jquery', 'myutil', "ht_config"], function () {
     var table = layui.table;
     var $ = layui.jquery;
+    var config = layui.ht_config;
     //第一个实例
     table.render({
         elem: '#proc_list'
-        ,height: 'auto'
-        ,url:preUrl+'/queryHisProcList' //数据接口
-        ,id: 'testReload'
-        ,page: true //开启分页
-        ,cols: [[ //表头\
-             {field: 'proInstId', title: '实例id'}
-             ,{field: 'proName', title: '流程名'}
-            ,{field: 'startTime', title: '开始时间'}
-            ,{field: 'endTime', title: '结束时间'}
-            ,{field: 'isComplate', title: '是否结束',templet:"#start"}
-            ,{fixed: 'right', width:250, align:'center', toolbar: '#barDemo'}
+        , height: 'auto'
+        , url: preUrl + '/queryHisProcList' //数据接口
+        , id: 'testReload'
+        , page: true //开启分页
+        , cols: [[ //表头\
+            {field: 'proInstId', title: '实例id'}
+            , {field: 'proName', title: '流程名'}
+            , {field: 'startTime', title: '开始时间'}
+            , {field: 'endTime', title: '结束时间'}
+            , {field: 'isComplate', title: '是否结束', templet: "#start"}
+            , {fixed: 'right', width: 250, align: 'center', toolbar: '#barDemo'}
         ]]
     });
-    table.on('tool(entityTable)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+    table.on('tool(entityTable)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
         var data = obj.data; //获得当前行数据
         var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
         var tr = obj.tr; //获得当前行 tr 的DOM对象
         var proInstId = data.proInstId;
         console.log(data);
-        if(layEvent === 'view'){ //明细
+        if (layEvent === 'view') { //明细
             showdetail(proInstId);
-        }else if(layEvent==='viewImg'){ // 流程图
+        } else if (layEvent === 'viewImg') { // 流程图
             showProImg(proInstId);
-        }else if(layEvent==='hisTz'){ //  跳转记录
+        } else if (layEvent === 'hisTz') { //  跳转记录
             showTzHis(proInstId);
         }
     });
@@ -53,64 +54,76 @@ layui.use(['table','jquery','myutil'], function(){
 
 
     active = {
-        reload: function(){
+        reload: function () {
             var modelName = $('#modelId');
             console.log(modelName.val());
             table.reload('testReload', {
                 page: {
                     curr: 1 //重新从第 1 页开始
                 }
-                ,where: {
+                , where: {
                     proId: modelName.val()
                 }
             });
         }
     };
 
-    $('#model_search').on('click', function(){
+    $('#model_search').on('click', function () {
         var type = $(this).data('type');
         active[type] ? active[type].call(this) : '';
     });
 
-    function showProImg(proInstId){
-        proInstIds=proInstId;
+    function showProImg(proInstId) {
+        proInstIds = proInstId;
+        layer.open({
+            type: 2,
+            shade: false,
+            title: "流程图",
+            anim: 5,
+            area: ['1200px', '600px'],
+            content: config.proImg + "viewProImg?processInstanceId=" + proInstId,
+            zIndex: layer.zIndex, //重点1
+            success: function (layero, index) {
+            }
+        });
+        // var layIndex = layer.open({
+        //     type: 2,
+        //     shade: false,
+        //     title:"流程图",
+        //     anim:5,
+        //     area : [ '1200px', '600px' ],
+        //     content: config.proImg + "viewProImg?processInstanceId=" +proInstId,
+        //     // content: preUrlUi+'/showProImg',
+        //     zIndex: layer.zIndex, //重点1
+        //     success: function(layero, index){
+        //         var body = layer.getChildFrame('body', index);
+        //         var input=body.find("input[type='hidden']");
+        //         input.val(proInstId);
+        //         layer.setTop(layero); //重点2
+        //     }
+        // });
+    }
+
+    function showTzHis(proInstId) {
         var layIndex = layer.open({
             type: 2,
             shade: false,
-            title:"流程图",
-            anim:5,
-            area : [ '1200px', '600px' ],
-            content: preUrlUi+'/showProImg',
+            title: "流转记录",
+            anim: 5,
+            area: ['700px', '600px'],
+            content: preUrlUi + '/procTzHis',
             zIndex: layer.zIndex, //重点1
-            success: function(layero, index){
+            success: function (layero, index) {
                 var body = layer.getChildFrame('body', index);
-                var input=body.find("input[type='hidden']");
+                var input = body.find("input[type='hidden']");
                 input.val(proInstId);
                 layer.setTop(layero); //重点2
             }
         });
     }
 
-    function showTzHis(proInstId){
-        var layIndex = layer.open({
-            type: 2,
-            shade: false,
-            title:"流转记录",
-            anim:5,
-            area : [ '700px', '600px' ],
-            content: preUrlUi+'/procTzHis',
-            zIndex: layer.zIndex, //重点1
-            success: function(layero, index){
-                var body = layer.getChildFrame('body', index);
-                var input=body.find("input[type='hidden']");
-                input.val(proInstId);
-                layer.setTop(layero); //重点2
-            }
-        });
-    }
 
-
-    function showdetail(proInstId){
+    function showdetail(proInstId) {
         // $.get(preUrl+"processHisAutoIdea?processInstanceId="+proInstId,function (data) {
         //     var result = data.data;
         //     $.get(preUrlUi+'/procDetail', null, function (form) {
@@ -139,14 +152,14 @@ layui.use(['table','jquery','myutil'], function(){
         var layIndex = layer.open({
             type: 2,
             shade: false,
-            title:"流程明细",
-            anim:5,
-            area : [ '700px', '600px' ],
-            content: preUrlUi+'/procDetail',
+            title: "流程明细",
+            anim: 5,
+            area: ['700px', '600px'],
+            content: preUrlUi + '/procDetail',
             zIndex: layer.zIndex, //重点1
-            success: function(layero, index){
+            success: function (layero, index) {
                 var body = layer.getChildFrame('body', index);
-                var input=body.find("input[type='hidden']");
+                var input = body.find("input[type='hidden']");
                 input.val(proInstId);
                 layer.setTop(layero); //重点2
             }
@@ -154,17 +167,18 @@ layui.use(['table','jquery','myutil'], function(){
         // layer.full(layIndex);
     }
 
-    function queryVersionList(modelId){
+    function queryVersionList(modelId) {
         table.reload('versionReload', {
             page: {
                 curr: 1 //重新从第 1 页开始
             }
-            ,where: {
+            , where: {
                 "modelId": modelId
             }
         });
     }
-    $('#version_search').on('click', function(){
+
+    $('#version_search').on('click', function () {
         var type = $(this).data('type');
         console.log(type);
         active[type] ? active[type].call(this) : '';

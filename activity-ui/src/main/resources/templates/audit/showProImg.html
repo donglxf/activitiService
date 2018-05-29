@@ -16,8 +16,22 @@
     layui.use(['table', 'ht_ajax', 'ht_auth', "ht_config"], function () {
         var config = layui.ht_config;
         var $=layui.jquery;
+        layer.open({
+            type: 2,
+            shade: false,
+            title:"流程图",
+            anim:5,
+            area : [ '1200px', '600px' ],
+            content: config.proImg + "viewProImg?processInstanceId=" + parent.proInstIds,
+            zIndex: layer.zIndex, //重点1
+            success: function(layero, index){
+
+                layer.setTop(layero); //重点2
+            }
+        });
         console.log(config.proImg+"viewProImg?processInstanceId="+ parent.proInstIds);
-        window.location.href = config.proImg + "viewProImg?processInstanceId=" + parent.proInstIds;
+//        window.location.href = config.proImg + "viewProImg?processInstanceId=" + parent.proInstIds;
+
 //        window.location.href = "http://localhost:32101/viewProImg?processInstanceId=" + parent.proInstIds;
     });
 
