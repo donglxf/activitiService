@@ -96,7 +96,7 @@ activitiModeler
             function fetchModel(modelId) {
                 var modelUrl = getModel(modelId);
                 console.log(modelUrl);
-                $http({method: 'GET', url: modelUrl,headers: {app: "FK"},}).
+                $http({method: 'GET', url: modelUrl,headers: {app: "ACTIVITI"},}).
                     success(function (data, status, headers, config) {
                         $rootScope.editor = new ORYX.Editor(data);
                         $rootScope.modelData = angular.fromJson(data);

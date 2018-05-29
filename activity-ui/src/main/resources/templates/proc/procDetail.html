@@ -22,7 +22,7 @@
         myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
     });
 
-    layui.use(['table','jquery'], function(){
+    layui.use(['table','ht_ajax', 'ht_auth'], function(){
         var table = layui.table;
         var $=layui.jquery;
         table.render({
