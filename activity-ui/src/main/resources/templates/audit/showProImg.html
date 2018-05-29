@@ -7,7 +7,17 @@
 </head>
 <body>
 <script>
-        window.location.href="http://localhost:32101/viewProImg?processInstanceId="+parent.proInstIds
+    layui.config({
+        base: '/activity/ui/src/js/modules/' //假设这是你存放拓展模块的根目录
+    }).extend({ //设定模块别名
+        myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
+    });
+    layui.use(['table', 'ht_ajax', 'ht_auth', "ht_config"], function () {
+        var config = layui.ht_config;
+        window.location.href = config.proImg + "viewProImg?processInstanceId=" + parent.proInstIds;
+//        window.location.href = "http://localhost:32101/viewProImg?processInstanceId=" + parent.proInstIds;
+    });
+
 </script>
 </body>
 </html>

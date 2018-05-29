@@ -20,7 +20,7 @@ layui.define(['config'],function (exports) {
         , refreshTokenUrl: basePath + "uaa/auth/token"
         , changePwdUrl : changePwdUrl
         , userInfoUpdate: userInfoUpdate
-
+        , proImg:basePath+"activity/service/"
         , activitiServicePath:"/activiti/" // 流程引擎配置模块根路径
         , ruleServicePath:"/activity/service/" // 流程引擎配置模块根路径
         ,dev:true
