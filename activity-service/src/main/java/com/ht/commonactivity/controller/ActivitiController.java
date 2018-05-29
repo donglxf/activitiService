@@ -525,7 +525,7 @@ public class ActivitiController implements ModelDataJsonConstants {
 
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             Map<String, Object> variables = new HashMap<String, Object>();
-            variables.put("flag", "2");
+            variables.put("flag", "0");
             TaskService service = getProcessEngine().getTaskService();  //与正在执行的任务管理相关的Service
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
@@ -601,7 +601,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @RequestMapping("/processBackTaskList")
     @ResponseBody
-    public Result<List<ProcessBackTaskNoteVo>> processHisTask(String procInstanceId) throws Exception {
+    public Result<List<ProcessBackTaskNoteVo>> processHisTask(@RequestParam(value = "processInstanceId") String procInstanceId) throws Exception {
         List<ProcessBackTaskNoteVo> backList = new ArrayList<ProcessBackTaskNoteVo>();
         List<ProcessBackTaskNoteVo> newBackList = new ArrayList<ProcessBackTaskNoteVo>();
         List<Task> tasks = getProcessEngine().getTaskService().createTaskQuery().processInstanceId(procInstanceId).list();
