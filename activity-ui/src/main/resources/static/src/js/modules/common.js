@@ -117,7 +117,7 @@ layui.define(['layer','laytpl','form','ht_ajax','ht_config'], function(exports) 
                             if(result[i].app == businessId){
                                 ischeck = 'selected="true"';
                             }
-                            var option = '<option value="'+result[i].app+'" '+ischeck+' >'+result[i].nameCn+'</option>';
+                            var option = '<option value="'+result[i].nameCn+'" '+ischeck+' >'+result[i].nameCn+'</option>';
                             $(obj).find("#"+selectId).append(option);
                         }
                         form.render('select');
