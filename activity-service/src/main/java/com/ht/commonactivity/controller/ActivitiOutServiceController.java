@@ -443,10 +443,15 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      */
     @GetMapping("/refuseTask")
     public Result<String> refuseTask(@RequestParam String proInsId) {
-//        taskService.delegateTask(taskId, owner);
-        return Result.success();
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInsId).list();
+        tasks.forEach(task -> {
+            taskService.complete(task.getId());
+        });
+        if (tasks.size() > 0) {
+            refuseTask(proInsId);
+        }
+        return Result.success("操作成功");
     }
-
 
 
 }
