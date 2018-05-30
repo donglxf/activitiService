@@ -14,12 +14,9 @@ import com.ht.commonactivity.common.RpcStartParamter;
 import com.ht.commonactivity.common.enumtype.ActivitiSignEnum;
 import com.ht.commonactivity.common.result.PageResult;
 import com.ht.commonactivity.common.result.Result;
-import com.ht.commonactivity.entity.ActModelDefinition;
-import com.ht.commonactivity.entity.ActProcRelease;
-import com.ht.commonactivity.entity.ActProcessAuditHis;
+import com.ht.commonactivity.entity.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ht.commonactivity.entity.ActProcessJumpHis;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.TestPointCat;
@@ -109,6 +106,8 @@ public class ActivitiController implements ModelDataJsonConstants {
     @Autowired
     protected RuntimeService runtimeService;
 
+    @Autowired
+    protected ModelCallLogService modelCallLogService;
 
     @Autowired
     protected UcAppRpc ucAppRpc;
@@ -151,6 +150,36 @@ public class ActivitiController implements ModelDataJsonConstants {
         result = PageResult.success(releaseVos, modelReleasePage.getTotal());
         log.info("查询模型版本证分页信息结束");
         return result;
+    }
+
+    /**
+     * 查询待验证的模型信息
+     *
+     * @param page
+     * @param actProcRelease
+     * @return
+     */
+    @GetMapping("/logPage")
+    @ApiIgnore
+    public PageResult<List<ModelCallLog>> logPage(String key, int limit, int page) {
+        log.info("查询模型版本分页信息开始");
+        PageResult<List<ModelCallLog>> result = null;
+        Wrapper<ModelCallLog> wrapper = new EntityWrapper<ModelCallLog>();
+        if (org.apache.commons.lang.StringUtils.isNotBlank(key)) {
+            wrapper.like("business_key", key);
+            wrapper.or().like("process_defined_key", key);
+            wrapper.or().like("version", key);
+            wrapper.or().like("datas", key);
+            wrapper.or().like("pro_inst_id", key);
+            wrapper.or().like("model_procdef_id", key);
+        }
+
+        Page<ModelCallLog> modelReleasePage = new Page<ModelCallLog>();
+        modelReleasePage.setCurrent(page);
+        modelReleasePage.setSize(limit);
+        modelReleasePage = modelCallLogService.selectPage(modelReleasePage, wrapper);
+        log.info("查询模型版本证分页信息结束");
+        return PageResult.success(modelReleasePage.getRecords(), modelReleasePage.getTotal());
     }
 
 
@@ -716,7 +745,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             highLightedActivitis.add(activityId);
         }
         //中文显示的是口口口，设置字体就好了
-        InputStream imageStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedActivitis, highLightedFlows, "宋体", "", null, null, 1.0);
+        InputStream imageStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedActivitis, highLightedFlows, "宋体", "宋体", null, null, 1.0);
 
         //单独返回流程图，不高亮显示
 //        InputStream imageStream = diagramGenerator.generatePngDiagram(bpmnModel);

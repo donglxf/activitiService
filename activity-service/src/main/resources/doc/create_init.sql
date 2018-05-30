@@ -77,8 +77,8 @@ create table act_model_definition(
 CREATE TABLE `act_process_jump_his` (
   `id` bigint(20) NOT NULL COMMENT '主键',
   `pro_name` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '流程名',
-  `proc_def_id` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '流程定义id',
-  `proc_inst_id` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '实例id',
+  `proc_def_id` varchar(70) COLLATE utf8_bin NOT NULL COMMENT '流程定义id',
+  `proc_inst_id` varchar(70) COLLATE utf8_bin NOT NULL COMMENT '实例id',
   `source_task_id` varchar(100) COLLATE utf8_bin NOT NULL COMMENT '跳转原节点id',
   `source_task_name` varchar(100) COLLATE utf8_bin NOT NULL COMMENT '跳转原节点Name',
   `target_task_id` varchar(100) COLLATE utf8_bin NOT NULL COMMENT '跳转目标节点id',
@@ -86,3 +86,17 @@ CREATE TABLE `act_process_jump_his` (
   `cre_user_id` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '执行人id',
   `cre_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '跳转时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='流程回退历史';
+
+# drop table if exists `act_model_call_log`;
+create table act_model_call_log(
+	id bigint(20) NOT NULL COMMENT '主键',
+	business_key varchar(50) not null comment '业务key',
+	process_defined_key varchar(200) not null comment '模型编码',
+	version varchar(20) null comment '模型版本',
+	datas text comment '模型参数',
+	pro_inst_id varchar(200) not null comment '实例id',
+	model_procdef_id varchar(200) not null comment '模型定义id',
+	sys_code varchar(50) not null comment '所属系统编码',
+	`status`  varchar(10) default '0' comment '状态 0-y,1-n',
+	cre_time datetime not null default now()  comment '创建时间'
+) engine = innodb character set = utf8 collate utf8_bin;

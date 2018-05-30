@@ -30,6 +30,14 @@
         "url": "procAudit",
         "children": []
       }
+    ,{
+        "id": "FK_M0304",
+        "icon": "fa fa-user",
+        "spread": true,
+        "title": "调用日志",
+        "url": "modelLog",
+        "children": []
+      }
     ]
   }
 ]

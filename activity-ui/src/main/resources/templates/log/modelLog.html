@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>审批过程</title>
+    <link rel="stylesheet" href="/activity/ui/plugins/layui/css/layui.css" media="all">
+</head>
+<body>
+<div class="demoTable" style="padding:10px 10px 0px 10px">
+    <div class="layui-row layui-col-space12">
+        <div class="layui-col-md2">
+            <input class="layui-input" name="id" id="userName" autocomplete="off" placeholder="查询">
+        </div>
+        <div class="layui-col-md1">
+            <button class="layui-btn" data-type="reload" id="model_search" onclick="active.reload();">查询</button>
+        </div>
+    </div>
+    <table id="log_list" lay-filter="modelLog" lay-data="{id: 'ModelLog'}"></table>
+</div>
+
+<script src="/activity/ui/plugins/layui/layui.js"></script>
+<script src="/activity/ui/src/js/log/modelLog.js"></script>
+
+<script>
+
+    Date.prototype.Format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1,                 //月份
+            "d+": this.getDate(),                    //日
+            "h+": this.getHours(),                   //小时
+            "m+": this.getMinutes(),                 //分
+            "s+": this.getSeconds(),                 //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds()             //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+</script>
+
+<script type="text/html" id="creTime">
+    {{#
+    var date = new Date();
+    date.setTime(d.creTime);
+    return date.Format("yyyy-MM-dd hh:mm:ss");
+    }}
+</script>
+</body>
+</html>

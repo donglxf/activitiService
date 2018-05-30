@@ -1,12 +1,15 @@
 package com.ht.commonactivity.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ht.commonactivity.common.ActivitiConstants;
 import com.ht.commonactivity.common.RpcStartParamter;
 import com.ht.commonactivity.common.enumtype.ActivitiSignEnum;
 import com.ht.commonactivity.common.result.Result;
+import com.ht.commonactivity.entity.ActModelDefinition;
 import com.ht.commonactivity.entity.ActProcRelease;
+import com.ht.commonactivity.entity.ModelCallLog;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.NextTaskInfo;
@@ -27,6 +30,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -66,6 +70,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @Autowired
     protected RuntimeService runtimeService;
 
+    @Autowired
+    protected ModelCallLogService modelCallLogService;
+
 
     @Autowired
     protected UcAppRpc ucAppRpc;
@@ -83,6 +90,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @PostMapping("/startProcessInstanceByKey")
     @ApiOperation("启动模型")
+    @Transactional
     public Result<List<NextTaskInfo>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
         log.info("start model,paramter:" + JSON.toJSONString(paramter));
         Result<List<NextTaskInfo>> data = null;
@@ -116,19 +124,30 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             ProcessInstance instance = runtimeService.startProcessInstanceById(release.getModelProcdefId(),
                     paramter.getBusinessKey(), paramter.getData());
 
-            boolean bool = procIsEnd(instance.getId());
+            log.info("process start installId======" + instance.getId());
+            String instId = instance.getId();
+            boolean bool = procIsEnd(instId);
             List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
-            List<Task> tasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(instId).list();
             for (Task t : tasks) {
                 NextTaskInfo result = new NextTaskInfo();
                 result.setTaskDefineKey(t.getTaskDefinitionKey());
                 result.setTaskText(t.getName());
-                result.setProcInstId(instance.getId());
+                result.setProcInstId(instId);
                 result.setTaskAssign(t.getAssignee());
                 result.setProIsEnd(bool ? "Y" : "N");
 //                result.setTaskId(t.getId());
                 list.add(result);
             }
+            ModelCallLog callLog = new ModelCallLog();
+            callLog.setBusinessKey(paramter.getBusinessKey());
+            callLog.setDatas(JSON.toJSONString(paramter));
+            callLog.setModelProcdefId(release.getModelProcdefId());
+            callLog.setProcessDefinedKey(paramter.getProcessDefinedKey());
+            callLog.setProInstId(instId);
+            callLog.setVersion(paramter.getVersion());
+            callLog.setSysCode(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
+            modelCallLogService.insert(callLog);
 
 //            String processInstanceId = activitiService.startProcess(paramter);
 //            TaskDefinition taskDefinition = activitiService.getNextTaskInfoByProcessId(instance.getId());
@@ -340,6 +359,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人,记入日志
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
             service.complete(taskId);
+
             List<Task> taskList = taskService.createTaskQuery().processDefinitionId(task.getProcessDefinitionId()).list();
             if (taskList.size() <= 0) {
                 NextTaskInfo result = new NextTaskInfo();
@@ -368,7 +388,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     /**
      * 撤销整个流程
      *
-     * @param proId
+     * @param proId 流程实例id
      * @return
      */
     @GetMapping("/repealPro")
@@ -376,6 +396,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         runtimeService.deleteProcessInstance(proId, "撤销流程");
         return Result.success("撤销成功");
     }
+
 
     /**
      * 单步撤销
@@ -413,5 +434,19 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         taskService.delegateTask(taskId, owner);
         return Result.success();
     }
+
+    /**
+     * 拒绝操作
+     *
+     * @param proInsId 实例id
+     * @return
+     */
+    @GetMapping("/refuseTask")
+    public Result<String> refuseTask(@RequestParam String proInsId) {
+//        taskService.delegateTask(taskId, owner);
+        return Result.success();
+    }
+
+
 
 }

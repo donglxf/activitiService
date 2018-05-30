@@ -108,4 +108,13 @@ public class ModelController {
         return "audit/showProImg";
     }
 
+    /**
+     * 显示流程图
+     * @return
+     */
+    @RequestMapping(value = "/modelLog", method = RequestMethod.GET)
+    public String modelLog() {
+        return "log/modelLog";
+    }
+
 }

@@ -40,11 +40,11 @@ import java.util.*;
  *   @Date : Create in 2017/9/19 14:48　
  */
 public class MysqlGenerator {
-    private static String projectName = "activiti-service";
-    private static String packageName="rule";    //文件路径
+    private static String projectName = "activity-service";
+    private static String packageName="commonactivity";    //文件路径
     private static String authorName="dyb";     //作者
-    private static String[] table={"msg_sent_record"};                  //table名字
-    private static String prefix="risk_";                     //table前缀
+    private static String[] table={"act_model_call_log"};                  //table名字
+    private static String prefix="act_";                     //table前缀
     private static File file = new File(projectName);
 //    private static String path = file.getAbsolutePath();
      private static String path = "D:/";
@@ -87,10 +87,10 @@ public class MysqlGenerator {
                                 return super.processTypeConvert(fieldType);
                             }
                         })
-                        .setDriverName("com.mysql.jdbc.Driver")
-                        .setUsername("msgcenter")
-                        .setPassword("kcCCNHLyp5Anczl7")
-                        .setUrl("jdbc:mysql://172.16.200.111:3306/msg_center?useUnicode=true&characterEncoding=UTF8")
+                        .setDriverName("com.mysql.cj.jdbc.Driver")
+                        .setUsername("activiti")
+                        .setPassword("activiti123")
+                        .setUrl("jdbc:mysql://172.16.200.111:3306/activiti?useUnicode=true&characterEncoding=UTF8")
         ).setStrategy(
                 // 策略配置
                 new StrategyConfig()
@@ -107,11 +107,11 @@ public class MysqlGenerator {
                         //.setSuperEntityColumns(new String[]{"test_id"})
                         .setTableFillList(tableFillList)
                         // 自定义 mapper 父类
-                        .setSuperMapperClass("com.ht.risk.common.mapper.SuperMapper")
+                        .setSuperMapperClass("com.ht.commonactivity.common.mapper.SuperMapper")
                         // 自定义 service 父类
-                        .setSuperServiceClass("com.ht.risk.common.service.BaseService")
+                        .setSuperServiceClass("com.ht.commonactivity.common.service.BaseService")
                         // 自定义 service 实现类父类
-                        .setSuperServiceImplClass("com.ht.risk.common.service.impl.BaseServiceImpl")
+                        .setSuperServiceImplClass("com.ht.commonactivity.common.service.impl.BaseServiceImpl")
                 // 自定义 controller 父类
                 // .setSuperControllerClass("com.tdx."+packageName+".controller.AbstractController")
                 // 【实体】是否生成字段常量（默认 false）
@@ -130,7 +130,7 @@ public class MysqlGenerator {
                 // 包配置
                 new PackageConfig()
                         //.setModuleName("User")
-                        .setParent("com.ht.risk."+packageName)// 自定义包路径
+                        .setParent("com.ht."+packageName)// 自定义包路径
                         .setController("controller")// 这里是控制器包名，默认 web
                         .setEntity("entity")
                         .setMapper("mapper")

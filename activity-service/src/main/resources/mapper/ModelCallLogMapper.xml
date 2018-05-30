@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ht.commonactivity.mapper.ModelCallLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ht.commonactivity.entity.ModelCallLog">
+        <result column="id" property="id" />
+        <result column="businessKey" property="businessKey" />
+        <result column="processDefinedKey" property="processDefinedKey" />
+        <result column="version" property="version" />
+        <result column="datas" property="datas" />
+        <result column="proInstId" property="proInstId" />
+        <result column="model_procdef_id" property="modelProcdefId" />
+        <result column="status" property="status" />
+        <result column="cre_time" property="creTime" />
+        <result column="sys_code" property="sysCode" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, businessKey, processDefinedKey, version, datas, proInstId, model_procdef_id AS modelProcdefId, status, cre_time AS creTime,sys_code as sysCode
+    </sql>
+
+</mapper>
