@@ -187,6 +187,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @PostMapping("/taskChangeOther")
+    @ApiOperation("任务转办")
     public Result<String> taksChangeOther(@RequestParam String taskId, @RequestParam String owner) {
         taskService.setAssignee(taskId, owner);
         return Result.success();
@@ -197,6 +198,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * 根据用户、候选人、候选组 查询所有任务
      */
     @PostMapping("/findTaskByAssignee")
+    @ApiOperation("根据用户查询所有任务")
     @ResponseBody
     public Result<List<TaskVo>> findMyPersonalTask(@RequestBody FindTaskBeanVo vo) {
         List<TaskVo> voList = new ArrayList<>();
@@ -268,6 +270,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * 根据候选组 查询所有代办任务,角色
      */
     @PostMapping("/findTaskByCandidateGroup")
+    @ApiOperation("根据候选组查询所有任务")
     @ResponseBody
     public Result<List<TaskVo>> findTaskByCandidateGroup(@RequestBody FindTaskBeanVo vo) {
         List<TaskVo> voList = new ArrayList<>();
@@ -334,6 +337,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @PostMapping("/complateTask")
+    @ApiOperation("完成任务")
     @ResponseBody
     public Result<List<NextTaskInfo>> completeMyPersonalTask(@RequestBody ComplateTaskVo vo) {
         List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
@@ -392,6 +396,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @GetMapping("/repealPro")
+    @ApiOperation("撤销")
     public Result<String> repealPro(@RequestParam String proId) {
         runtimeService.deleteProcessInstance(proId, "撤销流程");
         return Result.success("撤销成功");
@@ -406,6 +411,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @GetMapping("/singleRepealPro")
+    @ApiOperation("单步撤销")
     public Result<String> singleRepealPro(@RequestParam String proInstId, @RequestParam String toBackNoteId) {
         try {
             // 根据流程实例找到当前任务节点
@@ -430,6 +436,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @PostMapping("/ownerTask")
+    @ApiOperation("委托任务")
     public Result<String> ownerTask(String taskId, String owner) {
         taskService.delegateTask(taskId, owner);
         return Result.success();
@@ -442,6 +449,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @GetMapping("/refuseTask")
+    @ApiOperation("拒绝")
     public Result<String> refuseTask(@RequestParam String proInsId) {
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInsId).list();
         tasks.forEach(task -> {
