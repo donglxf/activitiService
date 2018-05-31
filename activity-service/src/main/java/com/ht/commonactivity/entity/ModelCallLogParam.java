@@ -26,7 +26,7 @@ public class ModelCallLogParam extends Model<ModelCallLogParam> {
      * 主键
      */
 	@ApiModelProperty(required= true,value = "主键")
-	private String id;
+	private Long id;
     /**
      * 外键id
      */
@@ -40,11 +40,11 @@ public class ModelCallLogParam extends Model<ModelCallLogParam> {
 	private String datas;
 
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

@@ -17,7 +17,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
         , page: true //开启分页
         , id: 'logReload'
         , cols: [[
-            {field: 'id', width: 200, title: 'id', sort: true}
+            {field: 'logId', width: 200, title: 'id', sort: true}
             ,{field: 'businessKey', width: 200, title: '业务key', sort: true}
             , {field: 'processDefinedKey', width: 200, title: '模型编码'}
             , {field: 'sysCode', width: 200, title: '所属系统'}
@@ -25,7 +25,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
             , {field: 'proInstId', title: '实例Id', width: 250} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
             , {field: 'modelProcdefId', width: '15%', minWidth: 100, title: '模型定义id', sort: true}
             , {field: 'creTime',width:200, title: '调用时间', sort: true, templet: "#creTime"}
-            , {field: 'ids', title: '操作',  templet: "#oper"}
+            , {field: 'id', title: '操作',  templet: "#oper"}
         ]]
     });
 
@@ -33,7 +33,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
         var data = obj.data; //获得当前行数据
         var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
         var tr = obj.tr; //获得当前行 tr 的DOM对象
-        var logId = data.id;
+        var logId = data.logId;
         console.log(data);
         if(layEvent === 'view'){ //查看
             showdetail(logId);

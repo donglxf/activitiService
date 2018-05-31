@@ -26,8 +26,9 @@ public class ModelCallLog extends Model<ModelCallLog> {
     /**
      * 主键
      */
+	@TableField("log_id")
 	@ApiModelProperty(required= true,value = "主键")
-	private String id;
+	private Long logId;
     /**
      * 业务key
      */
@@ -82,12 +83,12 @@ public class ModelCallLog extends Model<ModelCallLog> {
 	private Date creTime;
 
 
-	public String getId() {
-		return id;
+	public Long getLogId() {
+		return logId;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setLogId(Long logId) {
+		this.logId = logId;
 	}
 
 	public String getBusinessKey() {
@@ -164,13 +165,13 @@ public class ModelCallLog extends Model<ModelCallLog> {
 
 	@Override
 	protected Serializable pkVal() {
-		return this.id;
+		return this.logId;
 	}
 
 	@Override
 	public String toString() {
 		return "ModelCallLog{" +
-			"id=" + id +
+			"logId=" + logId +
 			", businessKey=" + businessKey +
 			", processDefinedKey=" + processDefinedKey +
 			", version=" + version +

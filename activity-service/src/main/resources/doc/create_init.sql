@@ -89,7 +89,7 @@ CREATE TABLE `act_process_jump_his` (
 
 # drop table if exists `act_model_call_log`;
 create table act_model_call_log(
-	id bigint(20) NOT NULL COMMENT '主键',
+	log_id bigint(20)  NOT NULL COMMENT '主键',
 	business_key varchar(50) not null comment '业务key',
 	process_defined_key varchar(200) not null comment '模型编码',
 	version varchar(20) null comment '模型版本',
@@ -102,7 +102,7 @@ create table act_model_call_log(
 ) engine = innodb character set = utf8 collate utf8_bin ;
 
 create table act_model_call_log_param(
-	id bigint(20) NOT NULL COMMENT '主键',
-	foreign_id bigint(20) not null comment '外键id',
+	id bigint(20)  NOT NULL COMMENT '主键',
+	foreign_id varchar(64) not null comment '外键id',
 	datas text comment '模型参数'
 ) engine = innodb character set = utf8 collate utf8_bin ;

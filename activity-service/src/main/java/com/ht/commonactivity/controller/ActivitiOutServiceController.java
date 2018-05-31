@@ -150,7 +150,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             callLog.setSysCode(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
             modelCallLogService.insert(callLog);
             ModelCallLogParam param = new ModelCallLogParam();
-            param.setForeignId(callLog.getId());
+            param.setForeignId(String.valueOf(callLog.getLogId()));
             param.setDatas(JSON.toJSONString(paramter));
             modelCallLogParamService.insert(param);
 
@@ -370,11 +370,13 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
             service.complete(taskId);
 
+
             List<Task> taskList = taskService.createTaskQuery().processDefinitionId(task.getProcessDefinitionId()).list();
             if (taskList.size() <= 0) {
                 NextTaskInfo result = new NextTaskInfo();
                 result.setProIsEnd("Y");
                 list.add(result);
+                updateModelLog("0", t.getProcessInstanceId());
                 return Result.success(list);
             }
 
@@ -388,11 +390,24 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 result.setProIsEnd("N");
                 list.add(result);
             });
+
+            updateModelLog("1", t.getProcessInstanceId());
             return Result.success(list);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return Result.error(1, "完成任务失败" + taskId);
+    }
+
+    /**
+     * 更新状态
+     * @param isEnd 1-未完成，0-已完成
+     * @param proInstId
+     */
+    public void updateModelLog(String isEnd, String proInstId) {
+        ModelCallLog log = new ModelCallLog();
+        log.setIsEnd(isEnd);
+        modelCallLogService.update(log, new EntityWrapper<ModelCallLog>().eq("pro_inst_id", proInstId));
     }
 
     /**
@@ -489,9 +504,11 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/getAllTaskGroupBySysName")
     @ApiOperation("根据系统名称获取所有未签收任务角色集合")
     public Result<TaskRoleAssignResult> getAllTaskGroupBySysName(@RequestParam String sysName) {
-        List<String> noClainList = new ArrayList<>();
+
 //        List<String> clainList = new ArrayList<>();
-        List<ModelCallLog> list = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", sysName));
+
+        // 根据系统名查询未完成的流程实例
+        List<ModelCallLog> list = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", sysName).eq("is_end", "1"));
         List<String> instIdList = new ArrayList<>(); // 未结束流程的实例Id
         list.forEach(li -> {
             if (!procIsEnd(li.getProInstId())) {
@@ -506,6 +523,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         List<TaskGroup> userList = new ArrayList<TaskGroup>();
         List<TaskGroup> roleList = new ArrayList<TaskGroup>();
         listTask.forEach(li -> {
+            List<String> noClainList = new ArrayList<>();
             TaskGroup group = new TaskGroup();
 // 获取任务所属角色
             if (StringUtils.isEmpty(li.getAssignee())) {  // assignee未空表示未签收
