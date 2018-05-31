@@ -10,13 +10,12 @@ import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActModelDefinition;
 import com.ht.commonactivity.entity.ActProcRelease;
 import com.ht.commonactivity.entity.ModelCallLog;
+import com.ht.commonactivity.entity.ModelCallLogParam;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.NextTaskInfo;
 import com.ht.commonactivity.utils.ObjectUtils;
-import com.ht.commonactivity.vo.ComplateTaskVo;
-import com.ht.commonactivity.vo.FindTaskBeanVo;
-import com.ht.commonactivity.vo.TaskVo;
+import com.ht.commonactivity.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +25,7 @@ import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.commons.lang3.StringUtils;
@@ -34,10 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @Api("工作流对外提供的接口服务")
@@ -72,6 +69,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @Autowired
     protected ModelCallLogService modelCallLogService;
+
+    @Autowired
+    protected ModelCallLogParamService modelCallLogParamService;
 
 
     @Autowired
@@ -141,13 +141,18 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             }
             ModelCallLog callLog = new ModelCallLog();
             callLog.setBusinessKey(paramter.getBusinessKey());
-            callLog.setDatas(JSON.toJSONString(paramter));
+//            callLog.setDatas(JSON.toJSONString(paramter));
             callLog.setModelProcdefId(release.getModelProcdefId());
             callLog.setProcessDefinedKey(paramter.getProcessDefinedKey());
             callLog.setProInstId(instId);
             callLog.setVersion(paramter.getVersion());
+            callLog.setIsEnd("1"); // 1-未完成，0-已完成
             callLog.setSysCode(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
             modelCallLogService.insert(callLog);
+            ModelCallLogParam param = new ModelCallLogParam();
+            param.setForeignId(callLog.getId());
+            param.setDatas(JSON.toJSONString(paramter));
+            modelCallLogParamService.insert(param);
 
 //            String processInstanceId = activitiService.startProcess(paramter);
 //            TaskDefinition taskDefinition = activitiService.getNextTaskInfoByProcessId(instance.getId());
@@ -314,6 +319,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
         List<Task> list = query.taskCandidateGroupIn(vo.getCandidateGroup())
                 .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
+
         for (Task task : list) {
             ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
             TaskVo tvo = new TaskVo();
@@ -459,6 +465,74 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             refuseTask(proInsId);
         }
         return Result.success("操作成功");
+    }
+
+    /**
+     * 任务签收
+     *
+     * @param taskId 实例id
+     * @return
+     */
+    @GetMapping("/claimTask")
+    @ApiOperation("任务签收")
+    public Result<String> claimTask(@RequestParam String taskId, @RequestParam String userName) {
+        taskService.claim(taskId, userName);
+        return Result.success("签收成功");
+    }
+
+    /**
+     * 根据系统获取所有未签收任务角色
+     *
+     * @param sysName 系统名
+     * @return
+     */
+    @GetMapping("/getAllTaskGroupBySysName")
+    @ApiOperation("根据系统名称获取所有未签收任务角色集合")
+    public Result<TaskRoleAssignResult> getAllTaskGroupBySysName(@RequestParam String sysName) {
+        List<String> noClainList = new ArrayList<>();
+//        List<String> clainList = new ArrayList<>();
+        List<ModelCallLog> list = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", sysName));
+        List<String> instIdList = new ArrayList<>(); // 未结束流程的实例Id
+        list.forEach(li -> {
+            if (!procIsEnd(li.getProInstId())) {
+                instIdList.add(li.getProInstId());
+            }
+        });
+        List<Task> listTask = new ArrayList<>();
+        instIdList.forEach(li -> {
+            listTask.addAll(taskService.createTaskQuery().processInstanceId(li).list());
+        });
+        TaskRoleAssignResult result = new TaskRoleAssignResult();
+        List<TaskGroup> userList = new ArrayList<TaskGroup>();
+        List<TaskGroup> roleList = new ArrayList<TaskGroup>();
+        listTask.forEach(li -> {
+            TaskGroup group = new TaskGroup();
+// 获取任务所属角色
+            if (StringUtils.isEmpty(li.getAssignee())) {  // assignee未空表示未签收
+                group.setTaskId(li.getId());
+                group.setTaskName(li.getName());
+                List<IdentityLink> linn = taskService.getIdentityLinksForTask(li.getId());
+                linn.forEach(link -> {
+                    noClainList.add(link.getGroupId());
+                });
+                group.setRoleGroup(noClainList);
+                roleList.add(group);
+            } else {
+                group.setTaskId(li.getId());
+                group.setTaskName(li.getName());
+//                clainList.add(li.getAssignee());
+                group.setUserName(li.getAssignee());
+                userList.add(group);
+            }
+        });
+        result.setUser(userList);
+        result.setRole(roleList);
+        System.out.println(JSON.toJSONString(result));
+
+//        Object[] args = new Object[2];
+//        args[0] = noClainList; // 未签收任务角色集合
+//        args[1] = clainList;  // 已签收任务人名集合
+        return Result.success(result);
     }
 
 

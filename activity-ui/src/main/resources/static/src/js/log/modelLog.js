@@ -17,33 +17,46 @@ layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
         , page: true //开启分页
         , id: 'logReload'
         , cols: [[
-            {field: 'businessKey', width: 130, title: '业务key', sort: true}
-            , {field: 'processDefinedKey', width: 130, title: '模型编码'}
-            , {field: 'sysCode', width: 90, title: '所属系统'}
+            {field: 'id', width: 200, title: 'id', sort: true}
+            ,{field: 'businessKey', width: 200, title: '业务key', sort: true}
+            , {field: 'processDefinedKey', width: 200, title: '模型编码'}
+            , {field: 'sysCode', width: 200, title: '所属系统'}
             , {field: 'version', width: 90, title: '版本', sort: true}
-            , {field: 'datas', width: '45%', minWidth: 120, title: '入参'}
-            , {field: 'proInstId', title: '实例Id', width: 130} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
-            , {field: 'modelProcdefId', title: '模型定义id', sort: true}
-            , {field: 'creTime', title: '调用时间', sort: true, templet: "#creTime"}
+            , {field: 'proInstId', title: '实例Id', width: 250} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
+            , {field: 'modelProcdefId', width: '15%', minWidth: 100, title: '模型定义id', sort: true}
+            , {field: 'creTime',width:200, title: '调用时间', sort: true, templet: "#creTime"}
+            , {field: 'ids', title: '操作',  templet: "#oper"}
         ]]
     });
 
-    // table.render({
-    //     elem: '#log_list'
-    //     , height: 'auto'
-    //     , url: preUrl + 'logPage' //数据接口
-    //     ,cellMinWidth: 90
-    //     , id: 'logReload'
-    //     , page: true //开启分页
-    //     , cols: [[ //表头\
-    //         {field: 'businessKey',width:90, title: '业务key',sort:true}
-    //         , {field: 'processDefinedKey',width:90, title: '模型编码'}
-    //         , {field: 'version', width:80,title: '版本'}
-    //         , {field: 'datas', width:300,title: '入参'}
-    //         , {field: 'proInstId',width:100, title: '实例Id'}
-    //         , {fixed: 'modelProcdefId',width:100,title: '模型定义id', align: 'center'}
-    //     ]]
-    // });
+    table.on('tool(modelLog)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+        var data = obj.data; //获得当前行数据
+        var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+        var tr = obj.tr; //获得当前行 tr 的DOM对象
+        var logId = data.id;
+        console.log(data);
+        if(layEvent === 'view'){ //查看
+            showdetail(logId);
+        }
+    });
+
+    function showdetail(logId) {
+        var layIndex = layer.open({
+            type: 2,
+            shade: false,
+            title: "流转记录",
+            anim: 5,
+            area: ['800px', '600px'],
+            content: preUrlUi + '/modelLogDetail',
+            zIndex: layer.zIndex, //重点1
+            success: function (layero, index) {
+                var body = layer.getChildFrame('body', index);
+                var input = body.find("input[type='hidden']");
+                input.val(logId);
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
 
     /**
      * 设置表单值

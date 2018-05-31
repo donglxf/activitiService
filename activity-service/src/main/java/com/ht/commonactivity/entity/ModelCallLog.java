@@ -3,23 +3,19 @@ package com.ht.commonactivity.entity;
 import java.io.Serializable;
 
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
-
 import java.io.Serializable;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 /**
  * <p>
- * <p>
+ * 
  * </p>
  *
  * @author dyb
- * @since 2018-05-30
+ * @since 2018-05-31
  */
 @ApiModel
 @TableName("act_model_call_log")
@@ -30,152 +26,160 @@ public class ModelCallLog extends Model<ModelCallLog> {
     /**
      * 主键
      */
-    @ApiModelProperty(required = true, value = "主键")
-    private Long id;
+	@ApiModelProperty(required= true,value = "主键")
+	private String id;
     /**
      * 业务key
      */
-    @ApiModelProperty(required = true, value = "业务key")
-    private String businessKey;
+	@TableField("business_key")
+	@ApiModelProperty(required= true,value = "业务key")
+	private String businessKey;
     /**
      * 模型编码
      */
-    @ApiModelProperty(required = true, value = "模型编码")
-    private String processDefinedKey;
+	@TableField("process_defined_key")
+	@ApiModelProperty(required= true,value = "模型编码")
+	private String processDefinedKey;
     /**
      * 模型版本
      */
-    @ApiModelProperty(required = true, value = "模型版本")
-    private String version;
-    /**
-     * 模型参数
-     */
-    @ApiModelProperty(required = true, value = "模型参数")
-    private String datas;
+	@ApiModelProperty(required= true,value = "模型版本")
+	private String version;
     /**
      * 实例id
      */
-    @ApiModelProperty(required = true, value = "实例id")
-    private String proInstId;
+	@TableField("pro_inst_id")
+	@ApiModelProperty(required= true,value = "实例id")
+	private String proInstId;
     /**
      * 模型定义id
      */
-    @TableField("model_procdef_id")
-    @ApiModelProperty(required = true, value = "模型定义id")
-    private String modelProcdefId;
+	@TableField("model_procdef_id")
+	@ApiModelProperty(required= true,value = "模型定义id")
+	private String modelProcdefId;
+    /**
+     * 所属系统编码
+     */
+	@TableField("sys_code")
+	@ApiModelProperty(required= true,value = "所属系统编码")
+	private String sysCode;
+    /**
+     * 流程是否完成,0-Y,1-N
+     */
+	@TableField("is_end")
+	@ApiModelProperty(required= true,value = "流程是否完成,0-Y,1-N")
+	private String isEnd;
     /**
      * 状态 0-y,1-n
      */
-    @ApiModelProperty(required = true, value = "状态 0-y,1-n")
-    private String status;
+	@ApiModelProperty(required= true,value = "状态 0-y,1-n")
+	private String status;
     /**
      * 创建时间
      */
-    @TableField("cre_time")
-    @ApiModelProperty(required = true, value = "创建时间")
-    private Date creTime;
+	@TableField("cre_time")
+	@ApiModelProperty(required= true,value = "创建时间")
+	private Date creTime;
 
-    @TableField("sys_code")
-    @ApiModelProperty(required = true, value = "系统编码")
-    private String sysCode;
 
-    public String getSysCode() {
-        return sysCode;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setSysCode(String sysCode) {
-        this.sysCode = sysCode;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public String getBusinessKey() {
+		return businessKey;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setBusinessKey(String businessKey) {
+		this.businessKey = businessKey;
+	}
 
-    public String getBusinessKey() {
-        return businessKey;
-    }
+	public String getProcessDefinedKey() {
+		return processDefinedKey;
+	}
 
-    public void setBusinessKey(String businessKey) {
-        this.businessKey = businessKey;
-    }
+	public void setProcessDefinedKey(String processDefinedKey) {
+		this.processDefinedKey = processDefinedKey;
+	}
 
-    public String getProcessDefinedKey() {
-        return processDefinedKey;
-    }
+	public String getVersion() {
+		return version;
+	}
 
-    public void setProcessDefinedKey(String processDefinedKey) {
-        this.processDefinedKey = processDefinedKey;
-    }
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-    public String getVersion() {
-        return version;
-    }
+	public String getProInstId() {
+		return proInstId;
+	}
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+	public void setProInstId(String proInstId) {
+		this.proInstId = proInstId;
+	}
 
-    public String getDatas() {
-        return datas;
-    }
+	public String getModelProcdefId() {
+		return modelProcdefId;
+	}
 
-    public void setDatas(String datas) {
-        this.datas = datas;
-    }
+	public void setModelProcdefId(String modelProcdefId) {
+		this.modelProcdefId = modelProcdefId;
+	}
 
-    public String getProInstId() {
-        return proInstId;
-    }
+	public String getSysCode() {
+		return sysCode;
+	}
 
-    public void setProInstId(String proInstId) {
-        this.proInstId = proInstId;
-    }
+	public void setSysCode(String sysCode) {
+		this.sysCode = sysCode;
+	}
 
-    public String getModelProcdefId() {
-        return modelProcdefId;
-    }
+	public String getIsEnd() {
+		return isEnd;
+	}
 
-    public void setModelProcdefId(String modelProcdefId) {
-        this.modelProcdefId = modelProcdefId;
-    }
+	public void setIsEnd(String isEnd) {
+		this.isEnd = isEnd;
+	}
 
-    public String getStatus() {
-        return status;
-    }
+	public String getStatus() {
+		return status;
+	}
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-    public Date getCreTime() {
-        return creTime;
-    }
+	public Date getCreTime() {
+		return creTime;
+	}
 
-    public void setCreTime(Date creTime) {
-        this.creTime = creTime;
-    }
+	public void setCreTime(Date creTime) {
+		this.creTime = creTime;
+	}
 
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
+	@Override
+	protected Serializable pkVal() {
+		return this.id;
+	}
 
-    @Override
-    public String toString() {
-        return "ModelCallLog{" +
-                "id=" + id +
-                ", businessKey=" + businessKey +
-                ", processDefinedKey=" + processDefinedKey +
-                ", version=" + version +
-                ", datas=" + datas +
-                ", proInstId=" + proInstId +
-                ", modelProcdefId=" + modelProcdefId +
-                ", status=" + status +
-                ", creTime=" + creTime +
-                "}";
-    }
+	@Override
+	public String toString() {
+		return "ModelCallLog{" +
+			"id=" + id +
+			", businessKey=" + businessKey +
+			", processDefinedKey=" + processDefinedKey +
+			", version=" + version +
+			", proInstId=" + proInstId +
+			", modelProcdefId=" + modelProcdefId +
+			", sysCode=" + sysCode +
+			", isEnd=" + isEnd +
+			", status=" + status +
+			", creTime=" + creTime +
+			"}";
+	}
 }

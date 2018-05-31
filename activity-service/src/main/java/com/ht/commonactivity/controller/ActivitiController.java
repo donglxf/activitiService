@@ -110,6 +110,9 @@ public class ActivitiController implements ModelDataJsonConstants {
     protected ModelCallLogService modelCallLogService;
 
     @Autowired
+    protected ModelCallLogParamService modelCallLogParamService;
+
+    @Autowired
     protected UcAppRpc ucAppRpc;
 
     protected static volatile ProcessEngine processEngine = null;
@@ -169,7 +172,6 @@ public class ActivitiController implements ModelDataJsonConstants {
             wrapper.like("business_key", key);
             wrapper.or().like("process_defined_key", key);
             wrapper.or().like("version", key);
-            wrapper.or().like("datas", key);
             wrapper.or().like("pro_inst_id", key);
             wrapper.or().like("model_procdef_id", key);
         }
@@ -812,6 +814,20 @@ public class ActivitiController implements ModelDataJsonConstants {
             }
         }
         return highFlows;
+    }
+
+
+    /**
+     * 查看日志明细
+     *
+     * @param proInstId
+     * @return
+     */
+    @RequestMapping("/modelLogDetail")
+    public Result<List<ModelCallLogParam>> modelLogDetail(String modelId) {
+        Wrapper<ModelCallLogParam> wrapper = new EntityWrapper<ModelCallLogParam>();
+        wrapper.eq("foreign_id", modelId);
+        return Result.success(modelCallLogParamService.selectList(wrapper));
     }
 
     /**

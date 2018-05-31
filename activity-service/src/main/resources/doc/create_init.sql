@@ -93,10 +93,16 @@ create table act_model_call_log(
 	business_key varchar(50) not null comment '业务key',
 	process_defined_key varchar(200) not null comment '模型编码',
 	version varchar(20) null comment '模型版本',
-	datas text comment '模型参数',
 	pro_inst_id varchar(200) not null comment '实例id',
 	model_procdef_id varchar(200) not null comment '模型定义id',
 	sys_code varchar(50) not null comment '所属系统编码',
+	is_end varchar(10) not null comment '流程是否完成,0-Y,1-N',
 	`status`  varchar(10) default '0' comment '状态 0-y,1-n',
 	cre_time datetime not null default now()  comment '创建时间'
-) engine = innodb character set = utf8 collate utf8_bin;
+) engine = innodb character set = utf8 collate utf8_bin ;
+
+create table act_model_call_log_param(
+	id bigint(20) NOT NULL COMMENT '主键',
+	foreign_id bigint(20) not null comment '外键id',
+	datas text comment '模型参数'
+) engine = innodb character set = utf8 collate utf8_bin ;

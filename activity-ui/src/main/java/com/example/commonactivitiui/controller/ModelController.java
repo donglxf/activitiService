@@ -109,12 +109,21 @@ public class ModelController {
     }
 
     /**
-     * 显示流程图
+     * 日志列表
      * @return
      */
     @RequestMapping(value = "/modelLog", method = RequestMethod.GET)
     public String modelLog() {
         return "log/modelLog";
+    }
+
+    /**
+     * 日志明细
+     * @return
+     */
+    @RequestMapping(value = "/modelLogDetail", method = RequestMethod.GET)
+    public String modelLogDetail() {
+        return "log/modelLogDetail";
     }
 
 }
