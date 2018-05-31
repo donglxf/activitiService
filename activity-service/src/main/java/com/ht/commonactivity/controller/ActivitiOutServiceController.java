@@ -90,7 +90,6 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @PostMapping("/startProcessInstanceByKey")
     @ApiOperation("启动模型")
-    @Transactional
     public Result<List<NextTaskInfo>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
         log.info("start model,paramter:" + JSON.toJSONString(paramter));
         Result<List<NextTaskInfo>> data = null;
@@ -150,7 +149,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             callLog.setSysCode(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
             modelCallLogService.insert(callLog);
             ModelCallLogParam param = new ModelCallLogParam();
-            param.setForeignId(String.valueOf(callLog.getLogId()));
+            param.setForeignId(String.valueOf(callLog.getId()));
             param.setDatas(JSON.toJSONString(paramter));
             modelCallLogParamService.insert(param);
 

@@ -4,7 +4,7 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.ht.commonactivity.entity.ModelCallLog">
-        <result column="id" property="logId" />
+        <result column="id" property="id" />
         <result column="business_key" property="businessKey" />
         <result column="process_defined_key" property="processDefinedKey" />
         <result column="version" property="version" />
@@ -18,7 +18,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id as logId, business_key AS businessKey, process_defined_key AS processDefinedKey, version, pro_inst_id AS proInstId, model_procdef_id AS modelProcdefId, sys_code AS sysCode, is_end AS isEnd, status, cre_time AS creTime
+        id, business_key AS businessKey, process_defined_key AS processDefinedKey, version, pro_inst_id AS proInstId, model_procdef_id AS modelProcdefId, sys_code AS sysCode, is_end AS isEnd, status, cre_time AS creTime
     </sql>
 
 </mapper>

@@ -1,10 +1,11 @@
 layui.config({
-    base: '/activity/ui/src/js/modules/' //假设这是你存放拓展模块的根目录
+    base: '/src/js/modules/' //假设这是你存放拓展模块的根目录
 }).extend({ //设定模块别名
     myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
 });
 var preUrl = "/activity/service/";
 var preUrlUi = "/activity/ui/";
+// var preUrlUi = "/activity/ui/";
 layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
     var table = layui.table;
     var itemTable = layui.table;
@@ -17,7 +18,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
         , page: true //开启分页
         , id: 'logReload'
         , cols: [[
-            {field: 'logId', width: 200, title: 'id', sort: true}
+            {field: 'id', width: 200, title: 'id', sort: true}
             ,{field: 'businessKey', width: 200, title: '业务key', sort: true}
             , {field: 'processDefinedKey', width: 200, title: '模型编码'}
             , {field: 'sysCode', width: 200, title: '所属系统'}
@@ -33,7 +34,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
         var data = obj.data; //获得当前行数据
         var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
         var tr = obj.tr; //获得当前行 tr 的DOM对象
-        var logId = data.logId;
+        var logId = data.id;
         console.log(data);
         if(layEvent === 'view'){ //查看
             showdetail(logId);
