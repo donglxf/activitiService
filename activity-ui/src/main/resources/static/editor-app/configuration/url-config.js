@@ -21,11 +21,11 @@ var KISBPM = KISBPM || {};
 KISBPM.URL = {
 
     getModel: function(modelId) {
-        return ACTIVITI.CONFIG.contextRoot + '/model/' + modelId + '/json';
+        return localGatewayUrl + '/model/' + modelId + '/json';
     },
 
     getStencilSet: function() {
-        return ACTIVITI.CONFIG.contextRoot + 'activiti/editor/stencilset?version=' + Date.now();
+        return localGatewayUrl + 'activiti/editor/stencilset?version=' + Date.now();
     },
 
     getNewStencilSet: function() {
@@ -33,6 +33,6 @@ KISBPM.URL = {
     },
 
     putModel: function(modelId) {
-        return ACTIVITI.CONFIG.contextRoot + 'activiti/model/save?modelId=' + modelId;
+        return localGatewayUrl + 'activiti/model/save?modelId=' + modelId;
     }
 };

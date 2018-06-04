@@ -471,6 +471,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/refuseTask")
     @ApiOperation("拒绝")
     public Result<String> refuseTask(@RequestParam String proInsId) {
+        // TODO 跳转至结束节点，6月4号修改
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInsId).list();
         tasks.forEach(task -> {
             taskService.complete(task.getId());

@@ -108,7 +108,10 @@ activitiModeler
             }
             
             function getModel(modelId){
-            	return ACTIVITI.CONFIG.contextRoot+"activiti/editModel?modelId="+modelId;
+            	// return ACTIVITI.CONFIG.contextRoot+"activiti/editModel?modelId="+modelId;
+                console.log(localGatewayUrl);
+            	// return "http://172.16.200.110:30111/activity/service/activiti/editModel?modelId="+modelId;
+            	return localGatewayUrl+"activiti/editModel?modelId="+modelId;
             }
             
             function initScrollHandling() {

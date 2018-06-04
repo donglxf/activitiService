@@ -1,4 +1,5 @@
-var gatewayUrl = -11111;
+var gatewayUrl = 'http://172.16.200.110:30111/activity/service/' ;
+
 
 /**
  * add by zhangp 2018/1/21

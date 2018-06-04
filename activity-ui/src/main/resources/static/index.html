@@ -73,14 +73,14 @@
                     无法用户信息
                 </a>
                 <!--<dl class="layui-nav-child">-->
-                    <!--<dd>-->
-                        <!--<a href="javascript:;" kit-target-->
-                           <!--data-options="{url:'/html/user/userInfo.html',icon:'&#xe658;',title:'基本资料',id:'966'}"><span>基本资料</span></a>-->
-                    <!--</dd>-->
-                    <!--<dd>-->
-                        <!--<a href="javascript:;" kit-target-->
-                           <!--data-options="{url:'/html/user/changePwd.html',icon:'&#xe658;',title:'修改密码',id:'967'}">修改密码</a>-->
-                    <!--</dd>-->
+                <!--<dd>-->
+                <!--<a href="javascript:;" kit-target-->
+                <!--data-options="{url:'/html/user/userInfo.html',icon:'&#xe658;',title:'基本资料',id:'966'}"><span>基本资料</span></a>-->
+                <!--</dd>-->
+                <!--<dd>-->
+                <!--<a href="javascript:;" kit-target-->
+                <!--data-options="{url:'/html/user/changePwd.html',icon:'&#xe658;',title:'修改密码',id:'967'}">修改密码</a>-->
+                <!--</dd>-->
                 <!--</dl>-->
             </li>
             <li class="layui-nav-item">
@@ -138,7 +138,7 @@
 
     var message;
     layui.config({
-        base: '/activity/ui/src/js/modules/',
+        base: '/src/js/modules/',
         version: false
     }).use(['layer', 'ht_cookie'], function () {
         var layer = layui.layer, cookie = layui.ht_cookie;
@@ -152,12 +152,13 @@
             return false;
         }
         layui.config({
-            base: '/activity/ui/src/js/modules/',
+            base: '/src/js/modules/',
             version: false
-        }).use(['app', 'message', 'ht_ajax', 'ht_cookie', 'ht_auth'], function () {
+        }).use(['app', 'message', 'ht_ajax', 'ht_cookie', 'ht_auth', 'ht_config'], function () {
             var app = layui.app,
                 $ = layui.jquery,
                 cookie = layui.ht_cookie,
+                config = layui.ht_config,
                 ht_auth = layui.ht_auth,
                 layer = layui.layer;
             //将message设置为全局以便子页面调用
@@ -197,15 +198,15 @@
             });
             //初始化权限资源
             ht_auth.load();
-                //设置登录用户名
-                $.get("/activity/service/user/getUserInfo",function (data) {
-                    if(data.code == 0){
-                        $("#userName").text(data.data.userName);
-                    }else{
-                        $("#userName").text("无法获取用户");
-                    }
+            //设置登录用户名
+            $.get(config.proImg + "user/getUserInfo", function (data) {
+                if (data.code == 0) {
+                    $("#userName").text(data.data.userName);
+                } else {
+                    $("#userName").text("无法获取用户");
+                }
 
-                },'json');
+            }, 'json');
 
         });
     });

@@ -4,16 +4,18 @@ layui.config({
     myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
 });
 var preUrl = "/activity/service/";
-var preUrlUi = "/activity/ui/";
 // var preUrlUi = "/activity/ui/";
-layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
+var preUrlUi = "";
+layui.use(['table','ht_config', 'jquery', 'myutil', 'ht_ajax'], function () {
     var table = layui.table;
     var itemTable = layui.table;
     var $ = layui.jquery;
+    var ht_config = layui.ht_config;
+    var basePath=ht_config.proImg;
     //第一个实例
     table.render({
         elem: '#log_list'
-        , url: preUrl + 'logPage'
+        , url: basePath + 'logPage'
         , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
         , page: true //开启分页
         , id: 'logReload'
@@ -26,7 +28,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_ajax'], function () {
             , {field: 'proInstId', title: '实例Id', width: 250} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
             , {field: 'modelProcdefId', width: '15%', minWidth: 100, title: '模型定义id', sort: true}
             , {field: 'creTime',width:200, title: '调用时间', sort: true, templet: "#creTime"}
-            , {field: 'id', title: '操作',  templet: "#oper"}
+            , {field: 'ids', title: '操作',  templet: "#oper"}
         ]]
     });
 

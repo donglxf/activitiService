@@ -34,12 +34,16 @@ public class GatewayRiskURLHelper {
     @Value("${ht.config.ui.userInfoUpdate}")
     private String userInfoUpdate;
 
+    @Value("${ht.config.ui.localGatewayUrl}")
+    private String localGatewayUrl;
+
     @GetMapping(value = "/config.js", produces = "application/javascript")
     public String config() {
 
         return String.format("var gatewayUrl='%s';", gatewayUrl)+
                 String.format("var changePwdUrl='%s';", changePwdUrl)+
                 String.format("var userInfoUpdate='%s';", userInfoUpdate)+
+                String.format("var localGatewayUrl='%s';", localGatewayUrl)+
                 " layui.define(function (exports) {\n" +
                 "    var config = {};\n" +
                 "    exports('config', config);\n" +

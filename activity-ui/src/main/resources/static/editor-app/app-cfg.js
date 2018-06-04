@@ -20,10 +20,15 @@
 
 var ACTIVITI = ACTIVITI || {};
 
+
+
 ACTIVITI.CONFIG = {
-	'contextRoot' : '/activity/service/',
+    // 'contextRoot' : ht_config.proImg ,
+    'contextRoot' : 'http://172.16.200.110:30111/activity/service/' ,
+    // 'contextRoot' : '/activity/service/',
 };
 
-var headers  = {
+
+var headers = {
     app: "FK" /*系统编码统一通过http headers进行传输*/
 }

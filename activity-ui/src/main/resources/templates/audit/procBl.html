@@ -18,14 +18,16 @@
 
 <script>
 
-    layui.use(['jquery','form'], function(){
+    layui.use(['jquery','form','ht_config'], function(){
         var $=layui.jquery;
         var form=layui.form;
+        var config=layui.ht_config;
+        var basePath=config.proImg;
         form.on('submit(formDemo)', function(data){
             $.ajax({
                 cache : true,
                 type : "POST",
-                url : '/activity/service/complateTask_bak',
+                url : basePath+'complateTask_bak',
                 data : data.field,// 你的formid
 //                data:JSON.stringify(data.field),
                 async : false,
