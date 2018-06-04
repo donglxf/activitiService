@@ -150,7 +150,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             callLog.setModelProcdefId(release.getModelProcdefId());
             callLog.setProcessDefinedKey(paramter.getProcessDefinedKey());
             callLog.setProInstId(instId);
-            callLog.setVersion(paramter.getVersion());
+            callLog.setVersion(com.ht.commonactivity.utils.StringUtils.isEmpty(paramter.getVersion()) ? release.getModelVersion() : paramter.getVersion());
             callLog.setIsEnd("1"); // 1-未完成，0-已完成
             callLog.setSysCode(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
             modelCallLogService.insert(callLog);
