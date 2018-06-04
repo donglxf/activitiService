@@ -11,6 +11,7 @@ layui.define(['layer','laytpl','form','ht_ajax','ht_config'], function(exports) 
         form = layui.form,
         laytpl = layui.laytpl,
         config = layui.ht_config,
+        basePath=config.proImg;
         _modName = 'myutil';
     //统一验证添加
     form.verify({
@@ -75,14 +76,14 @@ layui.define(['layer','laytpl','form','ht_ajax','ht_config'], function(exports) 
 
     var myUtil = {
         v: '1.0.3',
-        baseSerive:'/activity/service/system/getAll',
+        baseSerive:basePath+'system/getAll',
         //业务相关
         business:{
             select:{
                 name:'belongSystem',
                 id:'belongSystem'
             },
-            init_url:'/activity/service/system/getAll',
+            init_url:basePath+'system/getAll',
             init_html: function () {
                 return     '      <div class="layui-input-inline">\n' +
                     '                    <select name="'+myUtil.business.select.name+'"  lay-filter="business_select" lay-search="" id="'+myUtil.business.select.id+'" lay-verify="required">\n' +
