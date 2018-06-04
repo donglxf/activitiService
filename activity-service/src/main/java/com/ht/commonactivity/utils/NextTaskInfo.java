@@ -10,6 +10,15 @@ public class NextTaskInfo {
     private String taskText; // 节点名
     private String taskAssign; // 任务办理人
     private String proIsEnd; // 流程是否结束  Y-结束
+    private String procDefinedId;
+
+    public String getProcDefinedId() {
+        return procDefinedId;
+    }
+
+    public void setProcDefinedId(String procDefinedId) {
+        this.procDefinedId = procDefinedId;
+    }
 
     public String getProIsEnd() {
         return proIsEnd;

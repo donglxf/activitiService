@@ -5,6 +5,7 @@ import org.activiti.engine.identity.User;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProcessGoBack  {
 
@@ -18,6 +19,25 @@ public interface ProcessGoBack  {
      */
     public String turnBackNew(String taskId, String msg, String endActivityId,String toBackNoteId ) throws Exception;
 
+    /**
+     * 根据任务ID和节点ID获取活动节点 <br>
+     * @param taskId
+     * @param activityId
+     * @return
+     * @throws Exception
+     */
+    public ActivityImpl findActivitiImpl(String taskId, String activityId)
+            throws Exception;
+
+    /**
+     *
+     * @param taskId
+     * @param variables
+     * @param activityId
+     * @throws Exception
+     */
+    public void commitProcess(String taskId, Map<String, Object> variables,
+                              String activityId) throws Exception;
     /**
      * 会签退回
      * @param param

@@ -267,7 +267,7 @@ public class ProcessGoBackImpl implements ProcessGoBack {
      * @return
      * @throws Exception
      */
-    private ActivityImpl findActivitiImpl(String taskId, String activityId)
+    public ActivityImpl findActivitiImpl(String taskId, String activityId)
             throws Exception {
         // 取得流程定义
         ProcessDefinitionEntity processDefinition = findProcessDefinitionEntityByTaskId(taskId);
@@ -478,7 +478,7 @@ public class ProcessGoBackImpl implements ProcessGoBack {
      *                   此参数为空，默认为提交操作
      * @throws Exception
      */
-    private void commitProcess(String taskId, Map<String, Object> variables,
+    public void commitProcess(String taskId, Map<String, Object> variables,
                                String activityId) throws Exception {
         if (variables == null) {
             variables = new HashMap<String, Object>();

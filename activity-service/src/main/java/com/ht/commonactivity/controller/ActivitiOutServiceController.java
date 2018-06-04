@@ -19,9 +19,12 @@ import com.ht.commonactivity.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.engine.*;
 import org.activiti.engine.impl.identity.Authentication;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -42,6 +45,8 @@ import java.util.*;
 //@RequestMapping("/process")
 public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
+    @Resource
+    protected RepositoryService repositoryService;
 
     @Autowired
     protected HistoryService historyService;
@@ -135,6 +140,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 result.setProcInstId(instId);
                 result.setTaskAssign(t.getAssignee());
                 result.setProIsEnd(bool ? "Y" : "N");
+                result.setProcDefinedId(t.getProcessDefinitionId());
 //                result.setTaskId(t.getId());
                 list.add(result);
             }
@@ -400,7 +406,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     /**
      * 更新状态
-     * @param isEnd 1-未完成，0-已完成
+     *
+     * @param isEnd     1-未完成，0-已完成
      * @param proInstId
      */
     public void updateModelLog(String isEnd, String proInstId) {
@@ -471,14 +478,28 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/refuseTask")
     @ApiOperation("拒绝")
     public Result<String> refuseTask(@RequestParam String proInsId) {
-        // TODO 跳转至结束节点，6月4号修改
+//        BpmnModel model = repositoryService.getBpmnModel(procDefId);
+//        if (model != null) {
+//            Collection<FlowElement> flowElements = model.getMainProcess().getFlowElements();
+//            for (FlowElement e : flowElements) {
+//                if (e.getClass().toString().contains("EndEvent")) {
+//                    singleRepealPro(proInsId, e.getId());
+//                    System.out.println("flowelement id:" + e.getId() + "  name:" + e.getName() + "   class:" + e.getClass().toString() + "  type:");
+//                }
+//            }
+//        }
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInsId).list();
-        tasks.forEach(task -> {
-            taskService.complete(task.getId());
-        });
-        if (tasks.size() > 0) {
-            refuseTask(proInsId);
+        if (ObjectUtils.isNotEmpty(tasks)) {
+            Task t = tasks.get(0);
+            ActivityImpl endActivity = null;
+            try {
+                endActivity = processGoBack.findActivitiImpl(t.getId(), "end");
+                processGoBack.commitProcess(t.getId(), null, endActivity.getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
         return Result.success("操作成功");
     }
 
