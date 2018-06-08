@@ -23,7 +23,11 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.engine.*;
+import org.activiti.engine.delegate.Expression;
+import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.identity.Authentication;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.runtime.Execution;
@@ -38,6 +42,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @Api("工作流对外提供的接口服务")
@@ -197,7 +202,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @PostMapping("/taskChangeOther")
-    @ApiOperation("任务转办")
+    @ApiOperation("任务转办或动态设置代理人")
     public Result<String> taksChangeOther(@RequestParam String taskId, @RequestParam String owner) {
         taskService.setAssignee(taskId, owner);
         return Result.success();
@@ -523,7 +528,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @return
      */
     @GetMapping("/getAllTaskGroupBySysName")
-    @ApiOperation("根据系统名称获取所有未签收任务角色集合")
+    @ApiOperation("根据系统名称获取所有为完成流程当前所有未签收任务角色集合")
     public Result<TaskRoleAssignResult> getAllTaskGroupBySysName(@RequestParam String sysName) {
 
 //        List<String> clainList = new ArrayList<>();
@@ -574,5 +579,54 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return Result.success(result);
     }
 
+    @GetMapping("/getAllUserTask")
+    @ApiOperation("根据系统名称获取所有未签收任务角色集合")
+    public Result<List<AllUserTaskOutVo>> getAllUserTask(@RequestParam String proInstId) {
+        List<AllUserTaskOutVo> result = new ArrayList<>();
+        TaskDefinition task = null;
+        String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(proInstId).singleResult().getProcessDefinitionId();
+        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
+                .getDeployedProcessDefinition(definitionId);
+        List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
+        for (ActivityImpl activityImpl : activitiList) {
+            if ("userTask".equals(activityImpl.getProperty("type"))) {
+                AllUserTaskOutVo outVo = new AllUserTaskOutVo();
+                task = (TaskDefinition) activityImpl.getProperties().get("taskDefinition");
+                outVo.setTaskName(String.valueOf(activityImpl.getProperty("name")));
+                outVo.setTaskDefinedId(task.getKey());
+                if (ObjectUtils.isNotEmpty(task.getAssigneeExpression())) {
+                    outVo.setAssignName(task.getAssigneeExpression().getExpressionText());
+                }
+                if (ObjectUtils.isNotEmpty(task.getCandidateGroupIdExpressions())) {
+                    List<String> li = new ArrayList<String>();
+                    Set<Expression> s = task.getCandidateGroupIdExpressions();
+                    Iterator<Expression> iter = s.iterator();
+                    while (iter.hasNext()) {
+                        Expression exp = iter.next();
+                        li.add(exp.getExpressionText());
+                    }
+                    outVo.setCanditionUserGroup(li);
+                }
+                result.add(outVo);
+            }
+        }
+
+        return Result.success(result);
+    }
+
+    @GetMapping("/getProValiable")
+    @ApiOperation("获取流程运行过程中所有参数")
+    public Result<Map<String, Object>> getProValiable(@RequestParam String proInstId) {
+        Map<String, Object> a = runtimeService.getVariablesLocal(proInstId);
+//        System.out.println(JSON.toJSONString(a));
+        return Result.success(a);
+    }
+
+//    @PostMapping("/dynaSetCanditionUser")
+//    @ApiOperation("动态设置userTask办理人")
+//    public void dynaSetCanditionUser(@RequestParam String taskId) {
+//
+//        taskService.setAssignee("", "");
+//    }
 
 }

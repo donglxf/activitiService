@@ -164,9 +164,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      */
     @GetMapping("/logPage")
     @ApiIgnore
-    public PageResult<List<ModelCallLog>> logPage(String key, int limit, int page) {
-        log.info("查询模型版本分页信息开始");
-        PageResult<List<ModelCallLog>> result = null;
+    public PageResult<List<ModelCallLog>> logPage(String key, int page, int limit) {
         Wrapper<ModelCallLog> wrapper = new EntityWrapper<ModelCallLog>();
         if (org.apache.commons.lang.StringUtils.isNotBlank(key)) {
             wrapper.like("business_key", key);
@@ -176,12 +174,12 @@ public class ActivitiController implements ModelDataJsonConstants {
             wrapper.or().like("model_procdef_id", key);
         }
 
-        Page<ModelCallLog> modelReleasePage = new Page<ModelCallLog>();
-        modelReleasePage.setCurrent(page);
-        modelReleasePage.setSize(limit);
-        modelReleasePage = modelCallLogService.selectPage(modelReleasePage, wrapper);
+        Page<ModelCallLog> pages = new Page<ModelCallLog>();
+        pages.setCurrent(page);
+        pages.setSize(limit);
+        pages = modelCallLogService.selectPage(pages, wrapper);
         log.info("查询模型版本证分页信息结束");
-        return PageResult.success(modelReleasePage.getRecords(), modelReleasePage.getTotal());
+        return PageResult.success(pages.getRecords(), pages.getTotal());
     }
 
 
@@ -480,7 +478,7 @@ public class ActivitiController implements ModelDataJsonConstants {
     }
 
     @GetMapping("/findTaskByAssigneeSelf")
-    public Result<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee, Integer page, Integer limit) {
+    public PageResult<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee, Integer page, Integer limit) {
         vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
@@ -519,6 +517,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         if (StringUtils.isNotBlank(vo.getAssignee())) {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
+        int size = query.orderByTaskCreateTime().asc().list().size();
         page = (page - 1) * limit;
         /**排序*/
         List<Task> list = query.orderByTaskCreateTime().asc().listPage(page, limit);//返回列表
@@ -536,7 +535,7 @@ public class ActivitiController implements ModelDataJsonConstants {
                 voList.add(tvo);
             }
         }
-        return data = Result.success(voList);
+        return PageResult.success(voList,size);
     }
 
 
