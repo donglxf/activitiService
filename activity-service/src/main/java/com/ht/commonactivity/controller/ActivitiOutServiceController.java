@@ -392,6 +392,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
             taskList.forEach(ta -> {
                 NextTaskInfo result = new NextTaskInfo();
+                result.setTaskId(ta.getId());
                 result.setTaskDefineKey(ta.getTaskDefinitionKey());
                 result.setTaskText(ta.getName());
                 result.setProcInstId(ta.getProcessInstanceId());
@@ -618,15 +619,6 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("获取流程运行过程中所有参数")
     public Result<Map<String, Object>> getProValiable(@RequestParam String proInstId) {
         Map<String, Object> a = runtimeService.getVariablesLocal(proInstId);
-//        System.out.println(JSON.toJSONString(a));
         return Result.success(a);
     }
-
-//    @PostMapping("/dynaSetCanditionUser")
-//    @ApiOperation("动态设置userTask办理人")
-//    public void dynaSetCanditionUser(@RequestParam String taskId) {
-//
-//        taskService.setAssignee("", "");
-//    }
-
 }
