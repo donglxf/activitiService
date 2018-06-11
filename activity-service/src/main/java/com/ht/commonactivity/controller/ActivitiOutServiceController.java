@@ -580,7 +580,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return Result.success(result);
     }
 
-    @GetMapping("/getAllUserTask")
+    @GetMapping("/getUserTaskByProInsId")
     @ApiOperation("根据实例id获取所有userTask")
     public Result<List<AllUserTaskOutVo>> getAllUserTask(@RequestParam String proInstId) {
         List<AllUserTaskOutVo> result = new ArrayList<>();
