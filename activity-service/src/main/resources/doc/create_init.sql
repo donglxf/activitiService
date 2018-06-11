@@ -131,5 +131,5 @@ CREATE TABLE `activiti_file_type`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '文件类型配置表' ROW_FORMAT = Compact;
 
-INSERT INTO activiti_file_type(id, file_type_code, file_type_name, lfile_type_level, parent_code, filt_type_path, order_no, remark, lock_no, create_user, create_user_name, create_time, update_user, update_user_name, update_time, create_org_code, create_org_name, update_org_code, update_org_name) VALUES (1, '001', '业务线配置', 1, NULL, '1', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO activiti_file_type(id, file_type_code, file_type_name, lfile_type_level, parent_code, filt_type_path, order_no, remark, lock_no, create_user, create_user_name, create_time, update_user, update_user_name, update_time, create_org_code, create_org_name, update_org_code, update_org_name) VALUES (1, '001', '业务线配置', 1, '000', '1', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
