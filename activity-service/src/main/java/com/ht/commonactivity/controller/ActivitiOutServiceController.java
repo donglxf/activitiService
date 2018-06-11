@@ -581,7 +581,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     }
 
     @GetMapping("/getAllUserTask")
-    @ApiOperation("根据系统名称获取所有未签收任务角色集合")
+    @ApiOperation("根据实例id获取所有userTask")
     public Result<List<AllUserTaskOutVo>> getAllUserTask(@RequestParam String proInstId) {
         List<AllUserTaskOutVo> result = new ArrayList<>();
         TaskDefinition task = null;
