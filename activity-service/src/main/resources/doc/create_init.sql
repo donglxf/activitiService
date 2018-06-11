@@ -106,3 +106,30 @@ create table act_model_call_log_param(
 	foreign_id varchar(64) not null comment '外键id',
 	datas text comment '模型参数'
 ) engine = innodb character set = utf8 collate utf8_bin ;
+
+DROP TABLE IF EXISTS `activiti_file_type`;
+CREATE TABLE `activiti_file_type`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `file_type_code` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '文件类型编码',
+  `file_type_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '文件類型名稱',
+  `lfile_type_level` int(11) DEFAULT NULL COMMENT '层级',
+  `parent_code` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '父类型编码',
+  `filt_type_path` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '文件类型路径',
+  `order_no` int(11) DEFAULT NULL COMMENT '排序字段',
+  `remark` varchar(500) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '备注',
+  `lock_no` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '乐观锁',
+  `create_user` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '创建用户',
+  `create_user_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '创建用户名称',
+  `create_time` datetime(0) DEFAULT NULL COMMENT '创建时间',
+  `update_user` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '更新用户',
+  `update_user_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '更新用户名称',
+  `update_time` datetime(0) DEFAULT NULL COMMENT '更新时间',
+  `create_org_code` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '创建人机构',
+  `create_org_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '创建人机构名称',
+  `update_org_code` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '更新人机构',
+  `update_org_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '更新人机构名',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 54 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '文件类型配置表' ROW_FORMAT = Compact;
+
+INSERT INTO activiti_file_type(id, file_type_code, file_type_name, lfile_type_level, parent_code, filt_type_path, order_no, remark, lock_no, create_user, create_user_name, create_time, update_user, update_user_name, update_time, create_org_code, create_org_name, update_org_code, update_org_name) VALUES (1, '001', '业务线配置', 1, NULL, '1', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+

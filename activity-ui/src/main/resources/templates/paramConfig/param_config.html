@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>档案管理</title>
+    <link rel="stylesheet" href="/plugins/bootstrap/css/bootstrap.min.css" media="all"/>
+    <!--<link rel="stylesheet" href="/plugins/bootstrap/fonts/font-awesome-4.5.0/css/font-awesome.min.css" media="all"/>-->
+    <link rel="stylesheet" href="/plugins/layui/css/layui.css" media="all"/>
+    <link rel="stylesheet" href="/plugins/font-awesome/css/font-awesome.min.css" media="all"/>
+    <link rel="stylesheet" href="/src/css/ztree/metro/ztree.css" media="all"/>
+    <link rel="stylesheet" href="/src/css/app.css" media="all"/>
+    <link rel="stylesheet" href="/src/css/themes/default.css" media="all" id="skin" kit-skin/>
+    <link rel="stylesheet" href="/src/css/ht.css" media="all"/>
+    <style>
+        #ztree_div {
+            margin-top: 14px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="demoTable" style="padding:10px 10px 0px 10px">
+    <div class="layui-row">
+        <div class="layui-col-xs3" id="ztree_div">
+            <div>
+                <div class="tree_search">
+                    <div class="input-group input-group-sm" id="file_type_tree">
+                        <input type="text" id="file_type_search_tree" class="form-control" placeholder="文件类型"/>
+                        <div data-type="expandAll" class="input-group-addon btn" title="展开所有">
+                            <i class="fa fa-plus-square"></i>
+                        </div>
+                        <div data-type="collapseAll" class="input-group-addon btn" title="收起所有">
+                            <i class="fa fa-minus-square"></i>
+                        </div>
+                        <div data-type="refresh" class="input-group-addon btn" title="刷新">
+                            <i class="fa fa-refresh"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="file_type_ztree_left" class="ztree"></div>
+            </div>
+        </div>
+        <div class="layui-col-xs9">
+            <form id="search_form" onsubmit="javascript:return false;">
+                <div class="layui-field-box">
+                    <div class="demoTable" style="padding:2px">
+                        <!--<div class="layui-inline">
+                            <input class="layui-input" name="id" id="modelVersion" autocomplete="off" placeholder="模型版本">
+                        </div>-->
+                        <button class="layui-btn" data-type="versionReload" id="version_search">新增</button>
+                    </div>
+
+                    <table id="tree_list" lay-filter="tree_list" lay-data="{id: 'version'}"></table>
+                </div>
+                <fieldset>
+                    <div>
+                        <table id="document_list" lay-filter="document_list" class="layui-hide"></table>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+    </div>
+</div>
+<script src="/plugins/layui/layui.js"></script>
+<script src="/src/js/paramConfig/param_config.js"></script>
+<script src="/src/js/paramConfig/param_config_ztree.js"></script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="preview">预览</a>
+</script>
+<!--操作-->
+<script type="text/html" id="item_bar">
+    <button class="layui-btn layui-btn-sm" lay-event="edit">
+        <i class="layui-icon">&#xe642;</i>
+    </button>
+    <button class="layui-btn layui-btn-sm" lay-event="del">
+        <i class="layui-icon">&#xe640;</i>
+    </button>
+
+</script>
+
+<script type="text/html" id="downloadTpl">
+    <a download="doc.png" href="{{d.url}}" style="color: forestgreen"><i class="layui-icon">&#xe601;</i>下载</a>
+</script>
+<script type="text/html" id="previewTpl">
+    <a download="doc.png" href="{{d.url}}" style="color: forestgreen"><i class="layui-icon">&#xe601;</i>下载</a>
+</script>
+
+<script type="text/html" id="lengthTpl">
+    {{(d.length / 1000).toFixed(1)}}kb
+</script>
+
+<script>
+    Date.prototype.Format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1,                 //月份
+            "d+": this.getDate(),                    //日
+            "h+": this.getHours(),                   //小时
+            "m+": this.getMinutes(),                 //分
+            "s+": this.getSeconds(),                 //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds()             //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+</script>
+
+<script type="text/html" id="creTime">
+    {{#
+    var date = new Date();
+    date.setTime(d.createTime);
+    return date.Format("yyyy-MM-dd hh:mm:ss");
+    }}
+</script>
+
+</body>
+</html>

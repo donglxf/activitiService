@@ -1,0 +1,104 @@
+<div style="margin: 15px;">
+    <form class="layui-form" action="#" id="add_model_form">
+        <input type="hidden" name="filtTypePath" id="filtTypePath">
+        <input type="hidden" name="lfileTypeLevel" id="lfileTypeLevel">
+        <input type="hidden" name="id" id="id">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">名字1<span style="color: red;">＊</span></label>
+            <div class="layui-input-block">
+                <input type="text" name="fileTypeName" required lay-verify-max="32" lay-verify="required"
+                       placeholder="请输入菜单名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序<span style="color: red;">＊</span></label>
+            <div class="layui-input-block">
+                <input type="text" name="orderNo" lay-verify-max="32" required lay-verify="required|name"
+                       placeholder="请输入排序" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注<span style="color: red;">＊</span></label>
+            <div class="layui-input-block">
+                <input type="text" name="remark" lay-verify-max="300" required lay-verify="required|name"
+                       placeholder="请输入备注" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="display: none;">
+            <div class="layui-input-block">
+
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'jquery', 'ht_ajax', 'ht_config'], function () {
+        var form = layui.form;
+        $ = jQuery = layui.jquery;
+        var ht_config = layui.ht_config;
+
+        (function ($) {
+            var qy = $.GetQueryString = function (name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]);
+                return "";
+            };
+            var qy2 = $.GetUrlQueryString = function (url, name) {
+                var result = null;
+                if (url) {
+                    var myIndex = url.indexOf("?");
+                    if (myIndex != -1) {
+                        var search = url.substr(myIndex, url.length - myIndex);
+                        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                        var r = search.substr(1).match(reg);
+                        if (r != null) {
+                            result = unescape(r[2]);
+                        }
+                    }
+                }
+                return result;
+            };
+        })(jQuery);
+
+        var filtTypePath = $.GetQueryString("filtTypePath");
+        $("#filtTypePath").val(filtTypePath);
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: ht_config.proImg + 'fileIndex/editChildrenNode',
+                data: data.field,// 你的formid
+                async: false,
+                error: function (request) {
+                    alert("Connection error");
+                },
+                success: function (da) {
+                    console.info(da);
+                    if (da.code == 0) {
+                        layer.alert('保存数据成功', function (index) {
+                            refreshTree();
+                            tableRefresh.reload();
+                            var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+                            debugger;
+//                            layer.close(index);
+                            layer.closeAll();
+                        });
+                    } else {
+                        layer.msg(da.msg);
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+
+</script>

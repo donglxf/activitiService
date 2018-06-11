@@ -12,43 +12,52 @@
         <div class="layui-form-item">
             <label class="layui-form-label">模型编码<span style="color: red">&nbsp;*</span></label>
             <div class="layui-input-block">
-                <input type="text" name="key" lay-verify="required|name" lay-verify-max="32" autocomplete="off" placeholder="模型编码"
+                <input type="text" name="key" lay-verify="required|name" lay-verify-max="32" autocomplete="off"
+                       placeholder="模型编码"
                        class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">模型名称<span style="color: red">&nbsp;*</span></label>
             <div class="layui-input-block">
-                <input type="text" name="name" lay-verify="required" lay-verify-max="32" autocomplete="off" placeholder="模型名称"
+                <input type="text" name="name" lay-verify="required" lay-verify-max="32" autocomplete="off"
+                       placeholder="模型名称"
                        class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">所属系统<span style="color: red">&nbsp;*</span></label>
-            <div class="layui-input-block"  id="systemDiv">
+            <div class="layui-input-block" id="systemDiv">
                 <select id="belongSystem" name="belongSystem" lay-filter="test"></select>
             </div>
         </div>
-        <div class="layui-form-item" >
+        <div class="layui-form-item">
             <label class="layui-form-label">业务线<span style="color: red">&nbsp;*</span></label>
             <div class="layui-input-block" id="businessDiv">
                 <select id="businessId" name="businessId">
-                    <option>请选择</option>
-                    <option value="1">房贷</option>
-                    <option value="2">车贷</option>
+                    <!--<option>请选择</option>-->
+                    <!--<option value="1">房贷</option>-->
+                    <!--<option value="2">车贷</option>-->
+                    <!--<optgroup label="城市记忆">-->
+                        <!--<option value="你工作的第一个城市">你工作的第一个城市</option>-->
+                    <!--</optgroup>-->
+                    <!--<optgroup label="学生时代">-->
+                        <!--<option value="你的工号">你的工号</option>-->
+                        <!--<option value="你最喜欢的老师">你最喜欢的老师</option>-->
+                    <!--</optgroup>-->
                 </select>
             </div>
         </div>
         <div class="layui-form-item layui-form-text">
             <label class="layui-form-label">模型描述</label>
             <div class="layui-input-block">
-                <textarea name="description" placeholder="请输入内容"  lay-verify-max="255" class="layui-textarea"></textarea>
+                <textarea name="description" placeholder="请输入内容" lay-verify-max="255" class="layui-textarea"></textarea>
             </div>
         </div>
 
         <div class="layui-form-item">
             <div class="layui-input-block">
-                <button class="layui-btn" lay-submit lay-filter="formDemo" >提交
+                <button class="layui-btn" lay-submit lay-filter="formDemo">提交
                 </button>
                 <button type="reset" class="layui-btn layui-btn-primary">重置</button>
             </div>
@@ -68,39 +77,40 @@
         myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
     });
 
-    layui.use(['form', 'jquery','myutil','ht_config'], function(){
+    layui.use(['form', 'jquery', 'myutil', 'ht_config'], function () {
         var form = layui.form;
         var $ = layui.jquery;
         var myutil = layui.myutil;
-        var config=layui.ht_config;
-        var basePath=config.proImg;
-        myutil.business.init('belongSystem',$("#systemDiv"),"belongSystem");
+        var config = layui.ht_config;
+        var basePath = config.proImg;
+        myutil.business.init('belongSystem', $("#systemDiv"), "belongSystem");
+        myutil.business.initFileType('businessId', $("#businessDiv"), "businessId");
 
-        form.on('submit(formDemo)', function(data){
+        form.on('submit(formDemo)', function (data) {
             $.ajax({
-                cache : true,
-                type : "GET",
-                url : basePath+'addModeler',
-                data : data.field,// 你的formid
-                async : false,
-                error : function(request) {
+                cache: true,
+                type: "GET",
+                url: basePath + 'addModeler',
+                data: data.field,// 你的formid
+                async: false,
+                error: function (request) {
                     layer.msg("保存失败！");
                 },
-                success : function(data) {
-                    if(data.code == 0){
+                success: function (data) {
+                    if (data.code == 0) {
                         parent.layer.closeAll();//关闭弹出的子页面窗口
                         var layIndex = parent.layer.open({
                             type: 2,
                             shade: false,
-                            title:false,
-                            content: 'modelEdit?modelId='+data.data.modelId+"&date="+new Date(),
+                            title: false,
+                            content: 'modelEdit?modelId=' + data.data.modelId + "&date=" + new Date(),
                             zIndex: layer.zIndex, //重点1
-                            success: function(layero){
+                            success: function (layero) {
                                 layer.setTop(layero); //重点2
                             }
                         });
                         parent.layer.full(layIndex);
-                    }else{
+                    } else {
                         layer.msg("保存失败！模型code重复");
                     }
                 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ht.commonactivity.mapper.ActivitiFileTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ht.commonactivity.entity.ActivitiFileType">
+        <id column="id" property="id" />
+        <result column="file_type_code" property="fileTypeCode" />
+        <result column="file_type_name" property="fileTypeName" />
+        <result column="lfile_type_level" property="lfileTypeLevel" />
+        <result column="parent_code" property="parentCode" />
+        <result column="filt_type_path" property="filtTypePath" />
+        <result column="order_no" property="orderNo" />
+        <result column="remark" property="remark" />
+        <result column="lock_no" property="lockNo" />
+        <result column="create_user" property="createUser" />
+        <result column="create_user_name" property="createUserName" />
+        <result column="create_time" property="createTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_user_name" property="updateUserName" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_org_code" property="createOrgCode" />
+        <result column="create_org_name" property="createOrgName" />
+        <result column="update_org_code" property="updateOrgCode" />
+        <result column="update_org_name" property="updateOrgName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, file_type_code AS fileTypeCode, file_type_name AS fileTypeName, lfile_type_level AS lfileTypeLevel, parent_code AS parentCode, filt_type_path AS filtTypePath, order_no AS orderNo, remark, lock_no AS lockNo, create_user AS createUser, create_user_name AS createUserName, create_time AS createTime, update_user AS updateUser, update_user_name AS updateUserName, update_time AS updateTime, create_org_code AS createOrgCode, create_org_name AS createOrgName, update_org_code AS updateOrgCode, update_org_name AS updateOrgName
+    </sql>
+
+</mapper>

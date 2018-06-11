@@ -535,7 +535,7 @@ public class ActivitiController implements ModelDataJsonConstants {
                 voList.add(tvo);
             }
         }
-        return PageResult.success(voList,size);
+        return PageResult.success(voList, size);
     }
 
 
@@ -851,6 +851,17 @@ public class ActivitiController implements ModelDataJsonConstants {
     public Result<List<GetAllAppDto>> getAllSystem() {
         Result<List<GetAllAppDto>> result = ucAppRpc.getAllApp();
         return result;
+    }
+
+    /**
+     * 获取业务分类
+     *
+     * @return
+     */
+    @RequestMapping("/getFileType")
+    public Result<List<fileTypeVo>> getFileTypeTree() {
+        List<fileTypeVo> result = activitiService.getFileTypeTree();
+        return Result.success(result);
     }
 
 

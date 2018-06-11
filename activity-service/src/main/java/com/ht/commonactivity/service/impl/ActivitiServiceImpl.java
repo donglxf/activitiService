@@ -2,20 +2,24 @@ package com.ht.commonactivity.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ht.commonactivity.common.*;
 import com.ht.commonactivity.common.enumtype.ActivitiSignEnum;
 import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActExcuteTask;
 import com.ht.commonactivity.entity.ActProcRelease;
 import com.ht.commonactivity.entity.ActRuTask;
+import com.ht.commonactivity.entity.ActivitiFileType;
 import com.ht.commonactivity.mapper.ActExcuteTaskMapper;
 import com.ht.commonactivity.mapper.ActProcReleaseMapper;
+import com.ht.commonactivity.mapper.ActivitiFileTypeMapper;
 import com.ht.commonactivity.service.ActivitiService;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.internal.LinkedTreeMap;
 import com.ht.commonactivity.vo.TaskVo;
+import com.ht.commonactivity.vo.fileTypeVo;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FieldExtension;
@@ -84,6 +88,9 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
 
     @Resource
     private ActExcuteTaskMapper actExcuteTaskMapper;
+
+    @Resource
+    private ActivitiFileTypeMapper activitiFileTypeMapper;
 
 
     public Model getModelInfo(String modelId) {
@@ -490,7 +497,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         return task;
     }
 
-    public TaskDefinition getNextTaskInfo(String taskId,Map<String, Object> data) {
+    public TaskDefinition getNextTaskInfo(String taskId, Map<String, Object> data) {
         String id = null;
         TaskDefinition task = null;
 //        String procInstId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessDefinitionId(); // 流程实例id
@@ -508,7 +515,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
             id = activityImpl.getId();
             if (activitiId.equals(id)) {
                 //获取下一个节点信息
-                task = nextTaskDefinition(activityImpl, activityImpl.getId(), null, t.getProcessInstanceId(),data);
+                task = nextTaskDefinition(activityImpl, activityImpl.getId(), null, t.getProcessInstanceId(), data);
                 break;
             }
         }
@@ -554,6 +561,41 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         return releases.get(0);
     }
 
+    @Override
+    public List<fileTypeVo> getFileTypeTree() {
+        List<fileTypeVo> result = new ArrayList<>();
+        Wrapper<ActivitiFileType> wrapper = new EntityWrapper<ActivitiFileType>();
+        wrapper.eq("lfile_type_level", 1);
+        List<ActivitiFileType> fLevel = activitiFileTypeMapper.selectList(wrapper);
+        fLevel.forEach(fl -> {
+            fileTypeVo vo = new fileTypeVo();
+            vo.setId(String.valueOf(fl.getId()));
+            vo.setOrderNo(fl.getOrderNo());
+            vo.setParentCode(fl.getParentCode());
+            vo.setTypeCode(fl.getFileTypeCode());
+            vo.setTypeName(fl.getFileTypeName());
+            vo.setTypePath(fl.getFiltTypePath());
+            vo.setTypeLevel(fl.getLfileTypeLevel());
+            List<fileTypeVo> childrenResult = new ArrayList<>();
+            List<ActivitiFileType> children = activitiFileTypeMapper.selectList(new EntityWrapper<ActivitiFileType>()
+                    .eq("parent_code", fl.getFileTypeCode()).eq("lfile_type_level", 2));
+            children.forEach(cl -> {
+                fileTypeVo child = new fileTypeVo();
+                child.setId(String.valueOf(cl.getId()));
+                child.setOrderNo(cl.getOrderNo());
+                child.setParentCode(cl.getParentCode());
+                child.setTypeCode(cl.getFileTypeCode());
+                child.setTypeName(cl.getFileTypeName());
+                child.setTypePath(cl.getFiltTypePath());
+                child.setTypeLevel(cl.getLfileTypeLevel());
+                childrenResult.add(child);
+            });
+            vo.setChildren(childrenResult);
+            result.add(vo);
+        });
+        return result;
+    }
+
     /**
      * 下一个任务节点信息,
      * <p>
@@ -568,7 +610,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
      * @param String       processInstanceId      流程实例Id信息
      * @return
      */
-    private TaskDefinition nextTaskDefinition(ActivityImpl activityImpl, String activityId, String elString, String processInstanceId,Map<String,Object> data) {
+    private TaskDefinition nextTaskDefinition(ActivityImpl activityImpl, String activityId, String elString, String processInstanceId, Map<String, Object> data) {
 
         PvmActivity ac = null;
 
@@ -599,7 +641,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                     // 如果排他网关只有一条线路信息
                     if (outTransitionsTemp.size() == 1) {
                         return nextTaskDefinition((ActivityImpl) outTransitionsTemp.get(0).getDestination(), activityId,
-                                elString, processInstanceId,data);
+                                elString, processInstanceId, data);
                     } else if (outTransitionsTemp.size() > 1) { // 如果排他网关有多条线路信息
                         for (PvmTransition tr1 : outTransitionsTemp) {
                             s = tr1.getProperty("conditionText"); // 获取排他网关线路判断条件信息
@@ -611,12 +653,12 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                                     break;
                                 }
                             }
-                            elString= (String) data.get(key);
+                            elString = (String) data.get(key);
                             // 判断el表达式是否成立
 //                            if (isCondition(ac.getId(), StringUtils.trim(s.toString()), elString)) {
                             if (isCondition(key, StringUtils.trim(s.toString()), elString)) {
                                 return nextTaskDefinition((ActivityImpl) tr1.getDestination(), activityId, elString,
-                                        processInstanceId,data);
+                                        processInstanceId, data);
                             }
                         }
                     }
