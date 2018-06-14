@@ -261,6 +261,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         /**查询条件（where部分）*/
         if (vo.getAssignee() != null) {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
+
         }
         /**排序*/
         List<Task> list = query.orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());//返回列表
@@ -292,10 +293,10 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         log.info("/findTaskByCandidateGroup :" + JSON.toJSONString(vo));
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
-        if (vo.getCandidateGroup() == null) {
-            data = Result.error(1, "参数异常！");
-            return data;
-        }
+//        if (vo.getCandidateGroup() == null) {
+//            data = Result.error(1, "参数异常！");
+//            return data;
+//        }
         TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
                 .createTaskQuery();
         if (ObjectUtils.isNotEmpty(vo.getTaskDefinId())) {
@@ -329,8 +330,15 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             }
         }
 
-        List<Task> list = query.taskCandidateGroupIn(vo.getCandidateGroup())
-                .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
+        List<Task> list = new ArrayList<>();
+        if (null != vo.getCandidateGroup()) {
+            list = query.taskCandidateGroupIn(vo.getCandidateGroup())
+                    .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());
+        }
+        if (StringUtils.isNotEmpty(vo.getCandidateUser())) {
+            list.addAll(query.taskCandidateUser(vo.getCandidateUser())
+                    .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults()));
+        }
 
         for (Task task : list) {
             ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
@@ -384,7 +392,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             service.complete(taskId);
 
 
-            List<Task> taskList = taskService.createTaskQuery().processDefinitionId(task.getProcessDefinitionId()).list();
+            List<Task> taskList = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
             if (taskList.size() <= 0) {
                 NextTaskInfo result = new NextTaskInfo();
                 result.setProIsEnd("Y");
