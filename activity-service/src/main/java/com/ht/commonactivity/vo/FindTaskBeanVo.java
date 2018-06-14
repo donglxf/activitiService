@@ -1,5 +1,8 @@
 package com.ht.commonactivity.vo;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +11,7 @@ public class FindTaskBeanVo {
     /**
      * 用户名
      */
+    @ApiParam("用户名，findTaskByAssignee接口比传")
     private String assignee;
 
     private List<Map<String, Object>> paramMap;
@@ -61,11 +65,13 @@ public class FindTaskBeanVo {
     /**
      * 候选人
      */
+
     private String candidateUser;
 
     /**
      * 候选组
      */
+    @ApiParam("候选组名，findTaskByCandidateGroup接口必传")
     private List<String> candidateGroup;
 
     public String getAssignee() {
