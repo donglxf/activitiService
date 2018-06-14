@@ -216,6 +216,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("根据用户查询所有任务")
     @ResponseBody
     public Result<List<TaskVo>> findMyPersonalTask(@RequestBody FindTaskBeanVo vo) {
+        log.info("/findTaskByAssignee :" + JSON.toJSONString(vo));
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null; // new ArrayList<TaskVo>();
 //        泛型过滤重复对象
@@ -288,6 +289,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("根据候选组查询所有任务")
     @ResponseBody
     public Result<List<TaskVo>> findTaskByCandidateGroup(@RequestBody FindTaskBeanVo vo) {
+        log.info("/findTaskByCandidateGroup :" + JSON.toJSONString(vo));
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
         if (vo.getCandidateGroup() == null) {
@@ -356,6 +358,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("完成任务")
     @ResponseBody
     public Result<List<NextTaskInfo>> completeMyPersonalTask(@RequestBody ComplateTaskVo vo) {
+        log.info("/complateTask :" + JSON.toJSONString(vo));
         List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
         String taskId = vo.getTaskId();
         try {
