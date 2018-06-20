@@ -2,6 +2,7 @@ package com.ht.commonactivity.vo;
 
 import io.swagger.annotations.ApiParam;
 
+import java.util.List;
 import java.util.Map;
 
 public class ComplateTaskVo {
@@ -11,8 +12,8 @@ public class ComplateTaskVo {
     private String opinion; // 办理意见
     @ApiParam("办理者")
     private String userName; //办理者
-//    private String proInstId; // 流程实例id
-//    private Map<String, Object> data; // 业务数据
+    @ApiParam("候选人组")
+    private List<String> candidateUser; // 对应变量 ${hxUser}
 
     public String getUserName() {
         return userName;
@@ -36,5 +37,13 @@ public class ComplateTaskVo {
 
     public void setOpinion(String opinion) {
         this.opinion = opinion;
+    }
+
+    public List<String> getCandidateUser() {
+        return candidateUser;
+    }
+
+    public void setCandidateUser(List<String> candidateUser) {
+        this.candidateUser = candidateUser;
     }
 }

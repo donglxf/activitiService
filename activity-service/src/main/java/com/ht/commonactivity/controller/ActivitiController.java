@@ -553,9 +553,13 @@ public class ActivitiController implements ModelDataJsonConstants {
             Task t = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
 //        TaskInfo tt=  getProcessEngine().getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
 
+            List<String> list = new ArrayList<String>();
+            list.add("aa");
+            list.add("bb");
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("flag", "0");
+            variables.put("hxUser", list.toArray());
             TaskService service = getProcessEngine().getTaskService();  //与正在执行的任务管理相关的Service
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());

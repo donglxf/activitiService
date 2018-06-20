@@ -385,11 +385,16 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //            list.add(result);
             Task task = taskService.createTaskQuery().taskId(vo.getTaskId()).singleResult();
 
+
+            //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
+            Map<String, Object> variables = new HashMap<String, Object>();
+            variables.put("hxUser", vo.getCandidateUser());
+
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             TaskService service = getProcessEngine().getTaskService();
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人,记入日志
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
-            service.complete(taskId);
+            service.complete(taskId, variables);
 
 
             List<Task> taskList = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();

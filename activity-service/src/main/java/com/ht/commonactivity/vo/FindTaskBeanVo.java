@@ -65,7 +65,7 @@ public class FindTaskBeanVo {
     /**
      * 候选人
      */
-
+    @ApiParam("候选人名")
     private String candidateUser;
 
     /**
