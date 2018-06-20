@@ -331,7 +331,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         }
 
         List<Task> list = new ArrayList<>();
-        if (null != vo.getCandidateGroup()) {
+        if (null != vo.getCandidateGroup() && vo.getCandidateGroup().size() > 0) {
             list.addAll(query.taskCandidateGroupIn(vo.getCandidateGroup())
                     .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults()));
         }
