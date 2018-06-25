@@ -588,7 +588,7 @@ public class ActivitiController implements ModelDataJsonConstants {
      *
      * @param taskId
      */
-    @RequestMapping("/addGroupTask")
+    @RequestMapping("/addGroupTaskt")
     public void addGroupTask(String taskId) {
         getProcessEngine().getTaskService()
                 .addCandidateUser(taskId, "dTest1");

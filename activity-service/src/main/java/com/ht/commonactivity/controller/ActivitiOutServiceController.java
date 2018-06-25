@@ -176,7 +176,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             data = Result.error(1, "模型启动异常！");
             log.error("deploy model error,error message：", e);
         }
-        log.info("start model sucess.");
+        log.info("start model success.");
         return data;
     }
 
@@ -424,6 +424,19 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             e.printStackTrace();
         }
         return Result.error(1, "完成任务失败" + taskId);
+    }
+
+
+    @ApiOperation("动态设置自定义候选人组")
+    @PostMapping("/setCandidateGroup")
+    public Result<String> addGroupTask(@RequestBody SetCandidateGroupVo vo) {
+        if (StringUtils.isEmpty(vo.getTaskId())) {
+            return Result.error(1, "任务id不能为空");
+        }
+        for (String s : vo.getCandidateUser()) {
+            taskService.addCandidateUser(vo.getTaskId(), s);
+        }
+        return Result.success("操作成功");
     }
 
     /**
