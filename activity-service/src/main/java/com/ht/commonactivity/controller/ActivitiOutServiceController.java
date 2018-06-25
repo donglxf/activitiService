@@ -101,7 +101,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @PostMapping("/startProcessInstanceByKey")
     @ApiOperation("启动模型")
     public Result<List<NextTaskInfo>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
-        log.info("start model,paramter:" + JSON.toJSONString(paramter));
+        log.info("/startProcessInstanceByKey start model,paramter:" + JSON.toJSONString(paramter));
         Result<List<NextTaskInfo>> data = null;
         try {
             if (StringUtils.isEmpty(paramter.getBusinessKey())) {
@@ -430,6 +430,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("动态设置自定义候选人组")
     @PostMapping("/setCandidateGroup")
     public Result<String> addGroupTask(@RequestBody SetCandidateGroupVo vo) {
+        log.info("/setCandidateGroup param:===>" + JSON.toJSONString(vo));
         if (StringUtils.isEmpty(vo.getTaskId())) {
             return Result.error(1, "任务id不能为空");
         }
