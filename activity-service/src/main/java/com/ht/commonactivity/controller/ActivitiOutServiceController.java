@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -101,7 +102,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @PostMapping("/startProcessInstanceByKey")
     @ApiOperation("启动模型")
     public Result<List<NextTaskInfo>> startProcessInstanceByKey(@RequestBody RpcStartParamter paramter) {
-        log.info("/startProcessInstanceByKey start model,paramter:" + JSON.toJSONString(paramter));
+        log.info("startProcessInstanceByKey start model,paramter========》》:" + JSON.toJSONString(paramter));
         Result<List<NextTaskInfo>> data = null;
         try {
             if (StringUtils.isEmpty(paramter.getBusinessKey())) {
@@ -158,6 +159,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             callLog.setVersion(com.ht.commonactivity.utils.StringUtils.isEmpty(paramter.getVersion()) ? release.getModelVersion() : paramter.getVersion());
             callLog.setIsEnd("1"); // 1-未完成，0-已完成
             callLog.setSysCode(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
+            log.info("insert callLog Date=====》》》" + JSON.toJSONString(callLog));
             modelCallLogService.insert(callLog);
             ModelCallLogParam param = new ModelCallLogParam();
             param.setForeignId(String.valueOf(callLog.getId()));
@@ -171,6 +173,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //            result.setTaskText(taskDefinition.getNameExpression().getExpressionText());
 //            result.setProcInstId(instance.getId());
 //            result.setTaskAssign(taskDefinition.getAssigneeExpression().getExpressionText());
+            log.info("process result Date=====》》》" + JSON.toJSONString(list));
             data = Result.success(list);
         } catch (Exception e) {
             data = Result.error(1, "模型启动异常！");
@@ -204,6 +207,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @PostMapping("/taskChangeOther")
     @ApiOperation("任务转办或动态设置代理人")
     public Result<String> taksChangeOther(@RequestParam String taskId, @RequestParam String owner) {
+        log.info("taskChangeOther param Date=====》》》" + JSON.toJSONString(taskId) + "============" + JSON.toJSONString(owner));
         taskService.setAssignee(taskId, owner);
         return Result.success();
     }
@@ -216,7 +220,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("根据用户查询所有任务")
     @ResponseBody
     public Result<List<TaskVo>> findMyPersonalTask(@RequestBody FindTaskBeanVo vo) {
-        log.info("/findTaskByAssignee :" + JSON.toJSONString(vo));
+        log.info("findTaskByAssignee param date-------->>>:" + JSON.toJSONString(vo));
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null; // new ArrayList<TaskVo>();
 //        泛型过滤重复对象
@@ -280,7 +284,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 voList.add(tvo);
             }
         }
-        return data = Result.success(voList);
+        data = Result.success(voList);
+        log.info("findTaskByAssignee result Data-------->>>>" + JSON.toJSONString(data));
+        return data;
     }
 
     /**
@@ -290,7 +296,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("根据候选组查询所有任务")
     @ResponseBody
     public Result<List<TaskVo>> findTaskByCandidateGroup(@RequestBody FindTaskBeanVo vo) {
-        log.info("/findTaskByCandidateGroup :" + JSON.toJSONString(vo));
+        log.info("findTaskByCandidateGroup param Data-------->>:" + JSON.toJSONString(vo));
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
 //        if (vo.getCandidateGroup() == null) {
@@ -353,7 +359,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             tvo.setAssign(task.getAssignee());
             voList.add(tvo);
         }
-        return data = Result.success(voList);
+        data = Result.success(voList);
+        log.info("findTaskByCandidateGroup result Data-------->>:" + JSON.toJSONString(data));
+        return data;
     }
 
     /**
@@ -366,7 +374,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("完成任务")
     @ResponseBody
     public Result<List<NextTaskInfo>> completeMyPersonalTask(@RequestBody ComplateTaskVo vo) {
-        log.info("/complateTask :" + JSON.toJSONString(vo));
+        log.info("complateTask param data--------->:" + JSON.toJSONString(vo));
         List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
         String taskId = vo.getTaskId();
         try {
@@ -403,6 +411,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 result.setProIsEnd("Y");
                 list.add(result);
                 updateModelLog("0", t.getProcessInstanceId());
+                log.info("complateTask result data , process is end --------->:" + JSON.toJSONString(list));
                 return Result.success(list);
             }
 
@@ -419,9 +428,10 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             });
 
             updateModelLog("1", t.getProcessInstanceId());
+            log.info("complateTask result data--------->:" + JSON.toJSONString(list));
             return Result.success(list);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("complateTask Exception-------", e);
         }
         return Result.error(1, "完成任务失败" + taskId);
     }
@@ -430,10 +440,17 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @ApiOperation("动态设置自定义候选人组")
     @PostMapping("/setCandidateGroup")
     public Result<String> addGroupTask(@RequestBody SetCandidateGroupVo vo) {
-        log.info("/setCandidateGroup param:===>" + JSON.toJSONString(vo));
+        log.info("setCandidateGroup param data:===>" + JSON.toJSONString(vo));
         if (StringUtils.isEmpty(vo.getTaskId())) {
             return Result.error(1, "任务id不能为空");
         }
+//        if (StringUtils.isEmpty(vo.getProInstId())) {
+//            return Result.error(1, "实例id不能为空");
+//        }
+//        List<Task> taskList = taskService.createTaskQuery().processInstanceId(vo.getProInstId()).list();
+//        taskList.forEach(task -> {
+//            taskService.setVariables("dynName", vo.getParamMap());
+//        });
         for (String s : vo.getCandidateUser()) {
             taskService.addCandidateUser(vo.getTaskId(), s);
         }
@@ -461,8 +478,14 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/repealPro")
     @ApiOperation("撤销")
     public Result<String> repealPro(@RequestParam String proId) {
-        runtimeService.deleteProcessInstance(proId, "撤销流程");
-        return Result.success("撤销成功");
+        log.info("repealPro param data:===>" + JSON.toJSONString(proId));
+        try {
+            runtimeService.deleteProcessInstance(proId, "撤销流程");
+            return Result.success("撤销成功");
+        } catch (Exception e) {
+            log.error("repealPro exception --------", e);
+        }
+        return Result.error(1, "撤销异常！！");
     }
 
 
@@ -476,17 +499,16 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/singleRepealPro")
     @ApiOperation("单步撤销")
     public Result<String> singleRepealPro(@RequestParam String proInstId, @RequestParam String toBackNoteId) {
+        log.info("singleRepealPro param data:=========>" + JSON.toJSONString(proInstId) + "=======" + JSON.toJSONString(toBackNoteId));
         try {
             // 根据流程实例找到当前任务节点
             List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInstId).list();
             for (Task t : tasks) {
                 String currentTaskId = processGoBack.turnBackNew(t.getId(), "流程单步撤销", "", toBackNoteId);
             }
-
             return Result.success("撤销成功");
-
         } catch (Exception e) {
-            log.error("", e);
+            log.error("singleRepealPro error------------:", e);
         }
         return Result.error(1, "单步撤销失败");
     }
@@ -501,8 +523,14 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @PostMapping("/ownerTask")
     @ApiOperation("委托任务")
     public Result<String> ownerTask(String taskId, String owner) {
-        taskService.delegateTask(taskId, owner);
-        return Result.success();
+        log.info("ownerTask param data:=========>" + JSON.toJSONString(owner));
+        try {
+            taskService.delegateTask(taskId, owner);
+            return Result.success();
+        } catch (Exception e) {
+            log.error("ownerTask exception----------", e);
+        }
+        return Result.error(1, "委托异常!!");
     }
 
     /**
@@ -514,6 +542,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/refuseTask")
     @ApiOperation("拒绝")
     public Result<String> refuseTask(@RequestParam String proInsId) {
+        log.info("refuseTask param data:=========>" + JSON.toJSONString(proInsId));
 //        BpmnModel model = repositoryService.getBpmnModel(procDefId);
 //        if (model != null) {
 //            Collection<FlowElement> flowElements = model.getMainProcess().getFlowElements();
@@ -524,19 +553,20 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //                }
 //            }
 //        }
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInsId).list();
-        if (ObjectUtils.isNotEmpty(tasks)) {
-            Task t = tasks.get(0);
-            ActivityImpl endActivity = null;
-            try {
+
+        try {
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInsId).list();
+            if (ObjectUtils.isNotEmpty(tasks)) {
+                Task t = tasks.get(0);
+                ActivityImpl endActivity = null;
                 endActivity = processGoBack.findActivitiImpl(t.getId(), "end");
                 processGoBack.commitProcess(t.getId(), null, endActivity.getId());
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+            return Result.success("操作成功");
+        } catch (Exception e) {
+            log.error("refuseTask exception--------", e);
         }
-
-        return Result.success("操作成功");
+        return Result.error(1, "操作异常");
     }
 
     /**
@@ -548,8 +578,14 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/claimTask")
     @ApiOperation("任务签收")
     public Result<String> claimTask(@RequestParam String taskId, @RequestParam String userName) {
-        taskService.claim(taskId, userName);
-        return Result.success("签收成功");
+        log.info("claimTask param data:=========>" + JSON.toJSONString(taskId) + "=======" + JSON.toJSONString(userName));
+        try {
+            taskService.claim(taskId, userName);
+            return Result.success("签收成功");
+        } catch (Exception e) {
+            log.error("claimTask exception-----------", e);
+        }
+        return Result.error(1, "签收异常!!");
     }
 
     /**
@@ -561,7 +597,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/getAllTaskGroupBySysName")
     @ApiOperation("根据系统名称获取所有为完成流程当前所有未签收任务角色集合")
     public Result<TaskRoleAssignResult> getAllTaskGroupBySysName(@RequestParam String sysName) {
-
+        log.info("getAllTaskGroupBySysName param data:=========>" + JSON.toJSONString(sysName));
 //        List<String> clainList = new ArrayList<>();
 
         // 根据系统名查询未完成的流程实例
@@ -583,7 +619,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             List<String> noClainList = new ArrayList<>();
             TaskGroup group = new TaskGroup();
 // 获取任务所属角色
-            if (StringUtils.isEmpty(li.getAssignee())) {  // assignee未空表示未签收
+            if (StringUtils.isEmpty(li.getAssignee())) {  // assignee为空表示未签收
                 group.setTaskId(li.getId());
                 group.setTaskName(li.getName());
                 List<IdentityLink> linn = taskService.getIdentityLinksForTask(li.getId());
@@ -603,7 +639,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         result.setUser(userList);
         result.setRole(roleList);
         System.out.println(JSON.toJSONString(result));
-
+        log.info("getAllTaskGroupBySysName result data:=========>" + JSON.toJSONString(result));
 //        Object[] args = new Object[2];
 //        args[0] = noClainList; // 未签收任务角色集合
 //        args[1] = clainList;  // 已签收任务人名集合
@@ -613,6 +649,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @GetMapping("/getUserTaskByProInsId")
     @ApiOperation("根据实例id获取所有userTask")
     public Result<List<AllUserTaskOutVo>> getAllUserTask(@RequestParam String proInstId) {
+        log.info("getUserTaskByProInsId param data:=========>" + JSON.toJSONString(proInstId));
         List<AllUserTaskOutVo> result = new ArrayList<>();
         TaskDefinition task = null;
         String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(proInstId).singleResult().getProcessDefinitionId();
@@ -641,14 +678,16 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 result.add(outVo);
             }
         }
-
+        log.info("getUserTaskByProInsId result data:=========>" + JSON.toJSONString(result));
         return Result.success(result);
     }
 
     @GetMapping("/getProValiable")
     @ApiOperation("获取流程运行过程中所有参数")
     public Result<Map<String, Object>> getProValiable(@RequestParam String proInstId) {
+        log.info("getProValiable param data:=========>" + JSON.toJSONString(proInstId));
         Map<String, Object> a = runtimeService.getVariablesLocal(proInstId);
+        log.info("getProValiable result data:------------>" + JSON.toJSONString(a));
         return Result.success(a);
     }
 }
