@@ -114,6 +114,10 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             if (StringUtils.isEmpty(paramter.getSysCode())) {
                 return Result.error(1, "sysCode系统编码不能为空!!");
             }
+            if (StringUtils.isEmpty(paramter.getProcessDefinedKey())) {
+                return Result.error(1, "流程key不能为空!!");
+            }
+
             ActProcRelease release = null;
             // 版本信息为空，获取模型最新版本
             if (StringUtils.isEmpty(paramter.getVersion())) {
