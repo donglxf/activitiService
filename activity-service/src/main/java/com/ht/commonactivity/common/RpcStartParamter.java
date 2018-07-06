@@ -1,14 +1,18 @@
 package com.ht.commonactivity.common;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class RpcStartParamter implements Serializable {
+public class RpcStartParamter extends BaseProcessParamter  implements Serializable {
 
     /**
      * 业务key ,启动流程是传入
      */
+    @ApiParam(value = "业务key", required = true)
     private String businessKey;
     /**
      * 模型定义ID
@@ -18,12 +22,14 @@ public class RpcStartParamter implements Serializable {
     /**
      * 流程定义key  ,启动流程是传入
      */
+    @ApiParam(value = "流程定义key", required = true)
     private String processDefinedKey;
 
     private String userId;
     /**
      * 流程版本
      */
+    @ApiParam(value = "流程版本")
     private String version;
     /**
      * 批次号
@@ -34,18 +40,18 @@ public class RpcStartParamter implements Serializable {
      */
     private String type;
 
-//    private Long taskId;
-
-    private Map<String,Object> data; // 业务数据
+    //    private Long taskId;
+    @ApiParam(value = "业务数据")
+    private Map<String, Object> data; // 业务数据
     /**
      * 批次大小
      */
     private int batchSize;
+
     /**
      * 批量调用流程参数
      */
 //    private List<Map<String,Object>> datas;
-
     public String getVersion() {
         return version;
     }
@@ -103,7 +109,7 @@ public class RpcStartParamter implements Serializable {
     }
 
     public String getBusinessKey() {
-            return businessKey;
+        return businessKey;
     }
 
     public void setBusinessKey(String businessKey) {

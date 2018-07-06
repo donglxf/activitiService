@@ -37,7 +37,9 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.spring.web.json.Json;
 
@@ -48,7 +50,6 @@ import java.util.stream.Collectors;
 @RestController
 @Api("工作流对外提供的接口服务")
 @Log4j2
-//@RequestMapping("/process")
 public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @Resource
@@ -84,6 +85,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @Autowired
     protected ModelCallLogParamService modelCallLogParamService;
 
+    @Autowired
+    private RedisTemplate<String, String> redis;
 
     @Autowired
     protected UcAppRpc ucAppRpc;
@@ -108,6 +111,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             if (StringUtils.isEmpty(paramter.getBusinessKey())) {
                 return Result.error(1, "businessKey is null ,check");
             }
+            if (StringUtils.isEmpty(paramter.getSysCode())) {
+                return Result.error(1, "sysCode系统编码不能为空!!");
+            }
             ActProcRelease release = null;
             // 版本信息为空，获取模型最新版本
             if (StringUtils.isEmpty(paramter.getVersion())) {
@@ -118,21 +124,31 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             if (release == null) {
                 return Result.error(1, ActivitiConstants.MODEL_UNEXIST);
             }
-
-            List<ProcessInstance> processInstancs = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(paramter.getBusinessKey()).list();
-            String deleteReason = "删除重新启动";
-            if (processInstancs != null) {
-                for (ProcessInstance processInstance : processInstancs) {
-//                    Map<String, Object> maps = processInstance.getProcessVariables();
-//                    if (release.getModelId().equals(maps.get("modelId"))) {
-//                        runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), deleteReason);
-//                    }
-                    runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), deleteReason);
+            String ruleDrl = redis.opsForValue().get(paramter.getSysCode().toUpperCase() + paramter.getBusinessKey());
+            if (StringUtils.isNotEmpty(ruleDrl)) {
+                // 过滤非本系统具有相同业务key的流程
+                List<ModelCallLog> callList = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", paramter.getSysCode().toUpperCase()));
+                List<ProcessInstance> processInstancs = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(paramter.getBusinessKey()).list();
+                List<ProcessInstance> processInstancsN = new ArrayList<>();
+                for (ModelCallLog model : callList) {
+                    for (ProcessInstance processInstance : processInstancs) {
+                        if (model.getProInstId().equals(processInstance.getProcessInstanceId())) {
+                            processInstancsN.add(processInstance);
+                        }
+                    }
+                }
+                String deleteReason = "删除重新启动";
+                if (processInstancs != null) {
+                    for (ProcessInstance processInstance : processInstancsN) {
+                        runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), deleteReason);
+                    }
                 }
             }
 
             ProcessInstance instance = runtimeService.startProcessInstanceById(release.getModelProcdefId(),
                     paramter.getBusinessKey(), paramter.getData());
+            String str = "{\"sysCode\":\"" + paramter.getSysCode().toUpperCase() + "\",\"businessKey\":\"" + paramter.getBusinessKey() + "\"}";
+            redis.opsForValue().set(paramter.getSysCode().toUpperCase() + paramter.getBusinessKey(), JSON.toJSONString(str));
 
             log.info("process start installId======" + instance.getId());
             String instId = instance.getId();
@@ -150,21 +166,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //                result.setTaskId(t.getId());
                 list.add(result);
             }
-            ModelCallLog callLog = new ModelCallLog();
-            callLog.setBusinessKey(paramter.getBusinessKey());
-//            callLog.setDatas(JSON.toJSONString(paramter));
-            callLog.setModelProcdefId(release.getModelProcdefId());
-            callLog.setProcessDefinedKey(paramter.getProcessDefinedKey());
-            callLog.setProInstId(instId);
-            callLog.setVersion(com.ht.commonactivity.utils.StringUtils.isEmpty(paramter.getVersion()) ? release.getModelVersion() : paramter.getVersion());
-            callLog.setIsEnd("1"); // 1-未完成，0-已完成
-            callLog.setSysCode(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
-            log.info("insert callLog Date=====》》》" + JSON.toJSONString(callLog));
-            modelCallLogService.insert(callLog);
-            ModelCallLogParam param = new ModelCallLogParam();
-            param.setForeignId(String.valueOf(callLog.getId()));
-            param.setDatas(JSON.toJSONString(paramter));
-            modelCallLogParamService.insert(param);
+            activitiService.saveModelLog(release, paramter, instId);
 
 //            String processInstanceId = activitiService.startProcess(paramter);
 //            TaskDefinition taskDefinition = activitiService.getNextTaskInfoByProcessId(instance.getId());
@@ -206,9 +208,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      */
     @PostMapping("/taskChangeOther")
     @ApiOperation("任务转办或动态设置代理人")
-    public Result<String> taksChangeOther(@RequestParam String taskId, @RequestParam String owner) {
-        log.info("taskChangeOther param Date=====》》》" + JSON.toJSONString(taskId) + "============" + JSON.toJSONString(owner));
-        taskService.setAssignee(taskId, owner);
+    public Result<String> taksChangeOther(@RequestBody TaskChangeOtherVo vo) {
+        log.info("taskChangeOther param Date=====》》》" + JSON.toJSONString(vo.getTaskId()) + "============" + JSON.toJSONString(vo.getOwner()));
+        taskService.setAssignee(vo.getTaskId(), vo.getOwner());
         return Result.success();
     }
 
@@ -222,6 +224,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     public Result<List<TaskVo>> findMyPersonalTask(@RequestBody FindTaskBeanVo vo) {
         log.info("findTaskByAssignee param date-------->>>:" + JSON.toJSONString(vo));
         List<TaskVo> voList = new ArrayList<>();
+        if (StringUtils.isEmpty(vo.getSysCode())) {
+            return Result.error(1, "sysCode系统编码不能为空!!");
+        }
         Result<List<TaskVo>> data = null; // new ArrayList<TaskVo>();
 //        泛型过滤重复对象
 //        List<ActRuTask> tlist= activitiService.findTaskByAssigneeOrGroup(vo);
@@ -233,7 +238,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //        });
 
         if (StringUtils.isEmpty(vo.getAssignee())) {
-            data = Result.error(1, "参数异常！");
+            data = Result.error(1, "用户名不能为空！");
             return data;
         }
 
@@ -267,10 +272,21 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
 
         }
-        /**排序*/
+        /**过滤非本系统流程任务*/
         List<Task> list = query.orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());//返回列表
+        List<Task> newList = new ArrayList<>();
+        List<ModelCallLog> callList = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", vo.getSysCode().toUpperCase()));
         if (list != null && list.size() > 0) {
             for (Task task : list) {
+                for (ModelCallLog callLog : callList) {
+                    if (task.getProcessInstanceId().equals(callLog.getProInstId())) {
+                        newList.add(task);
+                    }
+                }
+            }
+        }
+        if (newList != null && newList.size() > 0) {
+            for (Task task : newList) {
                 ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
                 TaskVo tvo = new TaskVo();
                 tvo.setBusinessKey(pi.getBusinessKey());
@@ -284,6 +300,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 voList.add(tvo);
             }
         }
+
         data = Result.success(voList);
         log.info("findTaskByAssignee result Data-------->>>>" + JSON.toJSONString(data));
         return data;
@@ -345,8 +362,19 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             list.addAll(query.taskCandidateUser(vo.getCandidateUser())
                     .orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults()));
         }
-
-        for (Task task : list) {
+        /**过滤非本系统流程任务*/
+        List<Task> newList = new ArrayList<>();
+        List<ModelCallLog> callList = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", vo.getSysCode().toUpperCase()));
+        if (list != null && list.size() > 0) {
+            for (Task task : list) {
+                for (ModelCallLog callLog : callList) {
+                    if (task.getProcessInstanceId().equals(callLog.getProInstId())) {
+                        newList.add(task);
+                    }
+                }
+            }
+        }
+        for (Task task : newList) {
             ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
             TaskVo tvo = new TaskVo();
             tvo.setBusinessKey(pi.getBusinessKey());
@@ -381,7 +409,10 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             if (StringUtils.isEmpty(taskId)) {
                 return Result.error(1, "参数不合法，taskId不能为空");
             }
-            Task t = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+            if (StringUtils.isEmpty(vo.getSysCode())) {
+                return Result.error(1, "参数不合法，系统编码不能为空");
+            }
+//            Task t = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
 //        TaskInfo tt=  getProcessEngine().getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
 //            TaskDefinition taskDefinition = activitiService.getNextTaskInfo(taskId, vo.getData());
 //            NextTaskInfo result = new NextTaskInfo();
@@ -392,8 +423,11 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //            result.setProIsEnd(procIsEnd(vo.getProInstId()) ? "Y" : "N");
 //            list.add(result);
             Task task = taskService.createTaskQuery().taskId(vo.getTaskId()).singleResult();
+            if(ObjectUtils.isEmpty(task)){
+                return Result.error(1,"异常，任务id不存在!!");
+            }
 
-
+            ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("hxUser", vo.getCandidateUser());
@@ -401,16 +435,17 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             TaskService service = getProcessEngine().getTaskService();
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人,记入日志
-            service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
+            service.addComment(taskId, task.getProcessInstanceId(), vo.getOpinion());
             service.complete(taskId, variables);
-
 
             List<Task> taskList = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
             if (taskList.size() <= 0) {
                 NextTaskInfo result = new NextTaskInfo();
                 result.setProIsEnd("Y");
                 list.add(result);
-                updateModelLog("0", t.getProcessInstanceId());
+                activitiService.updateModelLog("0", task.getProcessInstanceId());
+                log.info("redis cache key:---" + vo.getSysCode().toUpperCase() + pi.getBusinessKey());
+                redis.delete(vo.getSysCode().toUpperCase() + pi.getBusinessKey());
                 log.info("complateTask result data , process is end --------->:" + JSON.toJSONString(list));
                 return Result.success(list);
             }
@@ -427,7 +462,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 list.add(result);
             });
 
-            updateModelLog("1", t.getProcessInstanceId());
+            activitiService.updateModelLog("1", task.getProcessInstanceId());
             log.info("complateTask result data--------->:" + JSON.toJSONString(list));
             return Result.success(list);
         } catch (Exception e) {
@@ -458,29 +493,17 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     }
 
     /**
-     * 更新状态
-     *
-     * @param isEnd     1-未完成，0-已完成
-     * @param proInstId
-     */
-    public void updateModelLog(String isEnd, String proInstId) {
-        ModelCallLog log = new ModelCallLog();
-        log.setIsEnd(isEnd);
-        modelCallLogService.update(log, new EntityWrapper<ModelCallLog>().eq("pro_inst_id", proInstId));
-    }
-
-    /**
      * 撤销整个流程
      *
      * @param proId 流程实例id
      * @return
      */
-    @GetMapping("/repealPro")
+    @PostMapping("/repealPro")
     @ApiOperation("撤销")
-    public Result<String> repealPro(@RequestParam String proId) {
-        log.info("repealPro param data:===>" + JSON.toJSONString(proId));
+    public Result<String> repealPro(@RequestBody RepealProVo vo) {
+        log.info("repealPro param data:===>" + JSON.toJSONString(vo.getProInstId()));
         try {
-            runtimeService.deleteProcessInstance(proId, "撤销流程");
+            runtimeService.deleteProcessInstance(vo.getProInstId(), "撤销流程");
             return Result.success("撤销成功");
         } catch (Exception e) {
             log.error("repealPro exception --------", e);
@@ -496,15 +519,15 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param toBackNoteId 任务id，如在流程设置则为设置的id，否则为默认id，格式：sid-26585B1A-9680-4331-AD31-7A107BA03AB7
      * @return
      */
-    @GetMapping("/singleRepealPro")
+    @PostMapping("/singleRepealPro")
     @ApiOperation("单步撤销")
-    public Result<String> singleRepealPro(@RequestParam String proInstId, @RequestParam String toBackNoteId) {
-        log.info("singleRepealPro param data:=========>" + JSON.toJSONString(proInstId) + "=======" + JSON.toJSONString(toBackNoteId));
+    public Result<String> singleRepealPro(@RequestBody RepealProVo vo) {
+        log.info("singleRepealPro param data:=========>" + JSON.toJSONString(vo.getProInstId()) + "=======" + JSON.toJSONString(vo.getToBackNoteId()));
         try {
             // 根据流程实例找到当前任务节点
-            List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInstId).list();
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(vo.getProInstId()).list();
             for (Task t : tasks) {
-                String currentTaskId = processGoBack.turnBackNew(t.getId(), "流程单步撤销", "", toBackNoteId);
+                String currentTaskId = processGoBack.turnBackNew(t.getId(), "流程单步撤销", "", vo.getToBackNoteId());
             }
             return Result.success("撤销成功");
         } catch (Exception e) {
@@ -522,10 +545,10 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      */
     @PostMapping("/ownerTask")
     @ApiOperation("委托任务")
-    public Result<String> ownerTask(String taskId, String owner) {
-        log.info("ownerTask param data:=========>" + JSON.toJSONString(owner));
+    public Result<String> ownerTask(@RequestBody TaskChangeOtherVo vo) {
+        log.info("ownerTask param data:=========>" + JSON.toJSONString(vo));
         try {
-            taskService.delegateTask(taskId, owner);
+            taskService.delegateTask(vo.getTaskId(), vo.getOwner());
             return Result.success();
         } catch (Exception e) {
             log.error("ownerTask exception----------", e);
@@ -539,10 +562,10 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param proInsId 实例id
      * @return
      */
-    @GetMapping("/refuseTask")
+    @PostMapping("/refuseTask")
     @ApiOperation("拒绝")
-    public Result<String> refuseTask(@RequestParam String proInsId) {
-        log.info("refuseTask param data:=========>" + JSON.toJSONString(proInsId));
+    public Result<String> refuseTask(@RequestBody ProcessParamVo vo) {
+        log.info("refuseTask param data:=========>" + JSON.toJSONString(vo));
 //        BpmnModel model = repositoryService.getBpmnModel(procDefId);
 //        if (model != null) {
 //            Collection<FlowElement> flowElements = model.getMainProcess().getFlowElements();
@@ -555,7 +578,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //        }
 
         try {
-            List<Task> tasks = taskService.createTaskQuery().processInstanceId(proInsId).list();
+            List<Task> tasks = taskService.createTaskQuery().processInstanceId(vo.getProInstId()).list();
             if (ObjectUtils.isNotEmpty(tasks)) {
                 Task t = tasks.get(0);
                 ActivityImpl endActivity = null;
@@ -575,12 +598,12 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param taskId 实例id
      * @return
      */
-    @GetMapping("/claimTask")
+    @PostMapping("/claimTask")
     @ApiOperation("任务签收")
-    public Result<String> claimTask(@RequestParam String taskId, @RequestParam String userName) {
-        log.info("claimTask param data:=========>" + JSON.toJSONString(taskId) + "=======" + JSON.toJSONString(userName));
+    public Result<String> claimTask(@RequestBody TaskChangeOtherVo vo) {
+        log.info("claimTask param data:=========>" + JSON.toJSONString(vo));
         try {
-            taskService.claim(taskId, userName);
+            taskService.claim(vo.getTaskId(), vo.getOwner());
             return Result.success("签收成功");
         } catch (Exception e) {
             log.error("claimTask exception-----------", e);
@@ -594,14 +617,14 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      * @param sysName 系统名
      * @return
      */
-    @GetMapping("/getAllTaskGroupBySysName")
+    @PostMapping("/getAllTaskGroupBySysName")
     @ApiOperation("根据系统名称获取所有为完成流程当前所有未签收任务角色集合")
-    public Result<TaskRoleAssignResult> getAllTaskGroupBySysName(@RequestParam String sysName) {
-        log.info("getAllTaskGroupBySysName param data:=========>" + JSON.toJSONString(sysName));
+    public Result<TaskRoleAssignResult> getAllTaskGroupBySysName(@RequestBody AllTaskGroupBySysNameVo vo) {
+        log.info("getAllTaskGroupBySysName param data:=========>" + JSON.toJSONString(vo));
 //        List<String> clainList = new ArrayList<>();
 
         // 根据系统名查询未完成的流程实例
-        List<ModelCallLog> list = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", sysName).eq("is_end", "1"));
+        List<ModelCallLog> list = modelCallLogService.selectList(new EntityWrapper<ModelCallLog>().eq("sys_code", vo.getSysCode().toUpperCase()).eq("is_end", "1"));
         List<String> instIdList = new ArrayList<>(); // 未结束流程的实例Id
         list.forEach(li -> {
             if (!procIsEnd(li.getProInstId())) {
@@ -646,13 +669,13 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return Result.success(result);
     }
 
-    @GetMapping("/getUserTaskByProInsId")
+    @PostMapping("/getUserTaskByProInsId")
     @ApiOperation("根据实例id获取所有userTask")
-    public Result<List<AllUserTaskOutVo>> getAllUserTask(@RequestParam String proInstId) {
-        log.info("getUserTaskByProInsId param data:=========>" + JSON.toJSONString(proInstId));
+    public Result<List<AllUserTaskOutVo>> getAllUserTask(@RequestBody ProcessParamVo vo) {
+        log.info("getUserTaskByProInsId param data:=========>" + JSON.toJSONString(vo));
         List<AllUserTaskOutVo> result = new ArrayList<>();
         TaskDefinition task = null;
-        String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(proInstId).singleResult().getProcessDefinitionId();
+        String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult().getProcessDefinitionId();
         ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
                 .getDeployedProcessDefinition(definitionId);
         List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
@@ -682,11 +705,11 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return Result.success(result);
     }
 
-    @GetMapping("/getProValiable")
+    @PostMapping("/getProValiable")
     @ApiOperation("获取流程运行过程中所有参数")
-    public Result<Map<String, Object>> getProValiable(@RequestParam String proInstId) {
-        log.info("getProValiable param data:=========>" + JSON.toJSONString(proInstId));
-        Map<String, Object> a = runtimeService.getVariablesLocal(proInstId);
+    public Result<Map<String, Object>> getProValiable(@RequestBody ProcessParamVo vo) {
+        log.info("getProValiable param data:=========>" + JSON.toJSONString(vo));
+        Map<String, Object> a = runtimeService.getVariablesLocal(vo.getProInstId());
         log.info("getProValiable result data:------------>" + JSON.toJSONString(a));
         return Result.success(a);
     }

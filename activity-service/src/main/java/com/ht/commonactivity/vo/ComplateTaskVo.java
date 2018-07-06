@@ -1,11 +1,12 @@
 package com.ht.commonactivity.vo;
 
+import com.ht.commonactivity.common.BaseProcessParamter;
 import io.swagger.annotations.ApiParam;
 
 import java.util.List;
 import java.util.Map;
 
-public class ComplateTaskVo {
+public class ComplateTaskVo extends  BaseProcessParamter{
     @ApiParam("任务id")
     private String taskId; // 任务id
     @ApiParam("办理意见")

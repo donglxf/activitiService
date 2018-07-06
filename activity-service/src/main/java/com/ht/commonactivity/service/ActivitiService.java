@@ -115,7 +115,7 @@ public interface ActivitiService {
     /**
      * 根据名称或分组查询所有任务信息
      *
-     * @param taskId
+     * @param vo
      * @return
      */
     public List<ActRuTask> findTaskByAssigneeOrGroup(FindTaskBeanVo vo);
@@ -125,5 +125,20 @@ public interface ActivitiService {
     public ActProcRelease getModelInfo(String modelCode, String modeVersion);
 
     public List<fileTypeVo> getFileTypeTree();
+
+    /**
+     * 保存log
+     *
+     * @param paramter
+     * @return
+     */
+    public int saveModelLog(ActProcRelease release, RpcStartParamter paramter, String instId);
+
+    /**
+     * 更新日志表
+     * @param isEnd
+     * @param proInstId
+     */
+    public void updateModelLog(String isEnd, String proInstId) ;
 
 }

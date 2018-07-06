@@ -6,20 +6,21 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.ht.commonactivity.common.*;
 import com.ht.commonactivity.common.enumtype.ActivitiSignEnum;
 import com.ht.commonactivity.common.result.Result;
-import com.ht.commonactivity.entity.ActExcuteTask;
-import com.ht.commonactivity.entity.ActProcRelease;
-import com.ht.commonactivity.entity.ActRuTask;
-import com.ht.commonactivity.entity.ActivitiFileType;
+import com.ht.commonactivity.entity.*;
 import com.ht.commonactivity.mapper.ActExcuteTaskMapper;
 import com.ht.commonactivity.mapper.ActProcReleaseMapper;
 import com.ht.commonactivity.mapper.ActivitiFileTypeMapper;
+import com.ht.commonactivity.service.ActModelDefinitionService;
 import com.ht.commonactivity.service.ActivitiService;
+import com.ht.commonactivity.service.ModelCallLogParamService;
+import com.ht.commonactivity.service.ModelCallLogService;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.internal.LinkedTreeMap;
 import com.ht.commonactivity.vo.TaskVo;
 import com.ht.commonactivity.vo.fileTypeVo;
+import lombok.extern.log4j.Log4j2;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FieldExtension;
@@ -66,14 +67,24 @@ import java.util.*;
 import java.util.zip.ZipInputStream;
 
 @Service
+@Log4j2
 public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConstants {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivitiServiceImpl.class);
+
+    @Autowired
+    protected ModelCallLogParamService modelCallLogParamService;
 
     @Resource
     private RepositoryService repositoryService;
     @Resource
     private RuntimeService runtimeService;
+
+    @Autowired
+    protected ModelCallLogService modelCallLogService;
+
+    @Autowired
+    protected ActModelDefinitionService modelDefinitionService;
 
     @Autowired
     private TaskService taskService;
@@ -594,6 +605,38 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
             result.add(vo);
         });
         return result;
+    }
+
+    @Override
+    public int saveModelLog(ActProcRelease release, RpcStartParamter paramter, String instId) {
+        ModelCallLog callLog = new ModelCallLog();
+        callLog.setBusinessKey(paramter.getBusinessKey());
+        callLog.setModelProcdefId(release.getModelProcdefId());
+        callLog.setProcessDefinedKey(paramter.getProcessDefinedKey());
+        callLog.setProInstId(instId);
+        callLog.setVersion(com.ht.commonactivity.utils.StringUtils.isEmpty(paramter.getVersion()) ? release.getModelVersion() : paramter.getVersion());
+        callLog.setIsEnd("1"); // 1-未完成，0-已完成
+        callLog.setSysCode(paramter.getSysCode().toUpperCase());
+        callLog.setSysName(modelDefinitionService.selectList(new EntityWrapper<ActModelDefinition>().eq("model_code", paramter.getProcessDefinedKey())).get(0).getBelongSystem());
+        log.info("insert callLog Date=====》》》" + JSON.toJSONString(callLog));
+        modelCallLogService.insert(callLog);
+        ModelCallLogParam param = new ModelCallLogParam();
+        param.setForeignId(String.valueOf(callLog.getId()));
+        param.setDatas(JSON.toJSONString(paramter));
+        modelCallLogParamService.insert(param);
+        return 0;
+    }
+
+    /**
+     * 更新状态
+     *
+     * @param isEnd     1-未完成，0-已完成
+     * @param proInstId
+     */
+    public void updateModelLog(String isEnd, String proInstId) {
+        ModelCallLog log = new ModelCallLog();
+        log.setIsEnd(isEnd);
+        modelCallLogService.update(log, new EntityWrapper<ModelCallLog>().eq("pro_inst_id", proInstId));
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.ht.commonactivity.vo;
 
+import com.ht.commonactivity.common.BaseProcessParamter;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -7,19 +8,21 @@ import java.util.List;
 import java.util.Map;
 
 
-public class FindTaskBeanVo {
+public class FindTaskBeanVo extends BaseProcessParamter{
     /**
      * 用户名
      */
-    @ApiParam("用户名，findTaskByAssignee接口比传")
+    @ApiParam("用户名，findTaskByAssignee接口必传")
     private String assignee;
 
+    @ApiParam("查询参数")
     private List<Map<String, Object>> paramMap;
 
     private int firstResult = 0;
 
     private int maxResults = 10;
 
+    @ApiParam("任务节点id")
     private String taskDefinId;
 
     public String getTaskDefinId() {

@@ -63,6 +63,13 @@ public class ModelCallLog extends Model<ModelCallLog> {
 	@TableField("sys_code")
 	@ApiModelProperty(required= true,value = "所属系统编码")
 	private String sysCode;
+
+	/**
+     * 所属系统编码
+     */
+	@TableField("sys_name")
+	@ApiModelProperty(required= true,value = "所属系统名称")
+	private String sysName;
     /**
      * 流程是否完成,0-Y,1-N
      */
@@ -136,6 +143,14 @@ public class ModelCallLog extends Model<ModelCallLog> {
 
 	public void setSysCode(String sysCode) {
 		this.sysCode = sysCode;
+	}
+
+	public String getSysName() {
+		return sysName;
+	}
+
+	public void setSysName(String sysName) {
+		this.sysName = sysName;
 	}
 
 	public String getIsEnd() {
