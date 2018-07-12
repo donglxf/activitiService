@@ -33,7 +33,7 @@
         <if test="modelCode != null and model_code != '' ">
             and a.model_code= #{modelCode}
         </if>
-        order by substring(model_version,3)+0 desc
+        order by create_time desc
     </select>
 
     <select id="findTaskByAssigneeOrGroup" parameterType="com.ht.commonactivity.vo.FindTaskBeanVo" resultType="com.ht.commonactivity.entity.ActRuTask">

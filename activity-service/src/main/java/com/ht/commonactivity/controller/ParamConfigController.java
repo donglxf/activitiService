@@ -53,14 +53,12 @@ public class ParamConfigController {
             fileType.setLfileTypeLevel(path.length + 1);
             fileType.setFiltTypePath(typePath + "/" + fileTypeCode);
             fileType.setParentCode(path[path.length - 1]);
-        } else { // filtTypePath==null 标识新增顶级菜单
+        } else { //  filtTypePath==null 标识新增顶级菜单
             fileType.setLfileTypeLevel(1);
             fileType.setFiltTypePath(fileTypeCode);
             fileType.setParentCode(ParamConfigEnum.top.getVal());
         }
-//        fileType.setLfileTypeLevel(path.length + 1);
-//        fileType.setFiltTypePath(typePath + "/" + fileTypeCode);
-//        fileType.setParentCode(path[path.length - 1]);
+
         fileType.setCreateTime(DateUtil.getDate(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", new Date()), "yyyy-MM-dd HH:mm:ss"));
         // 检测同层级菜单是否有重复名和code
         List<ActivitiFileType> li = activitiFileTypeService.selectList(new EntityWrapper<ActivitiFileType>().eq("lfile_type_level", path.length + 1).eq("file_type_name", fileType.getFileTypeName()));

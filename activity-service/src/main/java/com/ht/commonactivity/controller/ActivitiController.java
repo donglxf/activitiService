@@ -21,6 +21,7 @@ import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.TestPointCat;
 import com.ht.commonactivity.vo.*;
+import com.sun.net.httpserver.HttpsServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -111,6 +112,9 @@ public class ActivitiController implements ModelDataJsonConstants {
 
     @Autowired
     protected ModelCallLogParamService modelCallLogParamService;
+
+    @Autowired
+    private ActivitiFileTypeService activitiFileTypeService;
 
     @Autowired
     protected UcAppRpc ucAppRpc;
@@ -206,7 +210,7 @@ public class ActivitiController implements ModelDataJsonConstants {
             String modelId = activitiService.addModel(paramter);
             paramter.setModelId(modelId);
             ActModelDefinition t = new ActModelDefinition();
-            t.setBelongSystem(paramter.getBelongSystem());
+            t.setBelongSystem(paramter.getBelongSystem().split("_")[1]);
             t.setBusinessId(paramter.getBusinessId());
             t.setModelId(modelId);
             t.setModelCode(paramter.getKey());
@@ -858,6 +862,19 @@ public class ActivitiController implements ModelDataJsonConstants {
     }
 
     /**
+     * 维护本地内容配置
+     *
+     * @return
+     */
+    @RequestMapping("/initLocalData")
+    public Result<List<ActivitiFileType>> getAll() {
+        Wrapper<ActivitiFileType> wrapper = new EntityWrapper<ActivitiFileType>();
+        wrapper.eq("lfile_type_level", "2");
+        List<ActivitiFileType> list = activitiFileTypeService.selectList(wrapper);
+        return Result.success(list);
+    }
+
+    /**
      * 获取业务分类
      *
      * @return
@@ -866,6 +883,20 @@ public class ActivitiController implements ModelDataJsonConstants {
     public Result<List<fileTypeVo>> getFileTypeTree() {
         List<fileTypeVo> result = activitiService.getFileTypeTree();
         return Result.success(result);
+    }
+
+    /**
+     * 根据二级菜单获取所有子菜单
+     *
+     * @return
+     */
+    @RequestMapping(value = "/getFileTypeLd", method = RequestMethod.GET)
+    public Result<List<ActivitiFileType>> getFileTypeLd(@RequestParam("fileTypeCode") String fileTypeCode) {
+        Wrapper<ActivitiFileType> wrapper = new EntityWrapper<ActivitiFileType>();
+        wrapper.eq("lfile_type_level", "3");
+        wrapper.eq("parent_code", fileTypeCode);
+        List<ActivitiFileType> list = activitiFileTypeService.selectList(wrapper);
+        return Result.success(list);
     }
 
 

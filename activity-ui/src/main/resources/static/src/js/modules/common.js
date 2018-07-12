@@ -90,6 +90,7 @@ layui.define(['layer', 'laytpl', 'form', 'ht_ajax', 'ht_config'], function (expo
                 id: 'businessId'
             },
             init_url: basePath + 'system/getAll',
+            init_local_url: basePath + 'initLocalData',
             init_fileType_url: basePath + 'getFileType',
             init_html: function () {
                 return '      <div class="layui-input-inline">\n' +
@@ -141,6 +142,62 @@ layui.define(['layer', 'laytpl', 'form', 'ht_ajax', 'ht_config'], function (expo
                     }
                 }, 'json');
             },
+            initLocalByData: function (businessId, obj, selectId) {
+                $.get(myUtil.business.init_local_url, function (data) {
+                    if (data.code == '0') {
+                        if (selectId == '' || selectId == undefined) {
+                            selectId = myUtil.business.select.id;
+                        }
+                        var h = myUtil.business.init_html2(selectId);
+                        //初始化
+                        $(obj).html(h);
+                        var result = data.data;
+                        for (var i = 0; i < result.length; i++) {
+                            var ischeck = '';
+                            //选中的设置
+                            if (result[i].app == businessId) {
+                                ischeck = 'selected="true"';
+                            }
+                            var option = '<option value="' + result[i].fileTypeCode + '_' + result[i].fileTypeName + '" ' + ischeck + ' >' + result[i].fileTypeName + '</option>';
+                            $(obj).find("#" + selectId).append(option);
+                        }
+                        form.render('select');
+                        form.on('select(business_select)', function (data) {
+                            myUtil.business.ldSelect(data);
+                        });
+                    }
+                }, 'json');
+            },
+            ldSelect: function (da) {
+                var val = da.value.split("_")[0];
+                var selectId = 'businessId';
+                var businessId='businessId';
+                var obj=$("#businessDiv");
+                $.get(basePath + 'getFileTypeLd?fileTypeCode=' + val, function (data) {
+                    if (data.code == '0') {
+                        if (selectId == '' || selectId == undefined) {
+                            selectId = myUtil.business.select.id;
+                        }
+                        var h = myUtil.business.init_fileType_html2(selectId);
+                        //初始化
+                        $(obj).html(h);
+                        var result = data.data;
+                        for (var i = 0; i < result.length; i++) {
+                            var ischeck = '';
+                            //选中的设置
+                            if (result[i].app == businessId) {
+                                ischeck = 'selected="true"';
+                            }
+                            var option = '<option value="' + result[i].fileTypeCode + '" ' + ischeck + ' >' + result[i].fileTypeName + '</option>';
+                            $(obj).find("#" + selectId).append(option);
+                        }
+                        form.render('select');
+                        form.on('select(business_select)', function (data) {
+                            myUtil.business.selectBack(data);
+                        });
+                    }
+                }, 'json');
+            },
             selectBack: function (data) {
                 console.log(data);
             },
@@ -161,7 +218,7 @@ layui.define(['layer', 'laytpl', 'form', 'ht_ajax', 'ht_config'], function (expo
                         var result = data.data;
                         for (var i = 0; i < result.length; i++) {
                             var ischeck = '';
-                            var option='<optgroup label="'+result[i].typeName+'">';
+                            var option = '<optgroup label="' + result[i].typeName + '">';
                             // 子节点
                             var children = result[i].children;
                             for (var j = 0; j < children.length; j++) {
@@ -169,10 +226,10 @@ layui.define(['layer', 'laytpl', 'form', 'ht_ajax', 'ht_config'], function (expo
                                 if (children[j].id == businessId) {
                                     ischeck = 'selected="true"';
                                 }
-                                var childrenOption =  '<option value="' + children[j].id + '" ' + ischeck + ' >' + children[j].typeName + '</option>'
-                                option+=childrenOption;
+                                var childrenOption = '<option value="' + children[j].id + '" ' + ischeck + ' >' + children[j].typeName + '</option>'
+                                option += childrenOption;
                             }
-                            option+='</optgroup>';
+                            option += '</optgroup>';
                             $(obj).find("#" + selectId).append(option);
                         }
                         form.render('select');

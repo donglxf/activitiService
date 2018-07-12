@@ -13,12 +13,12 @@ layui.config({
 
     // 新增按钮
     $("#version_search").on('click', function () {
-        // if (filtTypePath == "" || undefined == filtTypePath) {
-        //     alert('请选择一个菜单!');
-        //     return;
-        // }
+        if (filtTypePath == "" || undefined == filtTypePath) {
+            alert('请选择一个菜单!');
+            return;
+        }
         var words = filtTypePath.split('/');
-        if (words.length >= 2) {
+        if (words.length >= 3) {
             alert('只支持到二级菜单!');
             return;
         }

@@ -1,6 +1,7 @@
 package com.ht.commonactivity.vo;
 
 import com.ht.commonactivity.common.BaseProcessParamter;
+import com.ht.commonactivity.entity.ActProcRelease;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class FindTaskBeanVo extends BaseProcessParamter{
+public class FindTaskBeanVo extends BaseProcessParamter {
     /**
      * 用户名
      */
@@ -18,12 +19,34 @@ public class FindTaskBeanVo extends BaseProcessParamter{
     @ApiParam("查询参数")
     private List<Map<String, Object>> paramMap;
 
-    private int firstResult = 0;
-
-    private int maxResults = 10;
+    @ApiParam("流程定义key")
+    private List<ActProcRelease> processDefinitionKey;
 
     @ApiParam("任务节点id")
     private String taskDefinId;
+
+    private int firstResult = 0;
+
+    private int maxResults = 10;
+    /**
+     * 候选人
+     */
+    @ApiParam("候选人名")
+    private String candidateUser;
+
+    /**
+     * 候选组
+     */
+    @ApiParam("候选组名，findTaskByCandidateGroup接口必传")
+    private List<String> candidateGroup;
+
+    public List<ActProcRelease> getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
+
+    public void setProcessDefinitionKey(List<ActProcRelease> processDefinitionKey) {
+        this.processDefinitionKey = processDefinitionKey;
+    }
 
     public String getTaskDefinId() {
         return taskDefinId;
@@ -65,17 +88,6 @@ public class FindTaskBeanVo extends BaseProcessParamter{
         this.maxResults = maxResults;
     }
 
-    /**
-     * 候选人
-     */
-    @ApiParam("候选人名")
-    private String candidateUser;
-
-    /**
-     * 候选组
-     */
-    @ApiParam("候选组名，findTaskByCandidateGroup接口必传")
-    private List<String> candidateGroup;
 
     public String getAssignee() {
         return assignee;

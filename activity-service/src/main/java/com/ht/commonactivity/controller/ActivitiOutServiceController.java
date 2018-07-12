@@ -2,6 +2,7 @@ package com.ht.commonactivity.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ht.commonactivity.common.ActivitiConstants;
 import com.ht.commonactivity.common.RpcStartParamter;
@@ -16,8 +17,11 @@ import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.NextTaskInfo;
 import com.ht.commonactivity.utils.ObjectUtils;
 import com.ht.commonactivity.vo.*;
+import com.ht.ussp.util.DateUtil;
+import com.sun.media.sound.ModelDestination;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowElement;
@@ -66,6 +70,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @Autowired
     protected ActModelDefinitionService modelDefinitionService;
+
+    @Autowired
+    protected ActProcReleaseService actProcReleaseService;
 
     @Autowired
     protected ProcessGoBack processGoBack;
@@ -221,6 +228,18 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     /**
      * 根据用户、候选人、候选组 查询所有任务
+     * {
+     "firstResult": 0,
+     "maxResults": 99,
+     "assignee": "张三",
+     "sysCode":"ACTIVITI",
+     "processDefinitionKey":[{"modelCode":"lcTest","modelVersion":"V.2"},{"modelCode":"proTest","modelVersion":"V.25"}],
+     "paramMap":[ {
+     "name":"name",
+     "value":"name1",
+     "type":"1"
+     }]
+     }
      */
     @PostMapping("/findTaskByAssignee")
     @ApiOperation("根据用户查询所有任务")
@@ -245,7 +264,6 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             data = Result.error(1, "用户名不能为空！");
             return data;
         }
-
 
         TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
                 .createTaskQuery();//创建任务查询对象
@@ -274,8 +292,26 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         /**查询条件（where部分）*/
         if (vo.getAssignee() != null) {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
-
         }
+
+
+        if (null != vo.getProcessDefinitionKey() && vo.getProcessDefinitionKey().size() > 0) {
+            List<String> list = new ArrayList<>();
+            vo.getProcessDefinitionKey().forEach(li -> {
+                Wrapper<ActProcRelease> wrapper = new EntityWrapper<ActProcRelease>();
+                wrapper.eq("model_code", li.getModelCode());
+                wrapper.eq("model_version", li.getModelVersion());
+                wrapper.orderBy("create_time", false);
+                List<ActProcRelease> ls = actProcReleaseService.selectList(wrapper);
+                if (null != ls && ls.size() > 0) {
+                    list.add(getProcessEngine().getRepositoryService().getProcessDefinition(ls.get(0).getModelProcdefId()).getKey());
+                }else{
+                    list.add("dybadff"+ DateUtil.getDate("yyyy-MM-dd")); // 如果所传模型code,version错误，添加随机值保证流程查不到记录
+                }
+            });
+            query.processDefinitionKeyIn(list);
+        }
+
         /**过滤非本系统流程任务*/
         List<Task> list = query.orderByTaskCreateTime().desc().listPage(vo.getFirstResult(), vo.getMaxResults());//返回列表
         List<Task> newList = new ArrayList<>();
@@ -357,6 +393,24 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             }
         }
 
+        if (null != vo.getProcessDefinitionKey() && vo.getProcessDefinitionKey().size() > 0) {
+            List<String> list = new ArrayList<>();
+            vo.getProcessDefinitionKey().forEach(li -> {
+                Wrapper<ActProcRelease> wrapper = new EntityWrapper<ActProcRelease>();
+                wrapper.eq("model_code", li.getModelCode());
+                wrapper.eq("model_version", li.getModelVersion());
+                wrapper.orderBy("create_time", false);
+                List<ActProcRelease> ls = actProcReleaseService.selectList(wrapper);
+                if (null != ls && ls.size() > 0) {
+                    list.add(getProcessEngine().getRepositoryService().getProcessDefinition(ls.get(0).getModelProcdefId()).getKey());
+                }else{
+                    list.add("dybadff"+ DateUtil.getDate("yyyy-MM-dd")); // 如果所传模型code错误，添加随机值保证流程查不到记录
+                }
+            });
+            query.processDefinitionKeyIn(list);
+        }
+
+
         List<Task> list = new ArrayList<>();
         if (null != vo.getCandidateGroup() && vo.getCandidateGroup().size() > 0) {
             list.addAll(query.taskCandidateGroupIn(vo.getCandidateGroup())
@@ -427,8 +481,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 //            result.setProIsEnd(procIsEnd(vo.getProInstId()) ? "Y" : "N");
 //            list.add(result);
             Task task = taskService.createTaskQuery().taskId(vo.getTaskId()).singleResult();
-            if(ObjectUtils.isEmpty(task)){
-                return Result.error(1,"异常，任务id不存在!!");
+            if (ObjectUtils.isEmpty(task)) {
+                return Result.error(1, "异常，任务id不存在!!");
             }
 
             ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();

@@ -83,8 +83,8 @@
         var myutil = layui.myutil;
         var config = layui.ht_config;
         var basePath = config.proImg;
-        myutil.business.init('belongSystem', $("#systemDiv"), "belongSystem");
-        myutil.business.initFileType('businessId', $("#businessDiv"), "businessId");
+        myutil.business.initLocalByData('belongSystem', $("#systemDiv"), "belongSystem");
+//        myutil.business.initFileType('businessId', $("#businessDiv"), "businessId");
 
         form.on('submit(formDemo)', function (data) {
             $.ajax({
