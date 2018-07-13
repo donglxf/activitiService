@@ -101,7 +101,7 @@ layui.define(['layer', 'laytpl', 'form', 'ht_ajax', 'ht_config'], function (expo
             },
             init_html2: function (id) {
 
-                return ' <select name="' + myUtil.business.select.name + '" lay-filter="business_select" lay-search="" id="' + id + '" lay-verify="required">\n' +
+                return ' <select name="' + myUtil.business.select.name + '" lay-filter="business_select2" lay-search="" id="' + id + '" lay-verify="required">\n' +
                     '    <option value="">选择系统</option>\n' +
                     '    </select>';
             },
@@ -162,7 +162,7 @@ layui.define(['layer', 'laytpl', 'form', 'ht_ajax', 'ht_config'], function (expo
                             $(obj).find("#" + selectId).append(option);
                         }
                         form.render('select');
-                        form.on('select(business_select)', function (data) {
+                        form.on('select(business_select2)', function (data) {
                             myUtil.business.ldSelect(data);
                         });
                     }
