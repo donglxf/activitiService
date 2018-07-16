@@ -6,8 +6,10 @@ import com.ht.commonactivity.common.enumtype.ParamConfigEnum;
 import com.ht.commonactivity.common.result.Result;
 import com.ht.commonactivity.entity.ActivitiFileType;
 import com.ht.commonactivity.entity.dto.FileTypeDto;
+import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.ActivitiFileTypeService;
 import com.ht.commonactivity.utils.UUIDUtils;
+import com.ht.commonactivity.vo.GetAllAppDto;
 import com.ht.ussp.util.DateUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +27,9 @@ import java.util.List;
 @Log4j2
 @RequestMapping("/fileIndex")
 public class ParamConfigController {
+
+    @Autowired
+    protected UcAppRpc ucAppRpc;
 
     @Autowired
     private ActivitiFileTypeService activitiFileTypeService;
@@ -104,6 +109,38 @@ public class ParamConfigController {
     @RequestMapping("/fileTypeList")
     @ApiOperation("树初始加载")
     public List<FileTypeDto> fileTypeList() {
+        // 获取uc所有系统
+        List<GetAllAppDto> newList = new ArrayList<>();
+        Result<List<GetAllAppDto>> result = ucAppRpc.getAllApp();
+        List<GetAllAppDto> dto = result.getData();
+        // 与当前所有二级菜单匹配
+        List<ActivitiFileType> tlist = activitiFileTypeService.selectList(new EntityWrapper<ActivitiFileType>().eq("lfile_type_level", "2"));
+        // 判断接口数据是否在表里面存在，如果不存在就insert，存在则保持不变
+        for (int i = 0; i < dto.size(); i++) {
+            GetAllAppDto d = dto.get(i);
+            boolean bool = false;
+            for (int j = 0; j < tlist.size(); j++) {
+                ActivitiFileType type = tlist.get(j);
+                if (d.getApp().equals(type.getFileTypeCode())) {
+                    bool = true;
+                    break;
+                }
+            }
+            if (!bool) {
+                newList.add(d);
+            }
+        }
+        newList.forEach(li -> {
+            ActivitiFileType t = new ActivitiFileType();
+            t.setFileTypeCode(li.getApp());
+            t.setParentCode("001");
+            t.setLfileTypeLevel(2);
+            t.setFileTypeName(li.getNameCn());
+            t.setFiltTypePath("001/" + li.getApp());
+            activitiFileTypeService.insert(t);
+        });
+
+
 //        Result<List<FileTypeDto>> result = null;
         List<FileTypeDto> fileTypes = new ArrayList<FileTypeDto>();
 

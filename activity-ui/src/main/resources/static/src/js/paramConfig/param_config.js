@@ -11,6 +11,9 @@ layui.config({
     var table = layui.table;
     var layer = layui.layer;
 
+    var height = window.innerHeight - 50 + "px";
+    $("#file_type_ztree_left").css({"height": height, "overflow": "auto"});
+
     // 新增按钮
     $("#version_search").on('click', function () {
         if (filtTypePath == "" || undefined == filtTypePath) {
