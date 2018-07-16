@@ -19,7 +19,7 @@ public class FindTaskBeanVo extends BaseProcessParamter {
     @ApiParam("查询参数")
     private List<Map<String, Object>> paramMap;
 
-    @ApiParam("流程定义key")
+    @ApiParam("模型编码")
     private List<ActProcRelease> processDefinitionKey;
 
     @ApiParam("任务节点id")
