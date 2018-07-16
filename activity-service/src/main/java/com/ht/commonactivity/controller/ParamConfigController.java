@@ -8,6 +8,7 @@ import com.ht.commonactivity.entity.ActivitiFileType;
 import com.ht.commonactivity.entity.dto.FileTypeDto;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.ActivitiFileTypeService;
+import com.ht.commonactivity.utils.DateUtils;
 import com.ht.commonactivity.utils.UUIDUtils;
 import com.ht.commonactivity.vo.GetAllAppDto;
 import com.ht.ussp.util.DateUtil;
@@ -137,6 +138,7 @@ public class ParamConfigController {
             t.setLfileTypeLevel(2);
             t.setFileTypeName(li.getNameCn());
             t.setFiltTypePath("001/" + li.getApp());
+            t.setCreateTime(DateUtils.getDate("yyyy-MM-dd HH:mm:ss"));
             activitiFileTypeService.insert(t);
         });
 
