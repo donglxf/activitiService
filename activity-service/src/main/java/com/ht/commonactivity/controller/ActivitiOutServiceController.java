@@ -229,17 +229,17 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     /**
      * 根据用户、候选人、候选组 查询所有任务
      * {
-     "firstResult": 0,
-     "maxResults": 99,
-     "assignee": "张三",
-     "sysCode":"ACTIVITI",
-     "processDefinitionKey":[{"modelCode":"lcTest","modelVersion":"V.2"},{"modelCode":"proTest","modelVersion":"V.25"}],
-     "paramMap":[ {
-     "name":"name",
-     "value":"name1",
-     "type":"1"
-     }]
-     }
+     * "firstResult": 0,
+     * "maxResults": 99,
+     * "assignee": "张三",
+     * "sysCode":"ACTIVITI",
+     * "processDefinitionKey":[{"modelCode":"lcTest","modelVersion":"V.2"},{"modelCode":"proTest","modelVersion":"V.25"}],
+     * "paramMap":[ {
+     * "name":"name",
+     * "value":"name1",
+     * "type":"1"
+     * }]
+     * }
      */
     @PostMapping("/findTaskByAssignee")
     @ApiOperation("根据用户查询所有任务")
@@ -305,8 +305,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 List<ActProcRelease> ls = actProcReleaseService.selectList(wrapper);
                 if (null != ls && ls.size() > 0) {
                     list.add(getProcessEngine().getRepositoryService().getProcessDefinition(ls.get(0).getModelProcdefId()).getKey());
-                }else{
-                    list.add("dybadff"+ DateUtil.getDate("yyyy-MM-dd")); // 如果所传模型code,version错误，添加随机值保证流程查不到记录
+                } else {
+                    list.add("dybadff" + DateUtil.getDate("yyyy-MM-dd")); // 如果所传模型code,version错误，添加随机值保证流程查不到记录
                 }
             });
             query.processDefinitionKeyIn(list);
@@ -356,10 +356,10 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         log.info("findTaskByCandidateGroup param Data-------->>:" + JSON.toJSONString(vo));
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
-//        if (vo.getCandidateGroup() == null) {
-//            data = Result.error(1, "参数异常！");
-//            return data;
-//        }
+        if (vo.getSysCode() == null) {
+            data = Result.error(1, "sysCode系统编码不能为空！");
+            return data;
+        }
         TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
                 .createTaskQuery();
         if (ObjectUtils.isNotEmpty(vo.getTaskDefinId())) {
@@ -403,8 +403,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 List<ActProcRelease> ls = actProcReleaseService.selectList(wrapper);
                 if (null != ls && ls.size() > 0) {
                     list.add(getProcessEngine().getRepositoryService().getProcessDefinition(ls.get(0).getModelProcdefId()).getKey());
-                }else{
-                    list.add("dybadff"+ DateUtil.getDate("yyyy-MM-dd")); // 如果所传模型code错误，添加随机值保证流程查不到记录
+                } else {
+                    list.add("dybadff" + DateUtil.getDate("yyyy-MM-dd")); // 如果所传模型code错误，添加随机值保证流程查不到记录
                 }
             });
             query.processDefinitionKeyIn(list);
