@@ -734,8 +734,41 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         List<AllUserTaskOutVo> result = new ArrayList<>();
         TaskDefinition task = null;
         String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult().getProcessDefinitionId();
+        result = getAllUserTask(definitionId);
+//        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
+//                .getDeployedProcessDefinition(definitionId);
+//        List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
+//        for (ActivityImpl activityImpl : activitiList) {
+//            if ("userTask".equals(activityImpl.getProperty("type"))) {
+//                AllUserTaskOutVo outVo = new AllUserTaskOutVo();
+//                task = (TaskDefinition) activityImpl.getProperties().get("taskDefinition");
+//                outVo.setTaskName(String.valueOf(activityImpl.getProperty("name")));
+//                outVo.setTaskDefinedId(task.getKey());
+//                if (ObjectUtils.isNotEmpty(task.getAssigneeExpression())) {
+//                    outVo.setAssignName(task.getAssigneeExpression().getExpressionText());
+//                }
+//                if (ObjectUtils.isNotEmpty(task.getCandidateGroupIdExpressions())) {
+//                    List<String> li = new ArrayList<String>();
+//                    Set<Expression> s = task.getCandidateGroupIdExpressions();
+//                    Iterator<Expression> iter = s.iterator();
+//                    while (iter.hasNext()) {
+//                        Expression exp = iter.next();
+//                        li.add(exp.getExpressionText());
+//                    }
+//                    outVo.setCanditionUserGroup(li);
+//                }
+//                result.add(outVo);
+//            }
+//        }
+        log.info("getUserTaskByProInsId result data:=========>" + JSON.toJSONString(result));
+        return Result.success(result);
+    }
+
+    public List<AllUserTaskOutVo> getAllUserTask(String proDefinitionId) {
+        List<AllUserTaskOutVo> result = new ArrayList<>();
+        TaskDefinition task = null;
         ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
-                .getDeployedProcessDefinition(definitionId);
+                .getDeployedProcessDefinition(proDefinitionId);
         List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
         for (ActivityImpl activityImpl : activitiList) {
             if ("userTask".equals(activityImpl.getProperty("type"))) {
@@ -759,8 +792,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
                 result.add(outVo);
             }
         }
-        log.info("getUserTaskByProInsId result data:=========>" + JSON.toJSONString(result));
-        return Result.success(result);
+        return result;
     }
 
     @PostMapping("/getProValiable")
@@ -771,4 +803,29 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         log.info("getProValiable result data:------------>" + JSON.toJSONString(a));
         return Result.success(a);
     }
+
+    @PostMapping("/getAllTaskByModelCode")
+    @ApiOperation("根据模型编码获取流程所有节点")
+    public Result<List<AllUserTaskOutVo>> getAllTaskByModelCode(@RequestBody GetAllTaskByModelCodeVo vo) {
+        log.info("getAllTaskByModelCode param data:=========>" + JSON.toJSONString(vo));
+        if (com.ht.commonactivity.utils.StringUtils.isEmpty(vo.getModeCode())) {
+            return Result.error(1, "modeCode模型编码不能为空!!");
+        }
+        List<AllUserTaskOutVo> result = new ArrayList<>();
+        ActModelDefinition model = modelDefinitionService.selectOne(new EntityWrapper().eq("model_code", vo.getModeCode()));
+        if (null != model) {
+            Wrapper<ActProcRelease> proc = new EntityWrapper<>();
+            proc.eq("model_id", model.getModelId());
+            proc.orderBy("create_time", false);
+            List<ActProcRelease> list = actProcReleaseService.selectList(proc);
+            if (null != list && list.size() > 0) {
+                ActProcRelease release = list.get(0);
+                result = getAllUserTask(release.getModelProcdefId());
+            }
+        }
+        log.info("getAllTaskByModelCode result data:------------>" + JSON.toJSONString(result));
+        return Result.success(result);
+    }
+
+
 }
