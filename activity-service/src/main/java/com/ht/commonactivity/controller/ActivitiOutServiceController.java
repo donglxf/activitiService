@@ -579,7 +579,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
      */
     @PostMapping("/singleRepealPro")
     @ApiOperation("单步撤销")
-    public Result<String> singleRepealPro(@RequestBody RepealProVo vo) {
+    public Result<List<NextTaskInfo>> singleRepealPro(@RequestBody RepealProVo vo) {
+        List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
         log.info("singleRepealPro param data:=========>" + JSON.toJSONString(vo.getProInstId()) + "=======" + JSON.toJSONString(vo.getToBackNoteId()));
         try {
             // 根据流程实例找到当前任务节点
@@ -587,7 +588,19 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             for (Task t : tasks) {
                 String currentTaskId = processGoBack.turnBackNew(t.getId(), "流程单步撤销", "", vo.getToBackNoteId());
             }
-            return Result.success("撤销成功");
+            List<Task> taskList = taskService.createTaskQuery().processInstanceId(vo.getProInstId()).list();
+            taskList.forEach(ta -> {
+                NextTaskInfo result = new NextTaskInfo();
+                result.setTaskId(ta.getId());
+                result.setTaskDefineKey(ta.getTaskDefinitionKey());
+                result.setTaskText(ta.getName());
+                result.setProcInstId(ta.getProcessInstanceId());
+                result.setTaskAssign(ta.getAssignee());
+//                result.setProIsEnd(procIsEnd(ta.getProcessInstanceId()) ? "Y" : "N");
+                result.setProIsEnd("N");
+                list.add(result);
+            });
+            return Result.success(list);
         } catch (Exception e) {
             log.error("singleRepealPro error------------:", e);
         }
