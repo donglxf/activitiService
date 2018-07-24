@@ -21,9 +21,10 @@ layui.use(['table','ht_config', 'jquery', 'myutil', 'ht_ajax'], function () {
         , id: 'logReload'
         , cols: [[
             {field: 'id', width: 200, title: 'id', sort: true}
-            ,{field: 'businessKey', width: 200, title: '业务key', sort: true}
-            , {field: 'processDefinedKey', width: 200, title: '模型编码'}
-            , {field: 'sysCode', width: 200, title: '所属系统'}
+            ,{field: 'businessKey', width: 200, title: '业务编码', sort: true}
+            , {field: 'processDefinedKey', width: 100, title: '模型编码'}
+            , {field: 'sysCode', width: 100, title: '所属系统'}
+            , {field: 'sysName', width: 200, title: '系统名称'}
             , {field: 'version', width: 90, title: '版本', sort: true}
             , {field: 'proInstId', title: '实例Id', width: 250} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
             , {field: 'modelProcdefId', width: '15%', minWidth: 100, title: '模型定义id', sort: true}

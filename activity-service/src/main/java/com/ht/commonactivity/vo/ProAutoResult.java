@@ -9,6 +9,15 @@ public class ProAutoResult {
     public String comment;
     public String processInstanceId;
     public String userName;
+    public String blTime;
+
+    public String getBlTime() {
+        return blTime;
+    }
+
+    public void setBlTime(String blTime) {
+        this.blTime = blTime;
+    }
 
     public String getUserName() {
         return userName;

@@ -9,12 +9,22 @@
 <body>
 <div class="demoTable" style="padding:10px 10px 0px 10px">
     <div class="layui-row layui-col-space12">
-        <div class="layui-col-md2">
-            <input class="layui-input" name="id" id="userName" autocomplete="off" placeholder="请输入userName查询">
-        </div>
-        <div class="layui-col-md1">
-            <button class="layui-btn" data-type="reload" id="model_search" onclick="active.reload();">查询</button>
-        </div>
+        <form onsubmit="return false;" class="layui-form">
+            <div class="layui-field-box">
+                <div class="demoTable" style="padding:10px 10px 0px 10px">
+                    <div class="layui-inline">
+                        <input class="layui-input" name="id" id="userName" autocomplete="off"
+                               placeholder="请输入userName查询">
+                    </div>
+                    <!--<div class="layui-inline" id="systemDiv">-->
+                        <!--<select id="belongSystem" name="belongSystem" lay-filter="test"></select>-->
+                    <!--</div>-->
+                    <button class="layui-btn" data-type="reload" id="model_search" onclick="active.reload();">查询
+                    </button>
+                </div>
+                <table id="model_list" lay-filter="model" lay-data="{id: 'idModel'}"></table>
+            </div>
+        </form>
     </div>
     <table id="proc_list" lay-filter="model" lay-data="{id: 'idModel'}"></table>
 </div>
@@ -22,6 +32,8 @@
 <script type="text/html" id="barDemo">
     <a class="layui-btn layui-btn-xs" lay-event="view">办理</a>
     <a class="layui-btn layui-btn-xs" lay-event="back">流程回退</a>
+    <a class="layui-btn layui-btn-xs" lay-event="detail">明细</a>
+    <a class="layui-btn layui-btn-xs" lay-event="viewImg">流程图</a>
 </script>
 
 <script src="/plugins/layui/layui.js"></script>

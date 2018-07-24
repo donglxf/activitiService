@@ -10,28 +10,37 @@
 <div class="demoTable" style="padding:10px 10px 0px 10px">
     <div class="layui-row">
         <div class="layui-col-xs12">
-            <div class="layui-col-xs5" style="padding-right: 2px">
+            <div class="layui-col-xs12" style="padding-right: 2px">
                 <fieldset class="layui-elem-field">
                     <legend>模型定义列表</legend>
-                    <div class="layui-field-box">
-                        <div class="demoTable" style="padding:10px 10px 0px 10px">
-                            <div class="layui-inline">
-                                <input class="layui-input" name="id" id="modelName" autocomplete="off" placeholder="模型名称">
+                    <form class="layui-form" onsubmit="return false;">
+                        <div class="layui-field-box">
+                            <div class="demoTable" style="padding:10px 10px 0px 10px">
+                                <div class="layui-inline">
+                                    <input class="layui-input" name="id" id="modelName" autocomplete="off"
+                                           placeholder="模型名称">
+                                </div>
+                                <div class="layui-inline" id="systemDiv">
+                                    <select id="belongSystem" name="belongSystem" lay-filter="test"></select>
+                                </div>
+                                <button class="layui-btn" data-type="reload" id="model_search">查询</button>
+                                <button class="layui-btn" data-type="getCheckData" onclick="addModel()">新增</button>
                             </div>
-                            <button class="layui-btn" data-type="reload" id="model_search">查询</button>
-                            <button class="layui-btn" data-type="getCheckData"  onclick="addModel()">新增</button>
+                            <table id="model_list" lay-filter="model" lay-data="{id: 'idModel'}"></table>
                         </div>
-                        <table id="model_list" lay-filter="model" lay-data="{id: 'idModel'}"></table>
-                    </div>
+                    </form>
                 </fieldset>
             </div>
-            <div class="layui-col-xs7">
+        </div>
+        <div class="layui-col-xs12">
+            <div class="layui-col-xs12">
                 <fieldset class="layui-elem-field">
                     <legend>模型版本（全）</legend>
                     <div class="layui-field-box">
                         <div class="demoTable" style="padding:2px">
                             <div class="layui-inline">
-                                <input class="layui-input" name="id" id="modelVersion" autocomplete="off" placeholder="模型版本">
+                                <input class="layui-input" name="id" id="modelVersion" autocomplete="off"
+                                       placeholder="模型版本">
                             </div>
                             <button class="layui-btn" data-type="versionReload" id="version_search">查询</button>
                         </div>
@@ -93,6 +102,17 @@
     return date.Format("yyyy-MM-dd hh:mm:ss");
     }}
 </script>
+<script type="text/html" id="updTime">
+    {{# if(d.updTime == '' || d.updTime == undefined || d.updTime == 'null' || d.updTime == null){ }}
+
+    {{# }else{ }}
+    {{#
+    var date = new Date();
+    date.setTime(d.updTime);
+    return date.Format("yyyy-MM-dd hh:mm:ss");
+    }}
+    {{# } }}
+</script>
 
 <script type="text/html" id="verfiactionTpl">
     {{#  if(d.isValidate != '' && d.isValidate != null && d.isValidate == '1'){ }}
@@ -113,20 +133,18 @@
 </script>
 
 
-
-
 <script type="text/html" id="barDemo">
     <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-    <a class="layui-btn layui-btn-xs" lay-event="deploy">发布测试</a>
+    <a class="layui-btn layui-btn-xs" lay-event="deploy">版本发布</a>
     <a class="layui-btn layui-btn-xs" lay-event="version">查看版本</a>
     <!--<a class="layui-btn layui-btn-xs" lay-event="export">导出</a>-->
 </script>
 
 <script type="text/html" id="start">
     <a class="layui-btn layui-btn-xs" lay-event="startProc">启动</a>
+    <a class="layui-btn layui-btn-xs" lay-event="viewImg">查看流程图</a>
 </script>
-
 
 
 <script src="/plugins/layui/layui.js"></script>

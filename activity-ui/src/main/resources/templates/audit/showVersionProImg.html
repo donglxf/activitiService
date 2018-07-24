@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>流程回退</title>
+</head>
+<body>
+<input type="hidden" name="modelProcdefId" id="modelProcdefId">
+<script src="/plugins/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '/src/js/modules/' //假设这是你存放拓展模块的根目录
+    }).extend({ //设定模块别名
+        myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
+    });
+    layui.use(['table', 'ht_ajax', 'ht_auth', "ht_config"], function () {
+        var config = layui.ht_config;
+        var $ = layui.jquery;
+//        layer.open({
+//            type: 2,
+//            shade: false,
+//            title:"流程图",
+//            anim:5,
+//            area : [ '1200px', '600px' ],
+//            content: config.proImg + "viewProImg?processInstanceId=" + parent.proInstIds,
+//            zIndex: layer.zIndex, //重点1
+//            success: function(layero, index){
+//
+//                layer.setTop(layero); //重点2
+//            }
+//        });
+        console.log(config.proImg + "viewImgByDefinition?processDefinitionId=" + $("#modelProcdefId").val());
+        window.location.href = config.proImg + "viewImgByDefinition?processDefinitionId="+ $("#modelProcdefId").val() ;
+
+//        window.location.href = "http://localhost:32101/viewImgByDefinition?processDefinitionId=" + $("#modelProcdefId").val();
+    });
+
+</script>
+</body>
+</html>

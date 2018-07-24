@@ -4,21 +4,22 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.ht.commonactivity.entity.ActModelDefinition">
-        <result column="id" property="id" />
-        <result column="model_id" property="modelId" />
-        <result column="model_code" property="modelCode" />
-        <result column="model_name" property="modelName" />
-        <result column="belong_system" property="belongSystem" />
-        <result column="business_id" property="businessId" />
-        <result column="model_desc" property="modelDesc" />
-        <result column="status" property="status" />
-        <result column="cre_user_id" property="creUserId" />
-        <result column="cre_time" property="creTime" />
+        <result column="id" property="id"/>
+        <result column="model_id" property="modelId"/>
+        <result column="model_code" property="modelCode"/>
+        <result column="model_name" property="modelName"/>
+        <result column="belong_system" property="belongSystem"/>
+        <result column="business_id" property="businessId"/>
+        <result column="model_desc" property="modelDesc"/>
+        <result column="status" property="status"/>
+        <result column="cre_user_id" property="creUserId"/>
+        <result column="cre_time" property="creTime"/>
+        <result column="upd_time" property="updTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, model_id AS modelId, model_code AS modelCode, model_name AS modelName, belong_system AS belongSystem, business_id AS businessId, model_desc AS modelDesc, status, cre_user_id AS creUserId, cre_time AS creTime
+        id, model_id AS modelId, model_code AS modelCode, model_name AS modelName, belong_system AS belongSystem, business_id AS businessId, model_desc AS modelDesc, status, cre_user_id AS creUserId, cre_time AS creTime,upd_time as updTime
     </sql>
 
 </mapper>

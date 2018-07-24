@@ -120,6 +120,16 @@ public class ModelController {
     }
 
     /**
+     * 版本显示流程图
+     *
+     * @return
+     */
+    @RequestMapping(value = "/showVersionProImg", method = RequestMethod.GET)
+    public String showVersionProImg() {
+        return "audit/showVersionProImg";
+    }
+
+    /**
      * 日志列表
      *
      * @return

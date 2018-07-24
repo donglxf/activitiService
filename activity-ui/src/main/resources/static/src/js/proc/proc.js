@@ -22,6 +22,7 @@ layui.use(['table', 'jquery', 'myutil','ht_ajax', "ht_config"], function () {
         , cols: [[ //表头\
             {field: 'proInstId', title: '实例id'}
             , {field: 'proName', title: '流程名'}
+            , {field: 'busKey', title: '业务主键'}
             , {field: 'startTime', title: '开始时间'}
             , {field: 'endTime', title: '结束时间'}
             , {field: 'isComplate', title: '是否结束', templet: "#start"}
@@ -155,7 +156,7 @@ layui.use(['table', 'jquery', 'myutil','ht_ajax', "ht_config"], function () {
             shade: false,
             title: "流程明细",
             anim: 5,
-            area: ['700px', '600px'],
+            area: ['800px', '600px'],
             content: preUrlUi + '/procDetail',
             zIndex: layer.zIndex, //重点1
             success: function (layero, index) {

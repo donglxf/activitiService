@@ -3,14 +3,16 @@ package com.ht.commonactivity.entity;
 import java.io.Serializable;
 
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 /**
  * <p>
- * 
+ * <p>
  * </p>
  *
  * @author dyb
@@ -25,161 +27,203 @@ public class ActModelDefinition extends Model<ActModelDefinition> {
     /**
      * 主键
      */
-	@ApiModelProperty(required= true,value = "主键")
-	private Long id;
+    @ApiModelProperty(required = true, value = "主键")
+    private Long id;
     /**
      * 模型id
      */
-	@TableField("model_id")
-	@ApiModelProperty(required= true,value = "模型id")
-	private String modelId;
+    @TableField("model_id")
+    @ApiModelProperty(required = true, value = "模型id")
+    private String modelId;
     /**
      * 模型编码
      */
-	@TableField("model_code")
-	@ApiModelProperty(required= true,value = "模型编码")
-	private String modelCode;
+    @TableField("model_code")
+    @ApiModelProperty(required = true, value = "模型编码")
+    private String modelCode;
     /**
      * 模型名称
      */
-	@TableField("model_name")
-	@ApiModelProperty(required= true,value = "模型名称")
-	private String modelName;
+    @TableField("model_name")
+    @ApiModelProperty(required = true, value = "模型名称")
+    private String modelName;
     /**
      * 所属系统
      */
-	@TableField("belong_system")
-	@ApiModelProperty(required= true,value = "所属系统")
-	private String belongSystem;
+    @TableField("belong_system")
+    @ApiModelProperty(required = true, value = "所属系统")
+    private String belongSystem;
+
+    /**
+     * 所属系统
+     */
+    @TableField("belong_system_name")
+    @ApiModelProperty(required = true, value = "系统编码")
+    private String belongSystemName;
+
     /**
      * 业务线
      */
-	@TableField("business_id")
-	@ApiModelProperty(required= true,value = "业务线")
-	private String businessId;
+    @TableField("business_id")
+    @ApiModelProperty(required = true, value = "业务线")
+    private String businessId;
     /**
      * 模型描述
      */
-	@TableField("model_desc")
-	@ApiModelProperty(required= true,value = "模型描述")
-	private String modelDesc;
+    @TableField("model_desc")
+    @ApiModelProperty(required = true, value = "模型描述")
+    private String modelDesc;
     /**
      * 状态
      */
-	@ApiModelProperty(required= true,value = "状态")
-	private String status;
+    @ApiModelProperty(required = true, value = "状态")
+    private String status;
     /**
      * 创建人id
      */
-	@TableField("cre_user_id")
-	@ApiModelProperty(required= true,value = "创建人id")
-	private String creUserId;
+    @TableField("cre_user_id")
+    @ApiModelProperty(required = true, value = "创建人id")
+    private String creUserId;
     /**
      * 创建时间
      */
-	@TableField("cre_time")
-	@ApiModelProperty(required= true,value = "创建时间")
-	private Date creTime;
+    @TableField("cre_time")
+    @ApiModelProperty(required = true, value = "创建时间")
+    private Date creTime;
+
+    /**
+     * 创建时间
+     */
+    @TableField("upd_time")
+    @ApiModelProperty(required = true, value = "更新时间")
+    private Date updTime;
+
+    @TableField(exist = false)
+    private String version;
 
 
-	public Long getId() {
-		return id;
-	}
+    public Date getUpdTime() {
+        return updTime;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setUpdTime(Date updTime) {
+        this.updTime = updTime;
+    }
 
-	public String getModelId() {
-		return modelId;
-	}
+    public String getVersion() {
+        return version;
+    }
 
-	public void setModelId(String modelId) {
-		this.modelId = modelId;
-	}
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
-	public String getModelCode() {
-		return modelCode;
-	}
+    public String getBelongSystemName() {
+        return belongSystemName;
+    }
 
-	public void setModelCode(String modelCode) {
-		this.modelCode = modelCode;
-	}
+    public void setBelongSystemName(String belongSystemName) {
+        this.belongSystemName = belongSystemName;
+    }
 
-	public String getModelName() {
-		return modelName;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setModelName(String modelName) {
-		this.modelName = modelName;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getBelongSystem() {
-		return belongSystem;
-	}
+    public String getModelId() {
+        return modelId;
+    }
 
-	public void setBelongSystem(String belongSystem) {
-		this.belongSystem = belongSystem;
-	}
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
+    }
 
-	public String getBusinessId() {
-		return businessId;
-	}
+    public String getModelCode() {
+        return modelCode;
+    }
 
-	public void setBusinessId(String businessId) {
-		this.businessId = businessId;
-	}
+    public void setModelCode(String modelCode) {
+        this.modelCode = modelCode;
+    }
 
-	public String getModelDesc() {
-		return modelDesc;
-	}
+    public String getModelName() {
+        return modelName;
+    }
 
-	public void setModelDesc(String modelDesc) {
-		this.modelDesc = modelDesc;
-	}
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getBelongSystem() {
+        return belongSystem;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setBelongSystem(String belongSystem) {
+        this.belongSystem = belongSystem;
+    }
 
-	public String getCreUserId() {
-		return creUserId;
-	}
+    public String getBusinessId() {
+        return businessId;
+    }
 
-	public void setCreUserId(String creUserId) {
-		this.creUserId = creUserId;
-	}
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
 
-	public Date getCreTime() {
-		return creTime;
-	}
+    public String getModelDesc() {
+        return modelDesc;
+    }
 
-	public void setCreTime(Date creTime) {
-		this.creTime = creTime;
-	}
+    public void setModelDesc(String modelDesc) {
+        this.modelDesc = modelDesc;
+    }
 
-	@Override
-	protected Serializable pkVal() {
-		return this.id;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	@Override
-	public String toString() {
-		return "ActModelDefinition{" +
-			"id=" + id +
-			", modelId=" + modelId +
-			", modelCode=" + modelCode +
-			", modelName=" + modelName +
-			", belongSystem=" + belongSystem +
-			", businessId=" + businessId +
-			", modelDesc=" + modelDesc +
-			", status=" + status +
-			", creUserId=" + creUserId +
-			", creTime=" + creTime +
-			"}";
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getCreUserId() {
+        return creUserId;
+    }
+
+    public void setCreUserId(String creUserId) {
+        this.creUserId = creUserId;
+    }
+
+    public Date getCreTime() {
+        return creTime;
+    }
+
+    public void setCreTime(Date creTime) {
+        this.creTime = creTime;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
+
+    @Override
+    public String toString() {
+        return "ActModelDefinition{" +
+                "id=" + id +
+                ", modelId=" + modelId +
+                ", modelCode=" + modelCode +
+                ", modelName=" + modelName +
+                ", belongSystem=" + belongSystem +
+                ", businessId=" + businessId +
+                ", modelDesc=" + modelDesc +
+                ", status=" + status +
+                ", creUserId=" + creUserId +
+                ", creTime=" + creTime +
+                "}";
+    }
 }

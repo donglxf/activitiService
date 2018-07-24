@@ -21,6 +21,7 @@ import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.TestPointCat;
 import com.ht.commonactivity.vo.*;
+import com.sun.media.sound.ModelDestination;
 import com.sun.net.httpserver.HttpsServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,6 +40,7 @@ import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.Model;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
@@ -73,7 +75,7 @@ import java.util.*;
 @RestController
 @Log4j2
 //@RequestMapping("/process")
-public class ActivitiController implements ModelDataJsonConstants {
+public class ActivitiController extends BaseController implements ModelDataJsonConstants {
 
     @Resource
     protected RepositoryService repositoryService;
@@ -176,8 +178,11 @@ public class ActivitiController implements ModelDataJsonConstants {
             wrapper.or().like("version", key);
             wrapper.or().like("pro_inst_id", key);
             wrapper.or().like("model_procdef_id", key);
+            wrapper.or().like("sys_name", key);
+            wrapper.or().like("sys_code", key);
+            wrapper.or().like("id", key);
         }
-
+        wrapper.orderBy("cre_time", false);
         Page<ModelCallLog> pages = new Page<ModelCallLog>();
         pages.setCurrent(page);
         pages.setSize(limit);
@@ -211,12 +216,13 @@ public class ActivitiController implements ModelDataJsonConstants {
             paramter.setModelId(modelId);
             ActModelDefinition t = new ActModelDefinition();
             t.setBelongSystem(paramter.getBelongSystem().split("_")[1]);
+            t.setBelongSystemName(paramter.getBelongSystem().split("_")[0]);
             t.setBusinessId(paramter.getBusinessId());
             t.setModelId(modelId);
             t.setModelCode(paramter.getKey());
             t.setModelName(paramter.getName());
             t.setModelDesc(paramter.getDescription());
-
+            t.setCreUserId(this.getUserId());
             modelDefinitionService.insert(t);
             data = Result.success(paramter);
         } catch (Exception e) {
@@ -353,17 +359,29 @@ public class ActivitiController implements ModelDataJsonConstants {
      * @return
      */
     @RequestMapping(value = "/list1")
-    public PageResult<List<ActModelDefinition>> list1(String key, Integer page, Integer limit) {
+    public PageResult<List<ActModelDefinition>> list1(String key, String belongSystem, Integer page, Integer limit) {
         Wrapper<ActModelDefinition> wrapper = new EntityWrapper<>();
         if (org.apache.commons.lang.StringUtils.isNotBlank(key)) {
             wrapper.like("model_name", key);
+        }
+        if (org.apache.commons.lang.StringUtils.isNotBlank(belongSystem)) {
+            wrapper.eq("belong_system_name", belongSystem.split("_")[0]);
         }
         wrapper.orderBy("cre_time", false);
         Page<ActModelDefinition> pages = new Page<>();
         pages.setCurrent(page);
         pages.setSize(limit);
         pages = modelDefinitionService.selectPage(pages, wrapper);
-        return PageResult.success(pages.getRecords(), pages.getTotal());
+        List<ActModelDefinition> li = pages.getRecords();
+        li.forEach(l -> {
+            Wrapper<ActProcRelease> w = new EntityWrapper<>();
+            w.eq("model_code", l.getModelCode());
+            w.orderBy("create_time", false);
+            ActProcRelease ws = actProcReleaseService.selectOne(w);
+            if (ws != null)
+                l.setVersion(ws.getModelVersion());
+        });
+        return PageResult.success(li, pages.getTotal());
     }
 
     @RequestMapping(value = "/list")
@@ -482,7 +500,7 @@ public class ActivitiController implements ModelDataJsonConstants {
     }
 
     @GetMapping("/findTaskByAssigneeSelf")
-    public PageResult<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee, Integer page, Integer limit) {
+    public PageResult<List<TaskVo>> findTaskByAssigneeSelf(FindTaskBeanVo vo, String assignee, String belongSystem, Integer page, Integer limit) {
         vo.setAssignee(StringUtils.isEmpty(vo.getAssignee()) ? assignee : vo.getAssignee());
         List<TaskVo> voList = new ArrayList<>();
         Result<List<TaskVo>> data = null;
@@ -491,7 +509,7 @@ public class ActivitiController implements ModelDataJsonConstants {
 //            data = Result.error(1, "请输入姓名查询！");
 //            return data;
 //        }
-
+        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         TaskQuery query = getProcessEngine().getTaskService()//与正在执行的任务管理相关的Service
                 .createTaskQuery();//创建任务查询对象
@@ -521,14 +539,22 @@ public class ActivitiController implements ModelDataJsonConstants {
         if (StringUtils.isNotBlank(vo.getAssignee())) {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
-        int size = query.orderByTaskCreateTime().asc().list().size();
+        int size = query.orderByTaskCreateTime().desc().list().size();
         page = (page - 1) * limit;
         /**排序*/
-        List<Task> list = query.orderByTaskCreateTime().asc().listPage(page, limit);//返回列表
+        List<Task> list = query.orderByTaskCreateTime().desc().listPage(page, limit);//返回列表
         if (list != null && list.size() > 0) {
             for (Task task : list) {
                 TaskVo tvo = new TaskVo();
-                tvo.setProName(actProcReleaseService.selectOne(new EntityWrapper().eq("model_procdef_id", task.getProcessDefinitionId())).getModelName());
+                HistoricProcessInstance es = historyService.createHistoricProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+                ActProcRelease act = actProcReleaseService.selectOne(new EntityWrapper().eq("model_procdef_id", task.getProcessDefinitionId()));
+                if (act != null) {
+                    ActModelDefinition mod = modelDefinitionService.selectOne(new EntityWrapper().eq("model_id", act.getModelId()));
+                    tvo.setSysCode(mod.getBelongSystemName());
+                    tvo.setSysName(mod.getBelongSystem());
+                    tvo.setProName(act.getModelName());
+                }
+                tvo.setStartTime(sim.format(es.getStartTime()));
                 tvo.setCreateTime(task.getCreateTime());
                 tvo.setTaskId(task.getId());
                 tvo.setExecutionId(task.getExecutionId());
@@ -539,6 +565,19 @@ public class ActivitiController implements ModelDataJsonConstants {
                 voList.add(tvo);
             }
         }
+//        List<TaskVo> voNewList = new ArrayList<>();
+//        if (StringUtils.isNotEmpty(belongSystem)) {
+//            List<Task> list1=query.orderByTaskCreateTime().asc().list();
+//
+//            String code = belongSystem.split("_")[0];
+//            voList.forEach(li -> {
+//                if (li.getSysCode().equals(code)) {
+//                    voNewList.add(li);
+//                }
+//            });
+//            voList = voNewList;
+//            size = voNewList.size();
+//        }
         return PageResult.success(voList, size);
     }
 
@@ -557,13 +596,23 @@ public class ActivitiController implements ModelDataJsonConstants {
             Task t = getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
 //        TaskInfo tt=  getProcessEngine().getHistoryService().createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
 
-            List<String> list = new ArrayList<String>();
-            list.add("aa");
-            list.add("bb");
+//            List<String> list = new ArrayList<String>();
+//            list.add("aa");
+//            list.add("bb");
+//            String[] strMark = {"&&", "||"};
+
+            String param = vo.getParam();
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             Map<String, Object> variables = new HashMap<String, Object>();
-            variables.put("flag", "0");
-            variables.put("hxUser", list.toArray());
+            if(StringUtils.isNotEmpty(param)){
+                String[] arg = param.split("&&");
+                for (int i = 0; i < arg.length; i++) {
+                    String[] s = arg[i].split("===");
+                    variables.put(s[0], s[1]);
+                }
+            }
+//            variables.put("flag", "0");
+//            variables.put("hxUser", list.toArray());
             TaskService service = getProcessEngine().getTaskService();  //与正在执行的任务管理相关的Service
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人
             service.addComment(taskId, t.getProcessInstanceId(), vo.getOpinion());
@@ -669,6 +718,7 @@ public class ActivitiController implements ModelDataJsonConstants {
     @RequestMapping("/processHisAutoIdea")
     @ResponseBody
     public Result<List<ProAutoResult>> queryHistoricActivitiInstance(String processInstanceId) {
+        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<ProAutoResult> result_list = new ArrayList<>();
         TaskService taskService = getProcessEngine().getTaskService();
         List<HistoricTaskInstance> list = getProcessEngine().getHistoryService()
@@ -683,6 +733,7 @@ public class ActivitiController implements ModelDataJsonConstants {
                     result.setComment(com.getFullMessage());
                     result.setUserName(com.getUserId());
                 }
+                result.setBlTime(hti.getEndTime() != null ? sim.format(hti.getEndTime()) : "");
                 result.setAssignee(hti.getAssignee());
                 result.setTaskName(hti.getName());
                 result.setTaskId(hti.getId());
@@ -708,6 +759,7 @@ public class ActivitiController implements ModelDataJsonConstants {
         if (!StringUtils.isEmpty(proId)) {
             query.processInstanceId(proId);
         }
+
         int size = query.orderByProcessInstanceStartTime().desc().list().size();
         page = (page - 1) * limit;
         List<HistoricProcessInstance> q = query.orderByProcessInstanceStartTime().desc().listPage(page, limit); // 开始记录数，每页显示数
@@ -718,6 +770,9 @@ public class ActivitiController implements ModelDataJsonConstants {
             if (null != pro) {
                 vo.setProName(pro.getModelName());
             }
+            ModelCallLog modelLog = modelCallLogService.selectOne(new EntityWrapper().eq("model_procdef_id", h.getProcessDefinitionId()));
+            if (null != modelLog)
+                vo.setBusKey(modelLog.getBusinessKey());
             vo.setProInstId(h.getId());
             vo.setEndTime(h.getEndTime() != null ? sim.format(h.getEndTime()) : "");
             vo.setStartTime(sim.format(h.getStartTime()));
@@ -739,14 +794,23 @@ public class ActivitiController implements ModelDataJsonConstants {
     public void getInstallImg(String processInstanceId, HttpServletResponse response) throws Exception {
         ProcessEngine processEngine = getProcessEngine();
         HistoricProcessInstance processInstance = processEngine.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
-        ProcessEngineConfiguration proConfig = processEngine.getProcessEngineConfiguration();
+        getProView(processInstanceId, processInstance.getProcessDefinitionId(), response);
+    }
+
+    @GetMapping("/viewImgByDefinition")
+    public void getProView(String processInstanceId, String processDefinitionId,
+                           HttpServletResponse response) throws Exception {
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+        ProcessEngineConfiguration proConfig = getProcessEngine().getProcessEngineConfiguration();
         Context.setProcessEngineConfiguration((ProcessEngineConfigurationImpl) proConfig);
 
         ProcessDiagramGenerator diagramGenerator = proConfig.getProcessDiagramGenerator();
-        ProcessDefinitionEntity definitionEntity = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-
-        List<HistoricActivityInstance> highLightedActivitList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).list();
+        ProcessDefinitionEntity definitionEntity = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
+        List<HistoricActivityInstance> highLightedActivitList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(processInstanceId)) {
+            highLightedActivitList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).list();
+        }
+//        repositoryService.createProcessDefinitionQuery().processDefinitionId("").list();
         //高亮环节id集合
         List<String> highLightedActivitis = new ArrayList<String>();
         //高亮线路id集合
@@ -770,8 +834,6 @@ public class ActivitiController implements ModelDataJsonConstants {
 
             response.getOutputStream().write(b, 0, len);
         }
-
-
     }
 
     /**

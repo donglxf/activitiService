@@ -14,6 +14,7 @@ import com.ht.commonactivity.service.ActModelDefinitionService;
 import com.ht.commonactivity.service.ActivitiService;
 import com.ht.commonactivity.service.ModelCallLogParamService;
 import com.ht.commonactivity.service.ModelCallLogService;
+import com.ht.commonactivity.utils.DateUtils;
 import com.ht.commonactivity.vo.FindTaskBeanVo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -173,7 +174,8 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         release.setModelProcdefId(prcdefId);
         release.setVersionType("1");
         release.setCreateTime(new Date(System.currentTimeMillis()));
-//        release.setCreateUser(userId);
+        release.setIsApprove("1");
+//        release.setCreateUser();
         actProcReleaseMapper.insert(release);
 
 
@@ -370,6 +372,9 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         transcoder.transcode(input, output);
         final byte[] result = outStream.toByteArray();
         repositoryService.addModelEditorSourceExtra(model.getId(), result);
+        ActModelDefinition modelDefinition = new ActModelDefinition();
+        modelDefinition.setUpdTime(DateUtils.getDate("yyyy-MM-dd HH:mm:ss"));
+        modelDefinitionService.update(modelDefinition, new EntityWrapper<ActModelDefinition>().eq("model_id", modelId));
         outStream.close();
     }
 
@@ -653,7 +658,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
      * @param String       processInstanceId      流程实例Id信息
      * @return
      */
-    private TaskDefinition nextTaskDefinition(ActivityImpl activityImpl, String activityId, String elString, String processInstanceId, Map<String, Object> data) {
+    public TaskDefinition nextTaskDefinition(ActivityImpl activityImpl, String activityId, String elString, String processInstanceId, Map<String, Object> data) {
 
         PvmActivity ac = null;
 

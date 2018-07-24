@@ -11,6 +11,9 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
     var $ = layui.jquery;
     var config = layui.ht_config;
     var basePath = config.proImg;
+    var myutil = layui.myutil;
+
+    myutil.business.initLocalByData('belongSystem', $("#systemDiv"), "belongSystem");
     //第一个实例
     table.render({
         elem: '#model_list'
@@ -19,10 +22,14 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
         , id: 'testReload'
         , page: true //开启分页
         , cols: [[ //表头\
-            {field: 'modelName', title: '模型名称', width: "20%"}
-            , {field: 'belongSystem', title: '所属系统', width: "20%"}
-            , {field: 'creTime', title: '创建时间', width: "20%", templet: "#creTime"}
-            , {fixed: 'right', width: 150, align: 'center', toolbar: '#barDemo', width: "40%"}
+            {field: 'modelName', title: '模型名称', width: "200"}
+            , {field: 'belongSystem', title: '所属系统', width: "200"}
+            , {field: 'belongSystemName', title: '系统编码', width: "200"}
+            , {field: 'version', title: '最新版本', width: "200"}
+            , {field: 'creUserId', title: '创建人', width: "200"}
+            , {field: 'updTime', title: '更新时间', width: "200", templet: "#updTime"}
+            , {field: 'creTime', title: '创建时间', width: "200", templet: "#creTime"}
+            , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: "250"}
         ]]
     });
     itemTable.render({
@@ -39,7 +46,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
             , {field: 'isApprove', title: '审核状态', width: "10%", templet: '#approvalTpl'}
             , {field: 'createUser', title: '创建人', width: "20%"}
             , {field: 'createTime', title: '创建时间', width: "20%"}
-            , {field: 'start', title: '启动', templet: '#start'}
+            , {field: 'start', title: '操作', templet: '#start'}
         ]]
     });
     table.on('tool(model)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
@@ -69,18 +76,22 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
         var modelVersion = data.modelVersion;
         if (layEvent === 'startProc') { // 启动流程
             startProc(modelProcdefId, modelVersion);
+        } else if (layEvent === 'viewImg') {
+            showProImg(modelProcdefId);
         }
     })
     var active = {
         reload: function () {
             var modelName = $('#modelName');
+            var belongSystem = $('#belongSystem');
             console.log(modelName.val());
             table.reload('testReload', {
                 page: {
                     curr: 1 //重新从第 1 页开始
                 }
                 , where: {
-                    "key": modelName.val()
+                    "key": modelName.val(),
+                    "belongSystem": belongSystem.val()
                 }
             });
         },
@@ -185,6 +196,24 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
         });
     }
 
+    function showProImg(modelProcdefId) {
+        var layIndex = layer.open({
+            type: 2,
+            shade: false,
+            title: "流程图",
+            anim: 5,
+            area: ['1200px', '600px'],
+            content: '/showVersionProImg',
+            zIndex: layer.zIndex, //重点1
+            success: function (layero, index) {
+                var body = layer.getChildFrame('body', index);
+                var input = body.find("input[type='hidden']");
+                input.val(modelProcdefId);
+                layer.setTop(layero); //重点2
+            }
+        });
+    }
+
     function startProc(modelProcdefId, modelVersion) {
         layer.confirm('您确定启动流程吗？', function (index) {
             layer.close(index);
@@ -222,6 +251,8 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
             content: preUrlUi + '/modelEdit?modelId=' + modelId + "&date=" + new Date(),
             zIndex: layer.zIndex, //重点1
             success: function (layero) {
+                console.info("模型编辑======" + layero);
+
                 layer.setTop(layero); //重点2
             }
         });

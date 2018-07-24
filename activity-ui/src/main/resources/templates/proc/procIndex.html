@@ -11,12 +11,19 @@
 <body>
 <div class="demoTable" style="padding:10px 10px 0px 10px">
     <div class="layui-row layui-field-box">
-        <div class="layui-col-md2">
-            <input class="layui-input" name="id" id="modelId" autocomplete="off" placeholder="流程id">
-        </div>
-        <div class="layui-col-md1">
+        <form onsubmit="return false;" class="layui-form">
+            <div class="layui-inline">
+                <input class="layui-input" name="id" id="modelId" autocomplete="off" placeholder="流程id">
+            </div>
+            <!--<div class="layui-inline">-->
+                <!--<select id="belongSystem" name="belongSystem" lay-filter="test">-->
+                    <!--<option>请选择状态</option>-->
+                    <!--<option value="">已结束</option>-->
+                    <!--<option value="">未结束</option>-->
+                <!--</select>-->
+            <!--</div>-->
             <button class="layui-btn" data-type="reload" id="model_search" onclick="active.reload();">查询</button>
-        </div>
+        </form>
     </div>
 </div>
 

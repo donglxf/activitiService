@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ht.commonactivity.vo.TaskVo;
 import com.ht.commonactivity.vo.fileTypeVo;
 import org.activiti.engine.history.HistoricVariableInstance;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.Model;
 import org.springframework.util.MultiValueMap;
@@ -112,6 +113,8 @@ public interface ActivitiService {
 
     public TaskDefinition getNextTaskInfoByProcessId(String taskId);
 
+    public TaskDefinition nextTaskDefinition(ActivityImpl activityImpl, String activityId, String elString, String processInstanceId, Map<String, Object> data);
+
     /**
      * 根据名称或分组查询所有任务信息
      *
@@ -136,9 +139,10 @@ public interface ActivitiService {
 
     /**
      * 更新日志表
+     *
      * @param isEnd
      * @param proInstId
      */
-    public void updateModelLog(String isEnd, String proInstId) ;
+    public void updateModelLog(String isEnd, String proInstId);
 
 }

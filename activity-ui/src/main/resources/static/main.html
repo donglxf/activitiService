@@ -14,7 +14,7 @@
             background-color: white;
             background-color: #ecf0f5;
         }
-        
+
         .info-box .info-box-icon {
             border-top-left-radius: 2px;
             border-top-right-radius: 0;
@@ -29,12 +29,12 @@
             line-height: 85px;
             background: rgba(0, 0, 0, 0.2);
         }
-        
+
         .info-box .info-box-content {
             padding: 5px 10px;
             margin-left: 85px;
         }
-        
+
         .info-box .info-box-content .info-box-text {
             display: block;
             font-size: 14px;
@@ -43,37 +43,217 @@
             text-overflow: ellipsis;
             text-transform: uppercase;
         }
-        
+
         .info-box .info-box-content .info-box-number {
             display: block;
             font-weight: bold;
             font-size: 18px;
         }
-        
+
         .major {
             font-weight: 10px;
             color: #01AAED;
         }
-        
+
         .main {
             margin-top: 25px;
         }
-        
+
         .main .layui-row {
             margin: 10px 0;
         }
-        body{
+
+        body {
             overflow: hidden;
             position: fixed;
-            width:100%;
-            height:100%;
-            background:url("./images/index.png");
-            background-size:cover;
+            width: 100%;
+            height: 100%;
+            background: url("./images/index.png");
+            background-size: cover;
         }
     </style>
 </head>
 
-<body >
+<body>
+
+<div id="topDiv" style="height: 410px;">
+    <div id="zxPicture" class="grid-demo grid-demo-bg1"></div>
+</div>
+<div class="layui-row" id="layuimd7" style="height: 410px;">
+    <div id="container" class="grid-demo grid-demo-bg1"></div>
+    <!--<div class="layui-col-md8" id="layuimd7" style="height: 410px;">-->
+    <!--<div id="container" class="grid-demo grid-demo-bg1"></div>-->
+    <!--</div>-->
+</div>
+
+<script src="/plugins/layui/layui.js"></script>
+<script src="/plugins/echarts/echarts.js"></script>
+<script>
+    var $ = null;
+    layui.config({
+        base: '/src/js/modules/' //假设这是你存放拓展模块的根目录
+    }).extend({ //设定模块别名
+        myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
+    });
+    layui.use(['jquery', 'element', 'laydate', 'ht_config', 'ht_ajax'], function () {
+        $ = layui.jquery;
+        var element = layui.element;
+        var laydata = layui.laydate;
+        var ht_config = layui.ht_config;
+
+        function indexLine(da) {
+            var xAxisList = new Array(da.xAxisList.length);
+            var seriesList = new Array(da.xAxisList.length);
+            for (var i = 0; i < da.xAxisList.length; i++) {
+                var map = da.xAxisList[i];
+                for (var key in map) {
+                    xAxisList[i] = key;
+                    seriesList[i] = map[key];
+                }
+            }
+
+            var dom = document.getElementById("zxPicture");
+            var resizeWorldMapContainer = function () {
+                dom.style.height = $("#topDiv").height() + 'px';
+                dom.style.width = window.innerWidth + 'px';
+            };
+            resizeWorldMapContainer();
+            var myChart = echarts.init(dom);
+            var app = {};
+            option = null;
+            option = {
+                title: {
+                    text: '流程接入统计/日'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xAxisList
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: seriesList,
+                    type: 'line',
+                    smooth: true
+                }]
+            };
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+                myChart.on('click', function (params) {
+                    graphPie(params.name);
+                });
+            }
+        }
+
+        /**
+         *
+         * @param date 日期
+         */
+        function graphPie(date) {
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: ht_config.proImg + 'report/subBar', // 数据接口
+                data: {
+                    "date": date
+                },
+                async: false,
+                error: function (request) {
+                },
+                success: function (da) {
+                    barGraph(da.data);
+                }
+            });
+        }
+
+        function barGraph(da) {
+            var xAxisList = new Array(da.xAxisList.length);
+            var seriesList = new Array(da.xAxisList.length);
+            for (var i = 0; i < da.xAxisList.length; i++) {
+                var map = da.xAxisList[i];
+                for (var key in map) {
+                    xAxisList[i] = key;
+                    seriesList[i] = map[key];
+                }
+            }
+
+            var dom = document.getElementById("container");
+            var resizeWorldMapContainer = function () {
+                dom.style.height = $("#layuimd7").height() + 'px';
+                dom.style.width = window.innerWidth + 'px';
+            };
+            resizeWorldMapContainer();
+            var myChart = echarts.init(dom);
+            var app = {};
+            option = null;
+            option = {
+                color: ['#3398DB'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xAxisList,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '调用次数',
+                        type: 'bar',
+                        barWidth: '60%',
+                        data: seriesList
+                    }
+                ]
+            };
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+            }
+        }
+
+
+        // 折线图
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: ht_config.proImg + 'report/indexLine', // 档案归档日统计
+            async: false,
+            error: function (request) {
+            },
+            success: function (da) {
+                indexLine(da.data);
+            }
+        });
+
+
+    })
+</script>
 </body>
 
 </html>

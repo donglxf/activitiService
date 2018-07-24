@@ -21,5 +21,14 @@
     <sql id="Base_Column_List">
         id, business_key AS businessKey, process_defined_key AS processDefinedKey, version, pro_inst_id AS proInstId, model_procdef_id AS modelProcdefId, sys_code AS sysCode,sys_name AS sysName, is_end AS isEnd, status, cre_time AS creTime
     </sql>
+    <select id="indexLine" resultType="java.util.Map">
+SELECT a.process_defined_key,DATE_FORMAT(a.cre_time,'%Y-%m-%d') create_time,COUNT(1) COUNT FROM   act_model_call_log  a
+      WHERE a.cre_time >= DATE(NOW()) - INTERVAL 9 DAY   GROUP BY  DATE_FORMAT(a.cre_time,'%Y-%m-%d') ORDER BY create_time
+    </select>
+    <select id="indexBar" resultType="java.util.Map" parameterType="map">
+        SELECT a.process_defined_key,COUNT(1) total, b.model_name FROM act_model_call_log a INNER JOIN act_model_definition b
+	ON a.process_defined_key=b.model_code  WHERE  DATE_FORMAT(a.cre_time,'%Y-%m-%d') =#{date} GROUP BY a.process_defined_key
+    </select>
+
 
 </mapper>

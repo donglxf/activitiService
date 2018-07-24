@@ -16,6 +16,16 @@ public class ComplateTaskVo extends  BaseProcessParamter{
     @ApiParam("候选人组")
     private List<String> candidateUser; // 对应变量 ${hxUser}
 
+    private String param;
+
+    public String getParam() {
+        return param;
+    }
+
+    public void setParam(String param) {
+        this.param = param;
+    }
+
     public String getUserName() {
         return userName;
     }

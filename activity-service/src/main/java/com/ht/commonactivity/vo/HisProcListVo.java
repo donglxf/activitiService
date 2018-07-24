@@ -3,9 +3,18 @@ package com.ht.commonactivity.vo;
 public class HisProcListVo {
     private String proInstId;
     private String startTime;
-    private String endTime ;
+    private String endTime;
     private String isComplate;
     private String proName;
+    private String busKey;
+
+    public String getBusKey() {
+        return busKey;
+    }
+
+    public void setBusKey(String busKey) {
+        this.busKey = busKey;
+    }
 
     public String getProName() {
         return proName;
