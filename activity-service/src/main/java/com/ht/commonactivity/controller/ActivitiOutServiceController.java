@@ -198,7 +198,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     @PostMapping("/getNextAllExecutionUserTask")
     @ApiOperation("根据实例id获取所有会执行的用户节点")
-    public List<NextTaskInfo> getNextNote(@RequestBody ProcessParamVo vo) {
+    public Result<List<NextTaskInfo>> getNextNote(@RequestBody ProcessParamVo vo) {
         log.info("getNextAllExecutionUserTask===========>>" + JSON.toJSONString(vo));
         List<TaskDefinition> list = new ArrayList<>();
         List<NextTaskInfo> resultList = new ArrayList<>();
@@ -213,7 +213,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             result.setTaskAssign(li.getAssigneeExpression().getExpressionText());
             resultList.add(result);
         });
-        return resultList;
+        return Result.success(resultList);
     }
 
     public TaskDefinition getNextTaskInfoByProcessId(List<TaskDefinition> list, TaskDefinition taskDefinition, ProcessParamVo vo) {
