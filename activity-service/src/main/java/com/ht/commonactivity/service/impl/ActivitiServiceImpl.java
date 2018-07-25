@@ -692,7 +692,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                                 elString, processInstanceId, data);
                     } else if (outTransitionsTemp.size() > 1) { // 如果排他网关有多条线路信息
                         for (PvmTransition tr1 : outTransitionsTemp) {
-                            s = tr1.getProperty("conditionText"); // 获取排他网关线路判断条件信息
+                            s = tr1.getProperty("conditionText"); // 获取排他网关线路判断条件信息${flag==0}
                             String key = null;
                             // 解析出表达式 key
                             for (int i = 0; i < ActivitiConstants.EL_ARR.length; i++) {

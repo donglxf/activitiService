@@ -196,6 +196,60 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return data;
     }
 
+    @PostMapping("/getNextAllExecutionUserTask")
+    @ApiOperation("根据实例id获取所有会执行的用户节点")
+    public List<NextTaskInfo> getNextNote(@RequestBody ProcessParamVo vo) {
+        log.info("getNextAllExecutionUserTask===========>>" + JSON.toJSONString(vo));
+        List<TaskDefinition> list = new ArrayList<>();
+        List<NextTaskInfo> resultList = new ArrayList<>();
+        TaskDefinition taskDefinition = null;
+        taskDefinition = getNextTaskInfoByProcessId(list, taskDefinition, vo);
+        log.info(list.size() + "==============");
+        list.forEach(li -> {
+            NextTaskInfo result = new NextTaskInfo();
+            result.setTaskDefineKey(li.getKey());
+            result.setTaskText(li.getNameExpression().getExpressionText());
+            result.setProcInstId(vo.getProInstId());
+            result.setTaskAssign(li.getAssigneeExpression().getExpressionText());
+            resultList.add(result);
+        });
+        return resultList;
+    }
+
+    public TaskDefinition getNextTaskInfoByProcessId(List<TaskDefinition> list, TaskDefinition taskDefinition, ProcessParamVo vo) {
+        String id = null;
+        TaskDefinition task = null;
+        String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult().getProcessDefinitionId();
+        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
+                .getDeployedProcessDefinition(definitionId);
+        ExecutionEntity execution = (ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult();
+        String activitiId = execution.getActivityId(); // 当前流程节点Id信息
+        if (null != taskDefinition) {
+            activitiId = taskDefinition.getKey();
+        }
+        List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
+        Result<Map<String, Object>> tmap = getProValiable(vo);
+        Map<String, Object> map = tmap.getData();
+        //遍历所有节点信息
+        for (ActivityImpl activityImpl : activitiList) {
+            id = activityImpl.getId();
+            if (activitiId.equals(id)) {
+                for (Map.Entry<String, Object> maps : activityImpl.getProperties().entrySet()) {
+                    System.out.println("属性：" + maps.getKey() + "======" + maps.getValue()); //输出某个节点的某种属性
+                }
+                //获取下一个节点信息
+                task = activitiService.nextTaskDefinition(activityImpl, activityImpl.getId(), null, vo.getProInstId(), map);
+                if (task == null) {
+                    break;
+                }
+                list.add(task);
+                return getNextTaskInfoByProcessId(list, task, vo);
+            }
+        }
+        return task;
+
+    }
+
     /**
      * 判断流程是否结束
      *
