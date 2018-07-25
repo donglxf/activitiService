@@ -196,6 +196,11 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return data;
     }
 
+    /**
+     * 限制条件 ： 流程分支必须要有排他网关，必须要有满足网关表达式值的变量存在，否则返回null
+     * @param vo
+     * @return
+     */
     @PostMapping("/getNextAllExecutionUserTask")
     @ApiOperation("根据实例id获取所有会执行的用户节点")
     public Result<List<NextTaskInfo>> getNextNote(@RequestBody ProcessParamVo vo) {

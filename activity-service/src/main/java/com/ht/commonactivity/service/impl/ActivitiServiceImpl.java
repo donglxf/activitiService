@@ -680,14 +680,9 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                 if ("exclusiveGateway".equals(ac.getProperty("type"))) {
                     outTransitionsTemp = ac.getOutgoingTransitions();
 
-                    // 如果网关路线判断条件为空信息
-//                    if (StringUtils.isEmpty(elString)) {
-//                        // 获取流程启动时设置的网关判断条件信息
-//                        elString = getGatewayCondition(ac.getId(), processInstanceId);
-//                    }
-
                     // 如果排他网关只有一条线路信息
                     if (outTransitionsTemp.size() == 1) {
+//                        return ((UserTaskActivityBehavior) ((ActivityImpl) ac).getActivityBehavior()).getTaskDefinition();
                         return nextTaskDefinition((ActivityImpl) outTransitionsTemp.get(0).getDestination(), activityId,
                                 elString, processInstanceId, data);
                     } else if (outTransitionsTemp.size() > 1) { // 如果排他网关有多条线路信息
@@ -703,7 +698,6 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                             }
                             elString = (String) data.get(key);
                             // 判断el表达式是否成立
-//                            if (isCondition(ac.getId(), StringUtils.trim(s.toString()), elString)) {
                             if (isCondition(key, StringUtils.trim(s.toString()), elString)) {
                                 return nextTaskDefinition((ActivityImpl) tr1.getDestination(), activityId, elString,
                                         processInstanceId, data);
