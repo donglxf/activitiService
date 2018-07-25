@@ -239,9 +239,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         for (ActivityImpl activityImpl : activitiList) {
             id = activityImpl.getId();
             if (activitiId.equals(id)) {
-                for (Map.Entry<String, Object> maps : activityImpl.getProperties().entrySet()) {
-                    System.out.println("属性：" + maps.getKey() + "======" + maps.getValue()); //输出某个节点的某种属性
-                }
+//                for (Map.Entry<String, Object> maps : activityImpl.getProperties().entrySet()) {
+//                    System.out.println("属性：" + maps.getKey() + "======" + maps.getValue()); //输出某个节点的某种属性
+//                }
                 //获取下一个节点信息
                 task = activitiService.nextTaskDefinition(activityImpl, activityImpl.getId(), null, vo.getProInstId(), map);
                 if (task == null) {

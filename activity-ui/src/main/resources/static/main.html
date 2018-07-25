@@ -108,7 +108,7 @@
                 var map = da.xAxisList[i];
                 for (var key in map) {
                     xAxisList[i] = key;
-                    seriesList[i] = map[key];
+                    seriesList[i] = map[key].total;
                 }
             }
 
@@ -237,7 +237,13 @@
             }
         }
 
-
+        var myDate = new Date();
+        var meh = parseInt(myDate.getMonth() + 1);
+        if (meh < 10) {
+            meh = '0' + meh;
+        }
+        var d = myDate.getFullYear() + "-" + meh + "-" + myDate.getDate();
+        graphPie(d);
         // 折线图
         $.ajax({
             cache: true,

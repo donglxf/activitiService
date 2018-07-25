@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -37,56 +38,55 @@ public class ModelCallLogServiceImpl extends BaseServiceImpl<ModelCallLogMapper,
         Date beforeDate = DateUtils.dayOffset(currentDate, -10);
         String[] days = DateUtils.minusDay(beforeDate, currentDate, ""); // 近10天数组
         log.info("最近10天数组:" + JSON.toJSONString(days));
-        List<Map<String, Object>> xAxis = new ArrayList<>();
-//        List<String> legend = new ArrayList<>();
-//        Set<String> aa = new HashSet<>();
+        List<ModelCallLog> xAxis = new ArrayList<>();
         List<Map<String, Object>> list = modelCallLogMapper.indexLine();
         list.forEach(li -> {
-//            aa.add(String.valueOf(li.get("type_code")));
             Map<String, Object> tmap = new HashMap<>();
             tmap.put(String.valueOf(li.get("create_time")), String.valueOf(li.get("COUNT")));
-            xAxis.add(tmap);
+            ModelCallLog call = new ModelCallLog();
+            call.setCreateTime(String.valueOf(li.get("create_time")));
+            call.setTotal(String.valueOf(li.get("COUNT")));
+            xAxis.add(call);
         });
-//        legend.addAll(aa);
         // 对于数据查询不存在的日期，补空
         for (int i = 0; i < days.length; i++) {
             boolean bool = false;
             for (int j = 0; j < xAxis.size(); j++) {
-                Map<String, Object> tmp = xAxis.get(j);
-                for (Map.Entry ma : tmp.entrySet()) {
-                    if (days[i].equals(ma.getKey())) {
-                        bool = true;
-                        break;
-                    }
+                ModelCallLog tmp = xAxis.get(j);
+                if (days[i].equals(tmp.getCreateTime())) {
+                    bool = true;
+                    break;
                 }
             }
             if (!bool) {
-                Map<String, Object> ma = new HashMap<>();
-                ma.put(days[i], "0");
-                xAxis.add(ma);
+                ModelCallLog tCall = new ModelCallLog();
+                tCall.setTotal("0");
+                tCall.setCreateTime(days[i]);
+                xAxis.add(tCall);
             }
         }
-//        List<Map.Entry<String, Map<String, Object>>> tlist = new ArrayList<Map.Entry<String, Map<String, Object>>>(xAxis.entrySet());
-//        Collections.sort(tlist, new Comparator<Map.Entry<String,  Map<String, Object>>>() {
-//            //降序排序
-//            public int compare(Map.Entry<String,  Map<String, Object>> o1,
-//                               Map.Entry<String,  Map<String, Object>> o2) {
-//                SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd");
-//                try {
-//                    Date o1key = sim.parse(o1.getKey());
-//                    Date o2key = sim.parse(o2.getKey());
-//                    if (o1key.before(o2key)) {
-//                        return 1;
-//                    } else {
-//                        return -1;
-//                    }
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//                return 1;
-//            }
-//        });
-        map.put("xAxisList", xAxis);
+        Map<String, ModelCallLog> appleMap = xAxis.stream().collect(Collectors.toMap(ModelCallLog::getCreateTime, a -> a, (k1, k2) -> k1));
+        List<Map.Entry<String, ModelCallLog>> tlist = new ArrayList<Map.Entry<String, ModelCallLog>>(appleMap.entrySet());
+        Collections.sort(tlist, new Comparator<Map.Entry<String, ModelCallLog>>() {
+            //降序排序
+            public int compare(Map.Entry<String, ModelCallLog> o1,
+                               Map.Entry<String, ModelCallLog> o2) {
+                SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd");
+                try {
+                    Date o1key = sim.parse(o1.getKey());
+                    Date o2key = sim.parse(o2.getKey());
+                    if (o1key.before(o2key)) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return 1;
+            }
+        });
+        map.put("xAxisList", tlist);
         return map;
     }
 
