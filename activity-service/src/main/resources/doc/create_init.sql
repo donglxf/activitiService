@@ -53,7 +53,8 @@ create table act_model_definition(
 	model_desc varchar(500) comment '模型描述',
 	`status`  varchar(10) comment '状态',
 	cre_user_id varchar(50) comment '创建人id',
-	cre_time datetime not null default now()  comment '创建时间'
+	cre_time datetime not null default now()  comment '创建时间',
+	upd_time datetime comment '修改时间'
 ) engine = innodb character set = utf8 collate utf8_bin;
 
 

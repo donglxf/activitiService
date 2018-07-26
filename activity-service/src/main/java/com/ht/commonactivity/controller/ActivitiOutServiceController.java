@@ -198,6 +198,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
     /**
      * 限制条件 ： 流程分支必须要有排他网关，必须要有满足网关表达式值的变量存在，否则返回null
+     *
      * @param vo
      * @return
      */
@@ -282,6 +283,26 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         log.info("taskChangeOther param Date=====》》》" + JSON.toJSONString(vo.getTaskId()) + "============" + JSON.toJSONString(vo.getOwner()));
         taskService.setAssignee(vo.getTaskId(), vo.getOwner());
         return Result.success();
+    }
+
+    @PostMapping("/getCurrentTaskByProInstId")
+    @ApiOperation("通过流程实例id查询当前任务")
+    public Result<List<NextTaskInfo>> getCurrentTaskByProInstId(@RequestBody ProcessParamVo vo) {
+        log.info("getCurrentTaskByProInstId param data============" + JSON.toJSONString(vo));
+        List<NextTaskInfo> list = new ArrayList<NextTaskInfo>();
+        List<Task> taskList = taskService.createTaskQuery().processInstanceId(vo.getProInstId()).list();
+        taskList.forEach(ta -> {
+            NextTaskInfo result = new NextTaskInfo();
+            result.setTaskId(ta.getId());
+            result.setTaskDefineKey(ta.getTaskDefinitionKey());
+            result.setTaskText(ta.getName());
+            result.setProcInstId(ta.getProcessInstanceId());
+            result.setTaskAssign(ta.getAssignee());
+//                result.setProIsEnd(procIsEnd(ta.getProcessInstanceId()) ? "Y" : "N");
+            result.setProIsEnd("N");
+            list.add(result);
+        });
+        return Result.success(list);
     }
 
 
