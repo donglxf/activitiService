@@ -21,6 +21,7 @@ import com.ht.ussp.util.DateUtil;
 import com.sun.media.sound.ModelDestination;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.activiti.bpmn.model.BpmnModel;
@@ -34,6 +35,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
+import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
@@ -569,7 +571,9 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("hxUser", vo.getCandidateUser());
-
+            if (vo.getData() != null) {
+                variables.putAll(vo.getData());
+            }
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             TaskService service = getProcessEngine().getTaskService();
             Authentication.setAuthenticatedUserId(vo.getUserName()); // 添加批注设置审核人,记入日志
@@ -827,7 +831,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         List<AllUserTaskOutVo> result = new ArrayList<>();
         TaskDefinition task = null;
         String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult().getProcessDefinitionId();
-        result = getAllUserTask(definitionId);
+        result = getAllUserTask(definitionId, null);
 //        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
 //                .getDeployedProcessDefinition(definitionId);
 //        List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
@@ -857,11 +861,17 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
         return Result.success(result);
     }
 
-    public List<AllUserTaskOutVo> getAllUserTask(String proDefinitionId) {
+    public List<AllUserTaskOutVo> getAllUserTask(String proDefinitionId, Integer version) {
         List<AllUserTaskOutVo> result = new ArrayList<>();
         TaskDefinition task = null;
-        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
-                .getDeployedProcessDefinition(proDefinitionId);
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+        if (null != version) {
+            query.processDefinitionVersion(version);
+        }
+        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) query.singleResult();
+
+//        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
+//                .getDeployedProcessDefinition(proDefinitionId);
         List<ActivityImpl> activitiList = processDefinitionEntity.getActivities(); //获取流程所有节点信息
         for (ActivityImpl activityImpl : activitiList) {
             if ("userTask".equals(activityImpl.getProperty("type"))) {
@@ -913,7 +923,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             List<ActProcRelease> list = actProcReleaseService.selectList(proc);
             if (null != list && list.size() > 0) {
                 ActProcRelease release = list.get(0);
-                result = getAllUserTask(release.getModelProcdefId());
+                result = getAllUserTask(release.getModelProcdefId(), vo.getVersion());
             }
         }
         log.info("getAllTaskByModelCode result data:------------>" + JSON.toJSONString(result));

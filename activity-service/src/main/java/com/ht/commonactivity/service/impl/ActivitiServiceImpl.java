@@ -687,18 +687,36 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                                 elString, processInstanceId, data);
                     } else if (outTransitionsTemp.size() > 1) { // 如果排他网关有多条线路信息
                         for (PvmTransition tr1 : outTransitionsTemp) {
-                            s = tr1.getProperty("conditionText"); // 获取排他网关线路判断条件信息${flag==0}
-                            String key = null;
-                            // 解析出表达式 key
-                            for (int i = 0; i < ActivitiConstants.EL_ARR.length; i++) {
-                                if (((String) s).contains(ActivitiConstants.EL_ARR[i])) {
-                                    key = ((String) s).substring(2, ((String) s).indexOf(ActivitiConstants.EL_ARR[i]));
-                                    break;
+                            s = tr1.getProperty("conditionText"); // 获取排他网关线路判断条件信息${flag==0} ${flag==1 && abc==2}
+                            try {
+                                s = new String(String.valueOf(s).getBytes("GBK"), "UTF-8").replaceAll("\\?\\?", "'");
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
+                            String tts = String.valueOf(s).replaceAll("\\(|\\)", "").replaceAll("\\&&|\\|\\|", "~");
+                            String subs = tts.substring(tts.indexOf("{") + 1, tts.lastIndexOf("}"));
+                            String[] ts = subs.split("~");
+                            String[] keys = new String[ts.length];
+                            String[] values = new String[ts.length];
+                            for (int j = 0; j < ts.length; j++) {
+                                for (int i = 0; i < ActivitiConstants.EL_ARR.length; i++) {
+                                    if (ts[j].contains(ActivitiConstants.EL_ARR[i])) {
+                                        keys[j] = ts[j].substring(0, ts[j].indexOf(ActivitiConstants.EL_ARR[i])).trim();
+                                        values[j] = (String) data.get(keys[j]);
+                                    }
                                 }
                             }
-                            elString = (String) data.get(key);
+//                            String key = null;
+//                            // 解析出表达式 key
+//                            for (int i = 0; i < ActivitiConstants.EL_ARR.length; i++) {
+//                                if (((String) s).contains(ActivitiConstants.EL_ARR[i])) {
+//                                    key = ((String) s).substring(2, ((String) s).indexOf(ActivitiConstants.EL_ARR[i]));
+//                                    break;
+//                                }
+//                            }
+//                            elString = (String) data.get(key);
                             // 判断el表达式是否成立
-                            if (isCondition(key, StringUtils.trim(s.toString()), elString)) {
+                            if (isCondition(keys, StringUtils.trim(s.toString()), values)) {
                                 return nextTaskDefinition((ActivityImpl) tr1.getDestination(), activityId, elString,
                                         processInstanceId, data);
                             }
@@ -711,6 +729,34 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
             }
             return null;
         }
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", "1");
+        String cs = (String) map.get("b");
+        log.info(cs);
+        String s = "${flag==1 && abc==name}";
+        s = s.replaceAll("\\(|\\)", "");
+        log.info(s);
+        s = s.replaceAll("\\&&|\\|\\|", "~");
+        log.info(s);
+        s = s.substring(s.indexOf("{") + 1, s.lastIndexOf("}"));
+        log.info(s);
+        String ts[] = null;
+        ts = s.split("~");
+        log.info(JSON.toJSONString(ts));
+        String[] key = new String[ts.length];
+        String[] value = {"1", "name"};
+        for (int j = 0; j < ts.length; j++) {
+            for (int i = 0; i < ActivitiConstants.EL_ARR.length; i++) {
+                if (ts[j].contains(ActivitiConstants.EL_ARR[i])) {
+                    key[j] = ts[j].substring(0, ts[j].indexOf(ActivitiConstants.EL_ARR[i])).trim();
+                    log.info(key[j] + "===");
+                }
+            }
+        }
+        log.info(isCondition(key, StringUtils.trim("${flag==1 && abc=='name'}"), value));
     }
 
 
@@ -739,6 +785,27 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
         ExpressionFactory factory = new ExpressionFactoryImpl();
         SimpleContext context = new SimpleContext();
         context.setVariable(key, factory.createValueExpression(value, String.class));
+        ValueExpression e = factory.createValueExpression(context, el, boolean.class);
+        return (Boolean) e.getValue(context);
+    }
+
+    /**
+     * 根据key和value判断el表达式是否通过信息
+     *
+     * @param String key    el表达式key信息
+     * @param String el     el表达式信息
+     * @param String value  el表达式传入值信息
+     * @return
+     */
+    public static boolean isCondition(String[] key, String el, String[] value) {
+        ExpressionFactory factory = new ExpressionFactoryImpl();
+        SimpleContext context = new SimpleContext();
+        if (key.length != value.length) {
+            return false;
+        }
+        for (int i = 0; i < key.length; i++) {
+            context.setVariable(key[i], factory.createValueExpression(value[i], String.class));
+        }
         ValueExpression e = factory.createValueExpression(context, el, boolean.class);
         return (Boolean) e.getValue(context);
     }

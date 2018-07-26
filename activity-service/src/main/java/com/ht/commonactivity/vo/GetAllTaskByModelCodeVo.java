@@ -7,4 +7,7 @@ import lombok.Data;
 public class GetAllTaskByModelCodeVo {
     @ApiParam("模型编码")
     private String modeCode;
+
+    @ApiParam("模型版本")
+    private Integer version;
 }
