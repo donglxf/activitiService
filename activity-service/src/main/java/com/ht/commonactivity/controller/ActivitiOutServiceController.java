@@ -227,7 +227,11 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     public TaskDefinition getNextTaskInfoByProcessId(List<TaskDefinition> list, TaskDefinition taskDefinition, ProcessParamVo vo) {
         String id = null;
         TaskDefinition task = null;
-        String definitionId = runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult().getProcessDefinitionId();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult();
+        if (null == instance) {
+            return null;
+        }
+        String definitionId = instance.getProcessDefinitionId();
         ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
                 .getDeployedProcessDefinition(definitionId);
         ExecutionEntity execution = (ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(vo.getProInstId()).singleResult();
