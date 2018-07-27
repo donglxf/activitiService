@@ -21,9 +21,6 @@ import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.*;
 import com.ht.commonactivity.utils.TestPointCat;
 import com.ht.commonactivity.vo.*;
-import com.sun.media.sound.ModelDestination;
-import com.sun.net.httpserver.HttpsServer;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
@@ -121,6 +118,9 @@ public class ActivitiController extends BaseController implements ModelDataJsonC
     @Autowired
     protected UcAppRpc ucAppRpc;
 
+    @Autowired
+    protected ModelCodeGenerateService modelCodeGenerateService;
+
     protected static volatile ProcessEngine processEngine = null;
 
     protected static ProcessEngine getProcessEngine() {
@@ -205,13 +205,15 @@ public class ActivitiController extends BaseController implements ModelDataJsonC
         Result<ModelParamter> data = null;
         try {
             paramter.setCategory(paramter.getBusinessId());
-            String key = paramter.getKey();
-            List modelList = repositoryService.createModelQuery().modelKey(key).list();
-            if (modelList != null && modelList.size() > 0) {
-                log.error("创建模型失败，模型编码已存在！");
-                data = Result.error(1, "创建模型失败，模型编码已存在！");
-                return data;
-            }
+//            String key = paramter.getKey();
+//            List modelList = repositoryService.createModelQuery().modelKey(key).list();
+//            if (modelList != null && modelList.size() > 0) {
+//                log.error("创建模型失败，模型编码已存在！");
+//                data = Result.error(1, "创建模型失败，模型编码已存在！");
+//                return data;
+//            }
+            String key = modelCodeGenerateService.getModelCode(paramter.getBelongSystem().split("_")[0], paramter.getBusinessId());
+            paramter.setKey(key);
             String modelId = activitiService.addModel(paramter);
             paramter.setModelId(modelId);
             ActModelDefinition t = new ActModelDefinition();
@@ -219,7 +221,7 @@ public class ActivitiController extends BaseController implements ModelDataJsonC
             t.setBelongSystemName(paramter.getBelongSystem().split("_")[0]);
             t.setBusinessId(paramter.getBusinessId());
             t.setModelId(modelId);
-            t.setModelCode(paramter.getKey());
+            t.setModelCode(key);
             t.setModelName(paramter.getName());
             t.setModelDesc(paramter.getDescription());
             t.setCreUserId(this.getUserId());
@@ -539,6 +541,13 @@ public class ActivitiController extends BaseController implements ModelDataJsonC
         if (StringUtils.isNotBlank(vo.getAssignee())) {
             query.taskAssignee(vo.getAssignee()); //指定个人任务查询，指定办理人
         }
+        List<String> lists = new ArrayList<>();
+        lists.add("returnArchivesProcess:1:f351e68c86fb48a0ad4f98f96c8f075d");
+        lists.add("returnArchivesProcess:2:40cc9c31d2644bb789f27def89cf9cef");
+        lists.add("returnArchivesProcess:3:4ed73f0779b74578902f98becb6b6101");
+        lists.add("returnArchivesProcess:4:a7065475c3774141937e6ab1d430d9d4");
+        lists.add("returnArchivesProcess:5:383f4410ab744e29bdbef6aad7e5f61c");
+//        query.processDefinitionKeyIn(lists);
         int size = query.orderByTaskCreateTime().desc().list().size();
         page = (page - 1) * limit;
         /**排序*/
@@ -604,7 +613,7 @@ public class ActivitiController extends BaseController implements ModelDataJsonC
             String param = vo.getParam();
             //完成任务的同时，设置流程变量，让流程变量判断连线该如何执行
             Map<String, Object> variables = new HashMap<String, Object>();
-            if(StringUtils.isNotEmpty(param)){
+            if (StringUtils.isNotEmpty(param)) {
                 String[] arg = param.split("&&");
                 for (int i = 0; i < arg.length; i++) {
                     String[] s = arg[i].split("===");
@@ -751,7 +760,7 @@ public class ActivitiController extends BaseController implements ModelDataJsonC
      */
     @GetMapping("/queryHisProcList")
     @ResponseBody
-    public PageResult<List<HisProcListVo>> queryHisProcList(String proId, Integer page, Integer limit) {
+    public PageResult<List<HisProcListVo>> queryHisProcList(String proId, String wfstatus, Integer page, Integer limit) {
         SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<HisProcListVo> list = new ArrayList<>();
 
@@ -759,24 +768,32 @@ public class ActivitiController extends BaseController implements ModelDataJsonC
         if (!StringUtils.isEmpty(proId)) {
             query.processInstanceId(proId);
         }
-
         int size = query.orderByProcessInstanceStartTime().desc().list().size();
+        if (!StringUtils.isEmpty(wfstatus)) {
+            if ("1".equals(wfstatus)) {
+                size = query.finished().orderByProcessInstanceStartTime().desc().list().size();
+                query.finished();
+            } else {
+                query.unfinished();
+                size = query.unfinished().orderByProcessInstanceStartTime().desc().list().size();
+            }
+        }
         page = (page - 1) * limit;
         List<HistoricProcessInstance> q = query.orderByProcessInstanceStartTime().desc().listPage(page, limit); // 开始记录数，每页显示数
         q.forEach(h -> {
-//            System.out.println(h.getId() + "," + h.getBusinessKey() + "," + h.getProcessDefinitionId() + "," + h.getStartTime() + "," + h.getProcessDefinitionKey());
             HisProcListVo vo = new HisProcListVo();
             ActProcRelease pro = actProcReleaseService.selectOne(new EntityWrapper().eq("model_procdef_id", h.getProcessDefinitionId()));
             if (null != pro) {
                 vo.setProName(pro.getModelName());
             }
-            ModelCallLog modelLog = modelCallLogService.selectOne(new EntityWrapper().eq("model_procdef_id", h.getProcessDefinitionId()));
-            if (null != modelLog)
-                vo.setBusKey(modelLog.getBusinessKey());
+//            ModelCallLog modelLog = modelCallLogService.selectOne(new EntityWrapper().eq("model_procdef_id", h.getProcessDefinitionId()));
+//            if (null != modelLog)
+//                vo.setBusKey(modelLog.getBusinessKey());
+            vo.setBusKey(h.getBusinessKey());
             vo.setProInstId(h.getId());
             vo.setEndTime(h.getEndTime() != null ? sim.format(h.getEndTime()) : "");
             vo.setStartTime(sim.format(h.getStartTime()));
-            vo.setIsComplate(h.getEndTime() == null ? "未结束" : "已结束");
+            vo.setIsComplate(h.getEndTime() == null ? "0" : "1"); //0-未结束  ，1-已结束
             list.add(vo);
         });
 

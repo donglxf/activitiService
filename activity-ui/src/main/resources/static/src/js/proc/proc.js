@@ -7,11 +7,11 @@ var preUrl = "/activity/service";
 var preUrlUi = "";
 // var preUrlUi = "/activity/ui";
 var proInstIds = '';
-layui.use(['table', 'jquery', 'myutil','ht_ajax', "ht_config"], function () {
+layui.use(['table', 'jquery', 'myutil', 'ht_ajax', "ht_config"], function () {
     var table = layui.table;
     var $ = layui.jquery;
     var config = layui.ht_config;
-    var basePath=config.proImg;
+    var basePath = config.proImg;
     //第一个实例
     table.render({
         elem: '#proc_list'
@@ -59,13 +59,15 @@ layui.use(['table', 'jquery', 'myutil','ht_ajax', "ht_config"], function () {
     active = {
         reload: function () {
             var modelName = $('#modelId');
+            var wfstatus = $('#wfstatus');
             console.log(modelName.val());
             table.reload('testReload', {
                 page: {
                     curr: 1 //重新从第 1 页开始
                 }
                 , where: {
-                    proId: modelName.val()
+                    proId: modelName.val(),
+                    wfstatus: wfstatus.val()
                 }
             });
         }
@@ -92,14 +94,14 @@ layui.use(['table', 'jquery', 'myutil','ht_ajax', "ht_config"], function () {
         var layIndex = layer.open({
             type: 2,
             shade: false,
-            title:"流程图",
-            anim:5,
-            area : [ '1200px', '600px' ],
-            content: preUrlUi+'/showProImg',
+            title: "流程图",
+            anim: 5,
+            area: ['1200px', '600px'],
+            content: preUrlUi + '/showProImg',
             zIndex: layer.zIndex, //重点1
-            success: function(layero, index){
+            success: function (layero, index) {
                 var body = layer.getChildFrame('body', index);
-                var input=body.find("input[type='hidden']");
+                var input = body.find("input[type='hidden']");
                 input.val(proInstId);
                 layer.setTop(layero); //重点2
             }

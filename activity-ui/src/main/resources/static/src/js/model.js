@@ -23,10 +23,11 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
         , page: true //开启分页
         , cols: [[ //表头\
             {field: 'modelName', title: '模型名称', width: "200"}
+            , {field: 'modelCode', title: '模型编码', width: "150"}
             , {field: 'belongSystem', title: '所属系统', width: "200"}
-            , {field: 'belongSystemName', title: '系统编码', width: "200"}
-            , {field: 'version', title: '最新版本', width: "200"}
-            , {field: 'creUserId', title: '创建人', width: "200"}
+            , {field: 'belongSystemName', title: '系统编码', width: "100"}
+            , {field: 'version', title: '最新版本', width: "150"}
+            , {field: 'creUserId', title: '创建人', width: "150"}
             , {field: 'updTime', title: '更新时间', width: "200", templet: "#updTime"}
             , {field: 'creTime', title: '创建时间', width: "200", templet: "#creTime"}
             , {fixed: 'right', title: '操作', align: 'center', toolbar: '#barDemo', width: "250"}

@@ -8,6 +8,7 @@ import com.ht.commonactivity.entity.ActivitiFileType;
 import com.ht.commonactivity.entity.dto.FileTypeDto;
 import com.ht.commonactivity.rpc.UcAppRpc;
 import com.ht.commonactivity.service.ActivitiFileTypeService;
+import com.ht.commonactivity.service.ModelCodeGenerateService;
 import com.ht.commonactivity.utils.DateUtils;
 import com.ht.commonactivity.utils.UUIDUtils;
 import com.ht.commonactivity.vo.GetAllAppDto;
@@ -33,6 +34,9 @@ public class ParamConfigController {
     protected UcAppRpc ucAppRpc;
 
     @Autowired
+    private ModelCodeGenerateService modelCodeGenerateService;
+
+    @Autowired
     private ActivitiFileTypeService activitiFileTypeService;
 
     @GetMapping("/getAll")
@@ -49,13 +53,13 @@ public class ParamConfigController {
 
     @RequestMapping("/addChildrenNode")
     @ApiOperation("添加子节点")
-    public Result<String> addChildrenNode(ActivitiFileType fileType) {
-        String fileTypeCode = UUIDUtils.getNextId();
-        fileType.setFileTypeCode(fileTypeCode);
+    public Result<String> addChildrenNode(ActivitiFileType fileType) throws Exception {
+        String fileTypeCode = null;
         String typePath = fileType.getFiltTypePath();
         String[] path = new String[0];
         if (StringUtils.isNotBlank(typePath)) {
             path = typePath.split("/");
+            fileTypeCode = modelCodeGenerateService.getTypeCode(path[path.length - 1]);
             fileType.setLfileTypeLevel(path.length + 1);
             fileType.setFiltTypePath(typePath + "/" + fileTypeCode);
             fileType.setParentCode(path[path.length - 1]);
@@ -65,6 +69,7 @@ public class ParamConfigController {
             fileType.setParentCode(ParamConfigEnum.top.getVal());
         }
 
+        fileType.setFileTypeCode(fileTypeCode);
         fileType.setCreateTime(DateUtil.getDate(DateUtil.formatDate("yyyy-MM-dd HH:mm:ss", new Date()), "yyyy-MM-dd HH:mm:ss"));
         // 检测同层级菜单是否有重复名和code
         List<ActivitiFileType> li = activitiFileTypeService.selectList(new EntityWrapper<ActivitiFileType>().eq("lfile_type_level", path.length + 1).eq("file_type_name", fileType.getFileTypeName()));

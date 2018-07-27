@@ -15,3 +15,6 @@ ht.config.ui:
   changePwdUrl: http://172.16.200.110:30131/html/user/changePwdOther.html
   userInfoUpdate: http://172.16.200.110:30131/html/user/userInfoOther.html
   localGatewayUrl: http://172.16.200.110:30111/activity/service/
+
+ht.rule:
+    defultInstanceId: WHT010017.hongte.info:activity-service:32101

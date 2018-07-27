@@ -12,6 +12,7 @@ public class SetCandidateGroupVo {
     private String proInstId;
     private Map<String,List<String>> paramMap;
 
+    @ApiParam("任务id")
     String taskId;
     @ApiParam("自定义候选人列表")
     private List<String> candidateUser;

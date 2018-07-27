@@ -13,11 +13,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @EnableFeignClients(basePackages = {"com.ht.ussp.client", "com.ht.commonactivity.rpc"})
-@MapperScan("com.ht.commonactivity.mapper")
+@MapperScan(basePackages = {"com.ht.commonactivity.mapper","com.ht.framework.generator.mapper"})
 @EnableTransactionManagement
 @EnableDiscoveryClient
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.ht.commonactivity", "com.ht.ussp.bean"})
+@ComponentScan(basePackages = {"com.ht.commonactivity", "com.ht.ussp.bean","com.ht.framework.generator"})
 public class CommonActivityApplication {
 
     @Bean

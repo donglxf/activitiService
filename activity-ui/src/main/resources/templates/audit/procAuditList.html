@@ -8,24 +8,22 @@
 </head>
 <body>
 <div class="demoTable" style="padding:10px 10px 0px 10px">
-    <div class="layui-row layui-col-space12">
-        <form onsubmit="return false;" class="layui-form">
-            <div class="layui-field-box">
-                <div class="demoTable" style="padding:10px 10px 0px 10px">
-                    <div class="layui-inline">
-                        <input class="layui-input" name="id" id="userName" autocomplete="off"
-                               placeholder="请输入userName查询">
-                    </div>
-                    <!--<div class="layui-inline" id="systemDiv">-->
-                        <!--<select id="belongSystem" name="belongSystem" lay-filter="test"></select>-->
-                    <!--</div>-->
-                    <button class="layui-btn" data-type="reload" id="model_search" onclick="active.reload();">查询
-                    </button>
+    <form onsubmit="return false;" class="layui-form">
+        <div class="layui-field-box layui-row">
+            <div class="demoTable" style="padding:10px 10px 0px 10px">
+                <div class="layui-inline">
+                    <input class="layui-input" name="id" id="userName" autocomplete="off"
+                           placeholder="请输入userName查询">
                 </div>
-                <table id="model_list" lay-filter="model" lay-data="{id: 'idModel'}"></table>
+                <div class="layui-inline" id="systemDiv">
+                    <select id="belongSystem" name="belongSystem" lay-filter="test"></select>
+                </div>
+                <button class="layui-btn" data-type="reload" id="model_search" onclick="active.reload();">查询
+                </button>
             </div>
-        </form>
-    </div>
+            <table id="model_list" lay-filter="model" lay-data="{id: 'idModel'}"></table>
+        </div>
+    </form>
     <table id="proc_list" lay-filter="model" lay-data="{id: 'idModel'}"></table>
 </div>
 

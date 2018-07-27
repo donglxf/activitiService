@@ -756,7 +756,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
                 }
             }
         }
-        log.info(isCondition(key, StringUtils.trim("${flag==1 && abc=='name'}"), value));
+//        log.info(isCondition(key, StringUtils.trim("${flag==1 && abc=='name'}"), value));
     }
 
 
@@ -797,7 +797,7 @@ public class ActivitiServiceImpl implements ActivitiService, ModelDataJsonConsta
      * @param String value  el表达式传入值信息
      * @return
      */
-    public static boolean isCondition(String[] key, String el, String[] value) {
+    public boolean isCondition(String[] key, String el, String[] value) {
         ExpressionFactory factory = new ExpressionFactoryImpl();
         SimpleContext context = new SimpleContext();
         if (key.length != value.length) {

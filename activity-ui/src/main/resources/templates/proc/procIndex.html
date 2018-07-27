@@ -15,13 +15,13 @@
             <div class="layui-inline">
                 <input class="layui-input" name="id" id="modelId" autocomplete="off" placeholder="流程id">
             </div>
-            <!--<div class="layui-inline">-->
-                <!--<select id="belongSystem" name="belongSystem" lay-filter="test">-->
-                    <!--<option>请选择状态</option>-->
-                    <!--<option value="">已结束</option>-->
-                    <!--<option value="">未结束</option>-->
-                <!--</select>-->
-            <!--</div>-->
+            <div class="layui-inline">
+                <select id="wfstatus" name="wfstatus" lay-filter="test">
+                    <option value="">选择结束状态</option>
+                    <option value="1">已结束</option>
+                    <option value="0">未结束</option>
+                </select>
+            </div>
             <button class="layui-btn" data-type="reload" id="model_search" onclick="active.reload();">查询</button>
         </form>
     </div>
@@ -41,10 +41,10 @@
 </script>
 
 <script type="text/html" id="start">
-    {{# if(d.endTime != ''){ }}
-    <div>{{d.isComplate}}</div>
+    {{# if(d.isComplate == 1){ }}
+    <div>已结束</div>
     {{# } else { }}
-    <div style="color:red;">{{d.isComplate}}</div>
+    <div style="color:red;">未结束</div>
     {{# } }}
 </script>
 

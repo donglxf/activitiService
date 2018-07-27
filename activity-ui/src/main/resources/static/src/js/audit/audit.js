@@ -3,7 +3,6 @@ layui.config({
 }).extend({ //设定模块别名
     myutil: 'common' //如果 mymod.js 是在根目录，也可以不用设定别名
 });
-var preUrl = "/activity/service/";
 var preUrlUi = "";
 layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
     var table = layui.table;
@@ -23,7 +22,7 @@ layui.use(['table', 'jquery', 'myutil', 'ht_config'], function () {
         , cols: [[ //表头\
             {field: 'taskId', title: '任务id'}
             , {field: 'proName', title: '流程名'}
-            , {field: 'name', title: '任务名'}
+            , {field: 'name', title: '节点名'}
             , {field: 'sysName', title: '所属系统'}
             , {field: 'sysCode', title: '系统编码'}
             , {field: 'startTime', title: '启动时间'}
