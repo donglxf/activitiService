@@ -21,17 +21,22 @@
     <sql id="Base_Column_List">
         id, model_id AS modelId, model_code AS modelCode, model_name AS modelName, belong_system AS belongSystem, business_id AS businessId, model_desc AS modelDesc, status, cre_user_id AS creUserId, cre_time AS creTime,upd_time as updTime
     </sql>
-    <select id="getProcessInfo" resultType="com.ht.commonactivity.vo.ProcessInfoOutVo">
+    <select id="getProcessInfo" resultType="com.ht.commonactivity.vo.ProcessInfoOutVo"
+            parameterType="com.ht.commonactivity.vo.ProcessInfoInVo">
         SELECT a.model_code modelCode ,a.model_name modelName,a.belong_system belongSys ,a.belong_system_name
         belongSysCode ,a.business_id categoryCode
         ,t.file_type_name categoryName FROM `act_model_definition` a LEFT JOIN activiti_file_type t ON
         a.business_id=t.file_type_code
         <where>
+            1=1
             <if test="sysCode !=null and sysCode!='' ">
-                a.belong_system_name = #{sysCode} ;
+                and a.belong_system_name = #{sysCode} ;
+            </if>
+            <if test="keyWord != null and keyWord != '' ">
+                and (a.model_name LIKE CONCAT('%',#{keyWord},'%') || a.model_code LIKE concat('%',#{keyWord},'%'))
             </if>
         </where>
-
+        limit #{limit},#{maxSize}
     </select>
 
 </mapper>

@@ -936,7 +936,8 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
     @PostMapping("/getProcessInfo")
     @ApiOperation("获取流程信息，如果系统编码为空获取所有，否则获取系统所有流程")
     public Result<List<ProcessInfoOutVo>> getProcessInfo(@RequestBody ProcessInfoInVo vo) {
-        List<ProcessInfoOutVo> list = modelDefinitionService.getProcessInfo(vo.getSysCode());
+        log.info("getProcessInfo param data:=========>" + JSON.toJSONString(vo));
+        List<ProcessInfoOutVo> list = modelDefinitionService.getProcessInfo(vo);
         list.forEach(li -> {
             Wrapper<ActProcRelease> w = new EntityWrapper<>();
             w.eq("model_code", li.getModelCode());
@@ -944,6 +945,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
             ActProcRelease ws = actProcReleaseService.selectOne(w);
             if (ws != null)
                 li.setVersion(ws.getModelVersion());
+            li.setCategoryName(li.getCategoryName());
         });
         return Result.success(list);
     }

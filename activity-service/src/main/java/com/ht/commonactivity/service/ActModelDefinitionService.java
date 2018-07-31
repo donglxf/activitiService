@@ -3,6 +3,7 @@ package com.ht.commonactivity.service;
 
 import com.ht.commonactivity.common.service.BaseService;
 import com.ht.commonactivity.entity.ActModelDefinition;
+import com.ht.commonactivity.vo.ProcessInfoInVo;
 import com.ht.commonactivity.vo.ProcessInfoOutVo;
 
 import java.util.List;
@@ -17,5 +18,5 @@ import java.util.List;
  */
 public interface ActModelDefinitionService extends BaseService<ActModelDefinition> {
 
-    List<ProcessInfoOutVo> getProcessInfo(String sysCode);
+    List<ProcessInfoOutVo> getProcessInfo(ProcessInfoInVo vo);
 }
