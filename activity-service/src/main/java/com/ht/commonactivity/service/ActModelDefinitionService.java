@@ -3,10 +3,13 @@ package com.ht.commonactivity.service;
 
 import com.ht.commonactivity.common.service.BaseService;
 import com.ht.commonactivity.entity.ActModelDefinition;
+import com.ht.commonactivity.vo.ProcessInfoOutVo;
+
+import java.util.List;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author dyb
@@ -14,4 +17,5 @@ import com.ht.commonactivity.entity.ActModelDefinition;
  */
 public interface ActModelDefinitionService extends BaseService<ActModelDefinition> {
 
+    List<ProcessInfoOutVo> getProcessInfo(String sysCode);
 }

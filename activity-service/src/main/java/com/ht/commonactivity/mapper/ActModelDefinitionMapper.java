@@ -3,10 +3,14 @@ package com.ht.commonactivity.mapper;
 
 import com.ht.commonactivity.common.mapper.SuperMapper;
 import com.ht.commonactivity.entity.ActModelDefinition;
+import com.ht.commonactivity.vo.ProcessInfoOutVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author dyb
@@ -14,4 +18,5 @@ import com.ht.commonactivity.entity.ActModelDefinition;
  */
 public interface ActModelDefinitionMapper extends SuperMapper<ActModelDefinition> {
 
+    List<ProcessInfoOutVo> getProcessInfo(@Param("sysCode") String sysCode);
 }
