@@ -597,6 +597,7 @@ public class ActivitiOutServiceController implements ModelDataJsonConstants {
 
             taskList.forEach(ta -> {
                 NextTaskInfo result = new NextTaskInfo();
+
                 result.setTaskId(ta.getId());
                 result.setTaskDefineKey(ta.getTaskDefinitionKey());
                 result.setTaskText(ta.getName());

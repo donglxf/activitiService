@@ -13,10 +13,9 @@
 
 
 	<parent>
-		<groupId>com.ht.cloud</groupId>
-		<artifactId>ht-cloud-release</artifactId>
-		<version>dev-20180327-01</version>
-		<relativePath/>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.2.RELEASE</version>
 	</parent>
 
 	<properties>
@@ -122,14 +121,9 @@
 
 	<repositories>
 		<repository>
-			<!-- Maven 自带的中央仓库使用的Id为central 如果其他的仓库声明也是用该Id 就会覆盖中央仓库的配置-->
-			<id>central</id>
-			<name>maven-central</name>
-			<url>http://172.16.200.111:8081/repository/maven-public/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -137,18 +131,18 @@
 	</repositories>
 
 
-	<distributionManagement>
-		<repository>
-			<id>nexus-releases</id>
-			<name>releases</name>
-			<url>http://172.16.200.111:8081/repository/maven-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<name>snapshots</name>
-			<url>http://172.16.200.111:8081/repository/maven-snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
+	<!--<distributionManagement>-->
+		<!--<repository>-->
+			<!--<id>nexus-releases</id>-->
+			<!--<name>releases</name>-->
+			<!--<url>http://172.16.200.111:8081/repository/maven-releases/</url>-->
+		<!--</repository>-->
+		<!--<snapshotRepository>-->
+			<!--<id>nexus-snapshots</id>-->
+			<!--<name>snapshots</name>-->
+			<!--<url>http://172.16.200.111:8081/repository/maven-snapshots/</url>-->
+		<!--</snapshotRepository>-->
+	<!--</distributionManagement>-->
 
 	<build>
 		<plugins>
