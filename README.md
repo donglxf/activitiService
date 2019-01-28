@@ -8,5 +8,8 @@ spring cloud + activiti ，集成流程设计器，
 使用要点：
 1，findTaskByAssignee 接口说明：
 
+# activiti 事件列表
+http://www.everycoding.com/coding/341.html
+
 
 
